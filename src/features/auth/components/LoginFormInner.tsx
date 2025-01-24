@@ -11,15 +11,15 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { type RegisterFormSchema } from "../forms/register";
+import { LoginFormSchema } from "../forms/login";
 import { useState } from "react";
 
-type RegisterFormInnerProps = {
-  onRegisterSubmit: (values: RegisterFormSchema) => void;
+type LoginFormInnerProps = {
+  onRegisterSubmit: (values: LoginFormSchema) => void;
 };
 
-export const RegisterFormInner = (props: RegisterFormInnerProps) => {
-  const form = useFormContext<RegisterFormSchema>();
+export const LoginFormInner = (props: LoginFormInnerProps) => {
+  const form = useFormContext<LoginFormSchema>();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -56,20 +56,6 @@ export const RegisterFormInner = (props: RegisterFormInnerProps) => {
           </FormItem>
         )}
       />
-      <FormField
-        control={form.control}
-        name="confirmPassword"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Confirm Password</FormLabel>
-            <FormControl>
-              <Input type={showPassword ? "text" : "password"} {...field} />
-            </FormControl>
-            <FormDescription />
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       <Label className="mt-4 flex items-center gap-2">
         <Checkbox
@@ -80,7 +66,7 @@ export const RegisterFormInner = (props: RegisterFormInnerProps) => {
       </Label>
 
       <Button size="lg" className="mt-4 w-full">
-        Buat Akun
+        Masuk
       </Button>
     </form>
   );
