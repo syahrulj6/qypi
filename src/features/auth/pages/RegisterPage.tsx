@@ -14,14 +14,30 @@ import {
 import { Form } from "~/components/ui/form";
 import { RegisterFormInner } from "../components/RegisterFormInner";
 import { type RegisterFormSchema, registerFormSchema } from "../forms/register";
+import { api } from "~/utils/api";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
   const form = useForm<RegisterFormSchema>({
     resolver: zodResolver(registerFormSchema),
   });
 
+  const { mutate: registerUser, isPending: registerUserIsPending } =
+    api.auth.register.useMutation({
+      onSuccess: () => {
+        toast("Akun kamu berhasil dibuat!");
+        form.setValue("email", "");
+        form.setValue("password", "");
+        form.setValue("confirmPassword", "");
+      },
+      onError: () => {
+        toast.error("Ada kesalahan terjadi, coba beberapa saat lagi");
+      },
+    });
+
   const handleRegisterSubmit = (values: RegisterFormSchema) => {
     alert("register!!");
+    registerUser(values);
   };
 
   return (
@@ -39,7 +55,10 @@ const RegisterPage = () => {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <RegisterFormInner onRegisterSubmit={handleRegisterSubmit} />
+              <RegisterFormInner
+                onRegisterSubmit={handleRegisterSubmit}
+                isLoading={registerUserIsPending}
+              />
             </Form>
           </CardContent>
 
