@@ -28,6 +28,7 @@ const RegisterPage = () => {
         toast("Akun kamu berhasil dibuat!");
         form.setValue("email", "");
         form.setValue("password", "");
+        form.setValue("confirmPassword", "");
       },
       onError: () => {
         toast.error("Ada kesalahan terjadi, coba beberapa saat lagi");
