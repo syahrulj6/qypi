@@ -4,6 +4,7 @@ import { passwordSchema } from "~/schemas/auth";
 import { generateFromEmail } from "unique-username-generator";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 export const authRouter = createTRPCRouter({
+  //Register Procedure
   register: publicProcedure
     .input(
       z.object({
@@ -39,5 +40,25 @@ export const authRouter = createTRPCRouter({
           await supabaseAdminClient.auth.admin.deleteUser(userId);
         }
       });
+    }),
+
+  // Login Procedure
+  login: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(6),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { email, password } = input;
+      const { data, error } = await supabaseAdminClient.auth.signInWithPassword(
+        {
+          email,
+          password,
+        },
+      );
+      if (error) throw new Error("Invalid credentials");
+      return data.session;
     }),
 });

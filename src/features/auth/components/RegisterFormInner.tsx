@@ -57,20 +57,6 @@ export const RegisterFormInner = (props: RegisterFormInnerProps) => {
           </FormItem>
         )}
       />
-      <FormField
-        control={form.control}
-        name="confirmPassword"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Confirm Password</FormLabel>
-            <FormControl>
-              <Input type={showPassword ? "text" : "password"} {...field} />
-            </FormControl>
-            <FormDescription />
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       <Label className="mt-4 flex items-center gap-2">
         <Checkbox

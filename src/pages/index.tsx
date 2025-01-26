@@ -10,9 +10,9 @@ export default function Home() {
 
   return (
     <>
-      <main className="bg-background flex min-h-screen flex-col items-center justify-center gap-y-6">
-        <h1 className="text-primary text-3xl">Hello World</h1>
-        <Button>Test</Button>
+      <main className="flex min-h-screen flex-col items-center justify-center gap-y-6 bg-background">
+        <h1 className="text-3xl text-primary">Hello World</h1>
+        <Button onClick={() => alert(hello.data?.greeting)}>Test</Button>
         <Button size="icon" onClick={() => setTheme("dark")}>
           <Moon />
         </Button>

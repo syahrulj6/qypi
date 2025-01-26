@@ -28,7 +28,6 @@ const RegisterPage = () => {
         toast("Akun kamu berhasil dibuat!");
         form.setValue("email", "");
         form.setValue("password", "");
-        form.setValue("confirmPassword", "");
       },
       onError: () => {
         toast.error("Ada kesalahan terjadi, coba beberapa saat lagi");
@@ -36,7 +35,6 @@ const RegisterPage = () => {
     });
 
   const handleRegisterSubmit = (values: RegisterFormSchema) => {
-    alert("register!!");
     registerUser(values);
   };
 
@@ -44,7 +42,7 @@ const RegisterPage = () => {
     <PageContainer>
       <SectionContainer
         padded
-        className="flex min-h-[calc(100vh-144px)] w-full flex-col items-center justify-center"
+        className="flex min-h-[calc(100vh-144px)] w-full flex-col justify-center"
       >
         <Card className="w-full max-w-[480px] self-center">
           <CardHeader className="flex flex-col items-center justify-center">
@@ -56,8 +54,8 @@ const RegisterPage = () => {
           <CardContent>
             <Form {...form}>
               <RegisterFormInner
-                onRegisterSubmit={handleRegisterSubmit}
                 isLoading={registerUserIsPending}
+                onRegisterSubmit={handleRegisterSubmit}
               />
             </Form>
           </CardContent>
