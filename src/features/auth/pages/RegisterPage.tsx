@@ -43,7 +43,7 @@ const RegisterPage = () => {
     <PageContainer>
       <SectionContainer
         padded
-        className="flex min-h-[calc(100vh-144px)] w-full flex-col justify-center"
+        className="flex min-h-[calc(100vh-144px)] flex-col justify-center"
       >
         <Card className="w-full max-w-[480px] self-center">
           <CardHeader className="flex flex-col items-center justify-center">

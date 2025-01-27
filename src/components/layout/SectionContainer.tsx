@@ -14,11 +14,7 @@ export const SectionContainer = forwardRef<
     <div className={cn("relative h-full", containerClassName)}>
       <section
         ref={ref}
-        className={cn(
-          "container flex flex-col lg:max-w-screen-md",
-          className,
-          padded ? "px-4" : "",
-        )}
+        className={cn("flex flex-col", className, padded ? "px-4" : "")}
         {...props}
       >
         {children}

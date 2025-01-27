@@ -3,6 +3,8 @@ import { supabaseAdminClient } from "~/lib/supabase/client";
 import { passwordSchema } from "~/schemas/auth";
 import { generateFromEmail } from "unique-username-generator";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import bcrypt from "bcryptjs";
+
 export const authRouter = createTRPCRouter({
   //Register Procedure
   register: publicProcedure
@@ -26,13 +28,19 @@ export const authRouter = createTRPCRouter({
           if (data.user) {
             userId = data.user.id;
           }
+
           if (error) throw error;
+
           const generatedUsername = generateFromEmail(email);
-          await tx.profile.create({
+
+          const hashedPassword = await bcrypt.hash(password, 10);
+
+          await tx.user.create({
             data: {
+              id: data.user.id,
               email,
-              userId: data.user.id,
-              username: generatedUsername,
+              password: hashedPassword,
+              name: generatedUsername,
             },
           });
         } catch (error) {
