@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { emailSchema, passwordSchema } from "~/schemas/auth";
 
-export const loginFormSchema = z.object({
+export const authFormSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
 
-export type LoginFormSchema = z.infer<typeof loginFormSchema>;
+export type AuthFormSchema = z.infer<typeof authFormSchema>;

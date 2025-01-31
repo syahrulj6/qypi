@@ -11,15 +11,15 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { LoginFormSchema } from "../forms/login";
+import { AuthFormSchema } from "../forms/auth";
 import { useState } from "react";
 
 type LoginFormInnerProps = {
-  onRegisterSubmit: (values: LoginFormSchema) => void;
+  onRegisterSubmit: (values: AuthFormSchema) => void;
 };
 
 export const LoginFormInner = (props: LoginFormInnerProps) => {
-  const form = useFormContext<LoginFormSchema>();
+  const form = useFormContext<AuthFormSchema>();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
