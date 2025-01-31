@@ -6,21 +6,26 @@ import { supabase } from "~/lib/supabase/client";
 import { Button } from "../ui/button";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
 
 export const Header = () => {
   const { theme, setTheme } = useTheme();
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
 
     const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
+      try {
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
     };
 
-    getSession();
+    void getSession();
   }, []);
 
   return (
