@@ -4,6 +4,7 @@ import { cn } from "~/lib/utils";
 type SectionContainerProps = {
   padded?: boolean;
   containerClassName?: string;
+  minFullscreen?: boolean;
 };
 
 export const SectionContainer = forwardRef<
@@ -14,7 +15,13 @@ export const SectionContainer = forwardRef<
     <div className={cn("relative h-full", containerClassName)}>
       <section
         ref={ref}
-        className={cn("flex flex-col", className, padded ? "px-4" : "")}
+        className={cn(
+          "container flex flex-col lg:max-w-screen-md",
+          props.minFullscreen &&
+            "flex min-h-[calc(100vh-144px)] w-full flex-col",
+          className,
+          padded ? "px-4" : "",
+        )}
         {...props}
       >
         {children}

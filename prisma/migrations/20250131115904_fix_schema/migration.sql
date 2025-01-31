@@ -13,6 +13,8 @@ CREATE TABLE "Profile" (
     "userId" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
+    "bio" TEXT,
+    "profilePictureUrl" TEXT,
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("userId")
 );

@@ -6,70 +6,26 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
     directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id         String     @id @default(cuid())
-  email      String     @unique
-  name       String
-  image      String?
-  onboarded  Boolean    @default(false)
-  posts      Post[]
-  isAdmin    Boolean    @default(false)
-  password   String
-  game       Game[]
-  bio        String?
-  comments   Comment[]
-  activities Activity[]
-}
-
 model Post {
-  id          String     @id @default(cuid())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  title       String
-  author      User       @relation(fields: [authorId], references: [id])
-  authorId    String
-  comments    Comment[]
-  activities  Activity[]
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([name])
 }
 
-model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
-}
+model Profile {
+    userId String @id
 
-model Game {
-  id        String   @id @default(cuid())
-  username  String
-  gameTitle GameTitle @relation(fields: [gameTitleId], references: [id]) // Relational model
-  gameTitleId String
-  gameId    String
-  user      User @relation(fields: [userId], references: [id])
-  userId    String @unique
-}
+    email    String @unique
+    username String @unique
 
-model GameTitle {
-  id    String @id @default(cuid())
-  name  String @unique
-  games Game[]
-}
-
-model Activity {
-  id        String   @id @default(cuid())
-  type      String
-  message   String
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+    bio               String?
+    profilePictureUrl String?
 }
