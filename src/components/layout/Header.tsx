@@ -10,12 +10,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
@@ -43,6 +38,15 @@ export const Header = () => {
     void getSession();
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setSession(null); // Clear session after sign-out
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <header className="flex h-16 items-center justify-between border-b-2 border-border px-4 md:h-20 md:px-8">
       <Link
@@ -69,17 +73,22 @@ export const Header = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    {/* TODO: SETTINGS PAGE */}
-                    <Link href="/settings" className="cursor-pointer">
-                      Settings
+                    {/* TODO: DASHBOARD PAGE */}
+                    <Link href="/dashboard" className="cursor-pointer">
+                      Dashboard
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  Log out
-                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                <DropdownMenuItem asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={handleSignOut}
+                    className="cursor-pointer"
+                  >
+                    Log out
+                  </Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

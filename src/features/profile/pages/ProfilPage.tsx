@@ -7,6 +7,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { api } from "~/utils/api";
 import { EditProfileFormInner } from "../components/EditProfileFormInner";
 import { ProfileSkeleton } from "../components/ProfileSkeleton";
+import { SessionRoute } from "~/components/layout/SessionRoute";
 
 const ProfilePage = () => {
   const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery(
@@ -23,44 +24,46 @@ const ProfilePage = () => {
   };
 
   return (
-    <PageContainer>
-      <SectionContainer padded minFullscreen className="gap-y-6 py-8">
-        <h1 className="text-3xl font-semibold">Profile Settings</h1>
-        <Card>
-          <CardContent className="flex gap-6 pt-6">
-            {isLoading ? (
-              <ProfileSkeleton />
-            ) : (
-              <>
-                <div className="flex flex-col gap-2">
-                  <Avatar className="size-24">
-                    <AvatarFallback>VF</AvatarFallback>
-                    <AvatarImage
-                      className="object-cover"
-                      src={`${getProfileData?.profilePictureUrl ? getProfileData.profilePictureUrl : ""}`}
-                    />
-                  </Avatar>
-                  <Button onClick={handleOpenFileExplorer} size="sm">
-                    Ganti Foto
-                  </Button>
-                  <input className="hidden" type="file" ref={inputFileRef} />
-                </div>
-                <div className="grid flex-1 grid-cols-2 gap-y-4">
-                  {getProfileData && (
-                    <EditProfileFormInner
-                      defaultValues={{
-                        bio: getProfileData.bio,
-                        username: getProfileData.username,
-                      }}
-                    />
-                  )}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </SectionContainer>
-    </PageContainer>
+    <SessionRoute>
+      <PageContainer>
+        <SectionContainer padded minFullscreen className="gap-y-6 py-8">
+          <h1 className="text-3xl font-semibold">Profile Settings</h1>
+          <Card>
+            <CardContent className="flex gap-6 pt-6">
+              {isLoading ? (
+                <ProfileSkeleton />
+              ) : (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <Avatar className="size-24">
+                      <AvatarFallback>VF</AvatarFallback>
+                      <AvatarImage
+                        className="object-cover"
+                        src={`${getProfileData?.profilePictureUrl ? getProfileData.profilePictureUrl : ""}`}
+                      />
+                    </Avatar>
+                    <Button onClick={handleOpenFileExplorer} size="sm">
+                      Ganti Foto
+                    </Button>
+                    <input className="hidden" type="file" ref={inputFileRef} />
+                  </div>
+                  <div className="grid flex-1 grid-cols-2 gap-y-4">
+                    {getProfileData && (
+                      <EditProfileFormInner
+                        defaultValues={{
+                          bio: getProfileData.bio,
+                          username: getProfileData.username,
+                        }}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </SectionContainer>
+      </PageContainer>
+    </SessionRoute>
   );
 };
 
