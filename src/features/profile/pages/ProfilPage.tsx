@@ -35,7 +35,10 @@ const ProfilePage = () => {
                 <div className="flex flex-col gap-2">
                   <Avatar className="size-24">
                     <AvatarFallback>VF</AvatarFallback>
-                    <AvatarImage />
+                    <AvatarImage
+                      className="object-cover"
+                      src={`${getProfileData?.profilePictureUrl ? getProfileData.profilePictureUrl : ""}`}
+                    />
                   </Avatar>
                   <Button onClick={handleOpenFileExplorer} size="sm">
                     Ganti Foto
@@ -56,9 +59,6 @@ const ProfilePage = () => {
             )}
           </CardContent>
         </Card>
-        <div className="flex w-full justify-end gap-4">
-          <Button>Simpan</Button>
-        </div>
       </SectionContainer>
     </PageContainer>
   );
