@@ -6,6 +6,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -26,7 +27,7 @@ const menuItems = [
 ];
 
 export const AppSidebar = () => {
-  const [session, setSession] = useState<Session | null>(null); // Update state type
+  const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export const AppSidebar = () => {
       if (error) {
         console.error("Error fetching session:", error);
       } else {
-        setSession(data.session); // TypeScript knows `session` is of type `Session | null`
+        setSession(data.session);
       }
     };
 
@@ -53,7 +54,13 @@ export const AppSidebar = () => {
   };
 
   return (
-    <Sidebar className="h-screen w-64 bg-gray-900 text-white">
+    <Sidebar className="h-screen w-56 bg-gray-900 text-white">
+      <SidebarHeader
+        aria-hidden
+        className="ml-1 mt-3 text-2xl font-bold text-blue-500 hover:cursor-pointer"
+      >
+        <Link href={"/"}>QYPI</Link>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>

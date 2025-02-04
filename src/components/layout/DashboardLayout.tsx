@@ -9,12 +9,9 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
+      <div className="flex h-screen w-full">
         <AppSidebar />
-
-        <div className="flex-1 p-6">
-          <DashboardSection>{children}</DashboardSection>
-        </div>
+        <DashboardSection>{children}</DashboardSection>
       </div>
     </SidebarProvider>
   );
