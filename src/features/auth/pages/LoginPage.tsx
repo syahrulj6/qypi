@@ -97,7 +97,10 @@ const LoginPage = () => {
 
               <p>
                 Belum punya akun?{" "}
-                <Link href="/register" className="font-bold text-purple-600">
+                <Link
+                  href="/register"
+                  className="font-bold text-primary transition-all hover:underline"
+                >
                   Daftar dong
                 </Link>
               </p>

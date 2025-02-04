@@ -15,6 +15,7 @@ export const profileRouter = createTRPCRouter({
     });
     return profile;
   }),
+
   updateProfile: privateProcedure
     .input(editProfileFormSchema)
     .mutation(async ({ ctx, input }) => {

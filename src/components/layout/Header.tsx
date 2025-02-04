@@ -51,7 +51,7 @@ export const Header = () => {
     <header className="flex h-16 items-center justify-between border-b-2 border-border px-4 md:h-20 md:px-8">
       <Link
         href={"/"}
-        className="text-2xl font-bold text-primary hover:cursor-pointer md:text-3xl"
+        className="text-2xl font-bold text-primary hover:hover:cursor-pointer md:text-3xl"
       >
         Qypi
       </Link>
@@ -68,13 +68,13 @@ export const Header = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
+                    <Link href="/profile" className="hover:cursor-pointer">
                       Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     {/* TODO: DASHBOARD PAGE */}
-                    <Link href="/dashboard" className="cursor-pointer">
+                    <Link href="/dashboard" className="hover:cursor-pointer">
                       Dashboard
                     </Link>
                   </DropdownMenuItem>
@@ -85,7 +85,7 @@ export const Header = () => {
                   <Button
                     variant="ghost"
                     onClick={handleSignOut}
-                    className="cursor-pointer"
+                    className="hover:cursor-pointer"
                   >
                     Log out
                   </Button>

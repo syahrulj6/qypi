@@ -79,7 +79,10 @@ const RegisterPage = () => {
 
               <p>
                 Sudah punya akun?{" "}
-                <Link href="/login" className="font-bold text-purple-600">
+                <Link
+                  href="/login"
+                  className="font-bold text-primary transition-all hover:underline"
+                >
                   P, Login
                 </Link>
               </p>
