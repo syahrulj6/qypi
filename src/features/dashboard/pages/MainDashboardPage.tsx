@@ -5,8 +5,7 @@ export default function MainDashboardPage() {
   return (
     <SessionRoute>
       <DashboardLayout>
-        <h1 className="text-2xl font-bold">Welcome to your Dashboard</h1>
-        <p className="text-gray-700">Manage your content here.</p>
+        <div className="mt-10 text-2xl font-bold text-primary">Hello World</div>
       </DashboardLayout>
     </SessionRoute>
   );

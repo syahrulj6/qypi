@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Sidebar,
   SidebarContent,
@@ -10,13 +8,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "~/components/ui/sidebar";
 import { Home, Inbox, Calendar, Search, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "~/lib/supabase/client";
-import { Session } from "@supabase/supabase-js"; // Import the Session type
 import { useSession } from "~/hooks/useSession";
 
 const menuItems = [
@@ -31,14 +26,15 @@ export const AppSidebar = () => {
   const { session, handleSignOut } = useSession();
 
   return (
-    <Sidebar className="h-screen w-56 bg-gray-900 text-primary">
+    <Sidebar className="flex h-screen w-56 flex-col text-primary">
       <SidebarHeader
         aria-hidden
         className="ml-1 mt-3 text-2xl font-bold text-primary hover:cursor-pointer"
       >
-        <Link href={"/"}>QYPI</Link>
+        <Link href={"/"}>Qypi</Link>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="flex-1">
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -56,27 +52,24 @@ export const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Logout Section */}
-        {session && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Account</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    onClick={handleSignOut}
-                    className="gap-2 text-red-500 hover:bg-red-600"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    Logout
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
       </SidebarContent>
+
+      {/* Logout Button at Bottom */}
+      {session && (
+        <SidebarFooter className="mb-4 mt-auto">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={handleSignOut}
+                className="w-full gap-2 text-red-500 hover:bg-red-600"
+              >
+                <LogOut className="h-5 w-5" />
+                Logout
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
     </Sidebar>
   );
 };
