@@ -2,13 +2,7 @@ import { api } from "~/utils/api";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { useSession } from "~/hooks/useSession";
 import Link from "next/link";
-import {
-  Bell,
-  Calendar,
-  MessageSquareCode,
-  MessageSquareDashed,
-  MessageSquareMore,
-} from "lucide-react";
+import { Bell, Calendar, MessageSquareMore } from "lucide-react";
 
 export const DashboardSection = ({
   children,
