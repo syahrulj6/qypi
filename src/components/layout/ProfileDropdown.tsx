@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +13,10 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Moon, Sun } from "lucide-react";
 import { api } from "~/utils/api";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface ProfileDropdownProps {
   session: Session | null;
@@ -28,6 +32,13 @@ export const ProfileDropdown = ({
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
   });
 
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const profilePictureUrl =
     getProfileData?.profilePictureUrl ?? "/blank-profile-picture.png";
 
@@ -42,7 +53,7 @@ export const ProfileDropdown = ({
             height={30}
             className="rounded-full object-cover"
           />
-          <button className="rounded-full p-1 text-white/60 transition-colors group-hover:text-white">
+          <button className="rounded-full p-1 text-primary/60 transition-colors group-hover:text-primary">
             <ChevronDown className="h-5 w-5" />
           </button>
         </div>
@@ -63,6 +74,19 @@ export const ProfileDropdown = ({
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hover:cursor-pointer"
+            >
+              {theme === "dark" ? <Sun /> : <Moon />}
+            </Button>
+          )}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Button

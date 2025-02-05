@@ -18,7 +18,7 @@ export const DashboardSection = ({
     <section className="flex w-full flex-col p-6">
       <div className="flex w-full items-center justify-between">
         <h1 className="text-3xl font-bold">
-          Good morning {getProfileData?.username}!
+          Good morning, {getProfileData?.username}!
         </h1>
         <div className="mr-8 flex items-center gap-2">
           <ProfileDropdown handleSignOut={handleSignOut} session={session} />

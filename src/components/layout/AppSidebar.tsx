@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "~/lib/supabase/client";
 import { Session } from "@supabase/supabase-js"; // Import the Session type
+import { useSession } from "~/hooks/useSession";
 
 const menuItems = [
   { title: "Home", url: "/dashboard", icon: Home },
@@ -27,37 +28,13 @@ const menuItems = [
 ];
 
 export const AppSidebar = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error fetching session:", error);
-      } else {
-        setSession(data.session);
-      }
-    };
-
-    fetchSession();
-  }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setSession(null);
-      router.push("/login"); // Redirect to login after logout
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+  const { session, handleSignOut } = useSession();
 
   return (
-    <Sidebar className="h-screen w-56 bg-gray-900 text-white">
+    <Sidebar className="h-screen w-56 bg-gray-900 text-primary">
       <SidebarHeader
         aria-hidden
-        className="ml-1 mt-3 text-2xl font-bold text-blue-500 hover:cursor-pointer"
+        className="ml-1 mt-3 text-2xl font-bold text-primary hover:cursor-pointer"
       >
         <Link href={"/"}>QYPI</Link>
       </SidebarHeader>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "~/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
 
 export const useSession = () => {
   const [session, setSession] = useState<Session | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const getSession = async () => {
@@ -21,7 +23,8 @@ export const useSession = () => {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-      setSession(null); // Clear session after sign-out
+      setSession(null);
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
