@@ -23,10 +23,7 @@ interface ProfileDropdownProps {
   handleSignOut: () => void;
 }
 
-export const ProfileDropdown = ({
-  session,
-  handleSignOut,
-}: ProfileDropdownProps) => {
+export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
   const { data: getProfileData } = api.profile.getProfile.useQuery(undefined, {
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
