@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { Card } from "./ui/card";
+import { Card, CardFooter } from "./ui/card";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
 type Creator = {
   name: string;
@@ -57,7 +59,7 @@ export const TrendingContentCreator = () => {
         {trendingCreator.map((creator, index) => (
           <Card
             key={index}
-            className="flex min-h-full flex-col justify-between p-4 shadow-md"
+            className="flex min-h-full flex-col items-center justify-between p-4 shadow-md"
           >
             <div className="relative aspect-[4/3] w-full md:h-48 lg:h-52">
               <Image
@@ -67,13 +69,17 @@ export const TrendingContentCreator = () => {
                 className="absolute inset-0 rounded-lg object-cover"
               />
             </div>
-            {/* Text Content */}
             <div className="mt-3 text-center">
               <h2 className="text-lg font-medium">{creator.name}</h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {creator.platform} - {creator.category}
               </p>
             </div>
+            <CardFooter className="mt-4">
+              <Button asChild variant="default" size={"sm"}>
+                <Link href={`/creator/${creator.name}`}>Lihat Profil</Link>
+              </Button>
+            </CardFooter>
           </Card>
         ))}
       </div>
