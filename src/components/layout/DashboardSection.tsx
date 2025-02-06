@@ -23,10 +23,10 @@ export const DashboardSection = ({
           Good morning, {getProfileData?.username}!
         </h1>
         <div className="mr-8 flex items-center gap-5">
-          <Link href="/calendar">
+          <Link href="/dashboard/calendar">
             <Calendar className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
           </Link>
-          <Link href="/inbox">
+          <Link href="/dashboard/inbox">
             <MessageSquareMore className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
           </Link>
           <button>
