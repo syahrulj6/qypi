@@ -102,4 +102,35 @@ export const profileRouter = createTRPCRouter({
         });
       }
     }),
+
+  deleteProfilePicture: privateProcedure.mutation(async ({ ctx }) => {
+    const { db, user } = ctx;
+
+    const profile = await db.profile.findUnique({
+      where: { userId: user?.id },
+      select: { profilePictureUrl: true },
+    });
+
+    if (!profile?.profilePictureUrl) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "NO_PROFILE_PICTURE",
+      });
+    }
+
+    const fileName = `avatar-${user?.id}.jpeg`;
+
+    const { error } = await supabaseAdminClient.storage
+      .from(SUPABASE_BUCKET.ProfilePictures)
+      .remove([fileName]);
+
+    if (error) throw error;
+
+    await db.profile.update({
+      where: { userId: user?.id },
+      data: { profilePictureUrl: null },
+    });
+
+    return { success: true };
+  }),
 });

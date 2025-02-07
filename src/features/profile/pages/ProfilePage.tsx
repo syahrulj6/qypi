@@ -59,7 +59,6 @@ const ProfilePage = () => {
       await apiUtils.profile.getProfile.invalidate();
     },
     onError: async () => {
-      // TODO: Handle image upload errors
       toast.error("Gagal ganti foto profil");
     },
   });
@@ -95,23 +94,49 @@ const ProfilePage = () => {
 
   const onPickProfilePicture: ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files) {
-      setSelectedImage(e.target.files[0]);
+      const file = e.target.files[0];
+
+      if (file!.size > 10 * 1024 * 1024) {
+        toast.error("Ukuran gambar maksimal 10MB");
+        e.target.value = "";
+        return;
+      }
+
+      setSelectedImage(file);
     }
   };
 
   const handleUpdateProfilePicture = async () => {
-    if (selectedImage) {
-      const reader = new FileReader();
+    if (!selectedImage) return;
 
-      reader.onloadend = function () {
-        const result = reader.result as string;
-        const imageBase64 = result.substring(result.indexOf(",") + 1);
+    const reader = new FileReader();
 
-        updateProfilePicture.mutate(imageBase64);
-      };
+    reader.onloadend = function () {
+      const result = reader.result as string;
+      const imageBase64 = result.substring(result.indexOf(",") + 1);
 
-      reader.readAsDataURL(selectedImage);
-    }
+      updateProfilePicture.mutate(imageBase64, {
+        onError: () => {
+          toast.error("Terjadi kesalahan saat mengupload gambar, coba lagi!");
+        },
+      });
+    };
+
+    reader.readAsDataURL(selectedImage);
+  };
+
+  const deleteProfilePicture = api.profile.deleteProfilePicture.useMutation({
+    onSuccess: async () => {
+      toast.success("Foto profil berhasil dihapus!");
+      await apiUtils.profile.getProfile.invalidate();
+    },
+    onError: () => {
+      toast.error("Gagal menghapus foto profil");
+    },
+  });
+
+  const handleDeleteProfilePicture = () => {
+    deleteProfilePicture.mutate();
   };
 
   const selectedProfilePicturePreview = useMemo(() => {
@@ -155,6 +180,15 @@ const ProfilePage = () => {
                 >
                   Ganti Foto
                 </Button>
+                {!selectedImage && (
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteProfilePicture}
+                    size="sm"
+                  >
+                    Hapus Foto
+                  </Button>
+                )}
                 {!!selectedImage && (
                   <>
                     <Button
@@ -162,7 +196,7 @@ const ProfilePage = () => {
                       variant="destructive"
                       size="sm"
                     >
-                      Hapus
+                      Cancel
                     </Button>
                     <Button onClick={handleUpdateProfilePicture} size="sm">
                       Simpan
