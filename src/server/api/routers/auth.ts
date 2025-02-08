@@ -20,11 +20,10 @@ export const authRouter = createTRPCRouter({
         let userId = "";
 
         try {
-          const { data, error } =
-            await supabaseAdminClient.auth.admin.createUser({
-              email,
-              password,
-            });
+          const { data, error } = await supabaseAdminClient.auth.signUp({
+            email,
+            password,
+          });
 
           if (data.user) {
             userId = data.user.id;
@@ -37,7 +36,7 @@ export const authRouter = createTRPCRouter({
           await tx.profile.create({
             data: {
               email,
-              userId: data.user.id,
+              userId: data!.user!.id,
               username: generatedUsername,
             },
           });
