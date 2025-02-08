@@ -1,6 +1,7 @@
 import { PageContainer } from "~/components/layout/PageContainer";
 import { SectionContainer } from "~/components/layout/SectionContainer";
 import { TrendingContentCreator } from "~/components/TrendingContentCreator";
+import { TrendingTopics } from "~/components/TrendingTopicsSection";
 import { Button } from "~/components/ui/button";
 
 export default function Home() {
@@ -23,8 +24,17 @@ export default function Home() {
           </p>
           <Button>Jelajahi Sekarang</Button>
         </SectionContainer>
-        <SectionContainer>
+        <SectionContainer
+          padded
+          className="flex min-h-[calc(100vh-144px)] flex-col justify-center gap-y-3"
+        >
           <TrendingContentCreator />
+        </SectionContainer>
+        <SectionContainer
+          padded
+          className="flex min-h-[calc(100vh-144px)] flex-col justify-center gap-y-3"
+        >
+          <TrendingTopics />
         </SectionContainer>
       </PageContainer>
     </>
