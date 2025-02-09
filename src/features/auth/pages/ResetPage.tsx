@@ -1,4 +1,4 @@
-// ResetPage.tsx
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { PageContainer } from "~/components/layout/PageContainer";
 import { SectionContainer } from "~/components/layout/SectionContainer";
@@ -7,6 +7,7 @@ import { Form } from "~/components/ui/form";
 import { toast } from "sonner";
 import { GuestRoute } from "~/components/layout/GuestRoute";
 import { supabase } from "~/lib/supabase/client";
+import { Button } from "~/components/ui/button";
 
 type ResetFormInputs = {
   email: string;
@@ -14,13 +15,18 @@ type ResetFormInputs = {
 
 const ResetPage = () => {
   const form = useForm<ResetFormInputs>();
+  const [isPending, setIsPending] = useState(false);
 
   const onSubmit = async (data: ResetFormInputs) => {
+    setIsPending(true);
     const { email } = data;
     const { error, data: resetPasswordData } =
       await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: "http://localhost:3000/update-password",
       });
+
+    setIsPending(false);
+
     if (error) {
       toast.error("Failed to send reset password email. Please try again.");
     } else {
@@ -43,9 +49,7 @@ const ResetPage = () => {
               </h1>
             </CardHeader>
             <CardContent>
-              {/* Pass all form methods to the Form component */}
               <Form {...form}>
-                {/* Now include your native form element with the submit handler */}
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <div className="flex flex-col gap-4">
                     <label
@@ -68,12 +72,12 @@ const ResetPage = () => {
                         {form.formState.errors.email.message}
                       </span>
                     )}
-                    <button
-                      type="submit"
-                      className="mt-4 w-full rounded bg-primary px-4 py-2 text-white"
+                    <Button
+                      size="lg"
+                      disabled={isPending || !form.watch("email")?.trim()}
                     >
-                      Send Reset Link
-                    </button>
+                      {isPending ? "Submitting..." : "Submit"}
+                    </Button>
                   </div>
                 </form>
               </Form>

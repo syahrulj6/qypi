@@ -19,7 +19,6 @@ const UpdatePasswordPage = () => {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  // On mount, attempt to extract the session from the URL and store it.
   useEffect(() => {
     async function initSession() {
       const { data, error } = await supabase.auth.getSession();
