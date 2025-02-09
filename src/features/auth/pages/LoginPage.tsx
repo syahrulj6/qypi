@@ -12,7 +12,6 @@ import {
   CardHeader,
 } from "~/components/ui/card";
 import { Form } from "~/components/ui/form";
-import { RegisterFormInner } from "../components/RegisterFormInner";
 import { type AuthFormSchema, authFormSchema } from "../forms/auth";
 import { toast } from "sonner";
 import { supabase } from "~/lib/supabase/client";
@@ -20,6 +19,7 @@ import { type AuthError } from "@supabase/supabase-js";
 import { SupabaseAuthErrorCode } from "~/lib/supabase/authErrorCodes";
 import { useRouter } from "next/router";
 import { GuestRoute } from "~/components/layout/GuestRoute";
+import { LoginFormInner } from "../components/LoginFormInner";
 
 const LoginPage = () => {
   const form = useForm<AuthFormSchema>({
@@ -73,9 +73,9 @@ const LoginPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <RegisterFormInner
+                <LoginFormInner
                   // isLoading={registerUserIsPending}
-                  onRegisterSubmit={handleLoginSubmit}
+                  onLoginSubmit={handleLoginSubmit}
                   buttonText="Masuk"
                 />
               </Form>

@@ -13,19 +13,21 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { AuthFormSchema } from "../forms/auth";
 import { useState } from "react";
+import Link from "next/link";
 
 type LoginFormInnerProps = {
-  onRegisterSubmit: (values: AuthFormSchema) => void;
+  onLoginSubmit: (values: AuthFormSchema) => void;
+  isLoading?: boolean;
+  buttonText?: string;
+  showPassword?: boolean;
 };
 
 export const LoginFormInner = (props: LoginFormInnerProps) => {
   const form = useFormContext<AuthFormSchema>();
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
   return (
     <form
-      onSubmit={form.handleSubmit(props.onRegisterSubmit)}
+      onSubmit={form.handleSubmit(props.onLoginSubmit)}
       className="flex flex-col gap-y-1"
     >
       <FormField
@@ -49,21 +51,18 @@ export const LoginFormInner = (props: LoginFormInnerProps) => {
           <FormItem>
             <FormLabel>Password</FormLabel>
             <FormControl>
-              <Input type={showPassword ? "text" : "password"} {...field} />
+              <Input type={"password"} {...field} />
             </FormControl>
             <FormDescription />
             <FormMessage />
           </FormItem>
         )}
       />
-
-      <Label className="mt-4 flex items-center gap-2">
-        <Checkbox
-          checked={showPassword}
-          onCheckedChange={(checked) => setShowPassword(!!checked)}
-        />
-        Show Password
-      </Label>
+      <div className="flex justify-end">
+        <Link href={"/reset"} className="p-0">
+          Lupa Password?
+        </Link>
+      </div>
 
       <Button size="lg" className="mt-4 w-full">
         Masuk

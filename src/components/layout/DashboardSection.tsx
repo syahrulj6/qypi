@@ -18,7 +18,7 @@ type NotificationsType = {
   date: Date;
   link: string;
 };
-// Notifications Dummy
+// Inbox Dummy
 const notifications: NotificationsType[] = [
   {
     id: "1",
@@ -55,7 +55,7 @@ const NotificationsDropdown = ({
 
   return (
     showNotifications && (
-      <div className="absolute right-0 top-8 z-10 flex flex-col gap-1 rounded-md border bg-secondary">
+      <div className="absolute right-0 top-8 z-10 flex w-2/4 flex-col gap-1 rounded-md border bg-secondary">
         {notifications.map((notif) => (
           <div
             ref={notificationsRef}
@@ -136,18 +136,14 @@ export const DashboardSection = ({
         <h1 className="text-3xl font-bold">
           Good morning, {getProfileData?.username}!
         </h1>
-        <div className="relative mr-8 flex items-center gap-5">
+        <div className="relative mr-8 flex w-2/3 items-center justify-end gap-5">
+          <ProfileDropdown handleSignOut={handleSignOut} session={session} />
           <button onClick={() => setShowCalendar((prev) => !prev)}>
             <CalendarIcon className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
           </button>
           <button onClick={() => setShowNotifications((prev) => !prev)}>
-            <MessageSquareMore className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
-          </button>
-          <button>
             <Bell className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
           </button>
-
-          <ProfileDropdown handleSignOut={handleSignOut} session={session} />
 
           <CalendarDropdown
             date={date}
