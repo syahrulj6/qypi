@@ -121,17 +121,9 @@ export const DashboardSection = ({
 
   const { session, handleSignOut } = useSession();
 
-  const { data: getProfileData } = api.profile.getProfile.useQuery(undefined, {
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
-  });
-
   return (
-    <section className="flex w-full flex-col p-6">
+    <section className="flex w-full flex-col gap-y-5 p-6">
       <div className="flex w-full items-start justify-between md:items-center">
-        <h1 className="text-lg font-bold md:text-3xl">
-          Good morning, {getProfileData?.username}!
-        </h1>
         <div className="relative mr-2 flex flex-1 items-center justify-end gap-5 md:mr-12 md:items-center">
           <button onClick={() => setShowCalendar((prev) => !prev)}>
             <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
