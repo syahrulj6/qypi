@@ -1,5 +1,4 @@
-// UpdatePasswordPage.tsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,28 +10,36 @@ import { UpdatePasswordFormInner } from "../components/UpdatePasswordFormInner";
 import { type ResetPasswordSchema, resetPasswordSchema } from "../forms/auth";
 import { toast } from "sonner";
 import { supabase } from "~/lib/supabase/client";
-import { SessionRoute } from "~/components/layout/SessionRoute";
 
 const UpdatePasswordPage = () => {
   const router = useRouter();
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
   });
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     async function initSession() {
       const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error retrieving session from URL:", error);
+      if (error || !data.session) {
+        console.error("No valid session found:", error);
+        router.replace("/");
       } else {
-        console.log("Session retrieved:", data.session);
+        const { session } = data;
+        const { type } = router.query;
+
+        if (type !== "recovery") {
+          console.error("Unauthorized access attempt.");
+          router.replace("/");
+        } else {
+          setIsAuthorized(true);
+        }
       }
     }
     initSession();
   }, [router]);
 
   const handleUpdatePassword = async (values: ResetPasswordSchema) => {
-    // client should be authenticated from the URL.
     const { error } = await supabase.auth.updateUser({
       password: values.password,
     });
@@ -47,32 +54,32 @@ const UpdatePasswordPage = () => {
     }
   };
 
+  if (!isAuthorized) {
+    return null;
+  }
+
   return (
-    <SessionRoute>
-      <PageContainer>
-        <SectionContainer
-          padded
-          className="flex min-h-[calc(100vh-144px)] flex-col justify-center"
-        >
-          <Card className="w-full max-w-[480px] self-center">
-            <CardHeader className="flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold text-primary">
-                Reset Password
-              </h1>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <UpdatePasswordFormInner
-                  isLoading={false}
-                  onUpdatePasswordSubmit={handleUpdatePassword}
-                  showPassword={true}
-                />
-              </Form>
-            </CardContent>
-          </Card>
-        </SectionContainer>
-      </PageContainer>
-    </SessionRoute>
+    <PageContainer>
+      <SectionContainer
+        padded
+        className="flex min-h-[calc(100vh-144px)] flex-col justify-center"
+      >
+        <Card className="w-full max-w-[480px] self-center">
+          <CardHeader className="flex flex-col items-center justify-center">
+            <h1 className="text-3xl font-bold text-primary">Reset Password</h1>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <UpdatePasswordFormInner
+                isLoading={false}
+                onUpdatePasswordSubmit={handleUpdatePassword}
+                showPassword={true}
+              />
+            </Form>
+          </CardContent>
+        </Card>
+      </SectionContainer>
+    </PageContainer>
   );
 };
 
