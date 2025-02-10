@@ -55,7 +55,7 @@ const NotificationsDropdown = ({
 
   return (
     showNotifications && (
-      <div className="absolute right-0 top-8 z-10 flex w-2/4 flex-col gap-1 rounded-md border bg-secondary">
+      <div className="absolute right-0 top-8 z-10 flex w-40 flex-col gap-1 rounded-md border bg-secondary md:w-52">
         {notifications.map((notif) => (
           <div
             ref={notificationsRef}
@@ -132,18 +132,18 @@ export const DashboardSection = ({
 
   return (
     <section className="flex w-full flex-col p-6">
-      <div className="flex w-full items-center justify-between">
-        <h1 className="text-3xl font-bold">
+      <div className="flex w-full items-start justify-between md:items-center">
+        <h1 className="text-lg font-bold md:text-3xl">
           Good morning, {getProfileData?.username}!
         </h1>
-        <div className="relative mr-8 flex w-2/3 items-center justify-end gap-5">
-          <ProfileDropdown handleSignOut={handleSignOut} session={session} />
+        <div className="relative mr-2 flex flex-1 items-center justify-end gap-5 md:mr-12 md:items-center">
           <button onClick={() => setShowCalendar((prev) => !prev)}>
-            <CalendarIcon className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
+            <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
           </button>
           <button onClick={() => setShowNotifications((prev) => !prev)}>
-            <Bell className="h-5 w-5 text-muted-foreground transition-colors hover:text-primary" />
+            <Bell className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
           </button>
+          <ProfileDropdown handleSignOut={handleSignOut} session={session} />
 
           <CalendarDropdown
             date={date}

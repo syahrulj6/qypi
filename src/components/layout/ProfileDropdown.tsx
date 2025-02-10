@@ -42,7 +42,7 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="group flex cursor-pointer gap-2">
+        <div className="group -mr-2 flex cursor-pointer gap-2">
           <Image
             src={profilePictureUrl}
             alt="profile picture"
@@ -50,12 +50,12 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
             height={30}
             className="rounded-full object-cover"
           />
-          <button className="rounded-full p-1 text-primary/60 transition-colors group-hover:text-primary">
+          <button className="rounded-full text-primary/60 transition-colors group-hover:text-primary">
             <ChevronDown className="h-5 w-5" />
           </button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-24 md:w-44">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
