@@ -2,11 +2,7 @@ import { api } from "~/utils/api";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { useSession } from "~/hooks/useSession";
 import Link from "next/link";
-import {
-  Bell,
-  Calendar as CalendarIcon,
-  MessageSquareMore,
-} from "lucide-react";
+import { Bell, Calendar as CalendarIcon } from "lucide-react";
 import { useState, useRef } from "react";
 import { Calendar } from "~/components/ui/calendar";
 import { useOutsideClick } from "~/hooks/useOutsideClick";

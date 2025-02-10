@@ -55,7 +55,7 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
           </button>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-24 md:w-44">
+      <DropdownMenuContent className="mr-2 w-24 md:mr-4 md:w-44">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,30 +16,22 @@ const UpdatePasswordPage = () => {
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
   });
-  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     async function initSession() {
       const { data, error } = await supabase.auth.getSession();
-      if (error || !data.session) {
-        console.error("No valid session found:", error);
+      if (error || data.session === null) {
+        console.error("Error retrieving session from URL:", error);
         router.replace("/");
       } else {
-        const { session } = data;
-        const { type } = router.query;
-
-        if (type !== "recovery") {
-          console.error("Unauthorized access attempt.");
-          router.replace("/");
-        } else {
-          setIsAuthorized(true);
-        }
+        console.log("Session retrieved:", data.session);
       }
     }
     initSession();
   }, [router]);
 
   const handleUpdatePassword = async (values: ResetPasswordSchema) => {
+    // client should be authenticated from the URL.
     const { error } = await supabase.auth.updateUser({
       password: values.password,
     });
@@ -53,10 +45,6 @@ const UpdatePasswordPage = () => {
       form.reset();
     }
   };
-
-  if (!isAuthorized) {
-    return null;
-  }
 
   return (
     <PageContainer>
