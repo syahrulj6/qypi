@@ -9,6 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SettingsFormInner } from "../components/SettingsFormInner";
 import { Form } from "~/components/ui/form";
 import { useEffect } from "react";
+import { toast } from "sonner";
+import { TRPCClientError } from "@trpc/client";
+import { Button } from "~/components/ui/button";
 
 const SettingsPage = () => {
   const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery();
@@ -18,6 +21,7 @@ const SettingsPage = () => {
     defaultValues: {
       username: "",
       bio: "",
+      email: "",
     },
   });
 
@@ -26,9 +30,33 @@ const SettingsPage = () => {
       form.reset({
         username: getProfileData.username ?? "",
         bio: getProfileData.bio ?? "",
+        email: getProfileData.email ?? "",
       });
     }
   }, [getProfileData, form]);
+
+  const updateProfile = api.profile.updateProfile.useMutation({
+    onSuccess: ({ bio, username }) => {
+      form.reset({ bio: bio ?? "", username });
+      toast.success("Berhasil update profile");
+    },
+    onError: (err) => {
+      if (err instanceof TRPCClientError && err.message === "USERNAME_USED") {
+        form.setError("username", { message: "Username sudah digunakan" });
+      }
+      toast.error("Gagal update profile");
+    },
+  });
+
+  const handleUpdateProfileSubmit = (values: SettingsFormSchema) => {
+    updateProfile.mutate({
+      username:
+        values.username !== getProfileData?.username
+          ? values.username
+          : undefined,
+      bio: values.bio !== getProfileData?.bio ? values.bio : undefined,
+    });
+  };
 
   // TODO: Update Profile
 
@@ -51,11 +79,12 @@ const SettingsPage = () => {
               </p>
             </div>
           </div>
-          <div className="grid flex-1 grid-cols-2 gap-y-4">
+          <div className="grid flex-1 grid-cols-2 gap-x-3 gap-y-4">
             {!isLoading && getProfileData && (
               <Form {...form}>
                 <SettingsFormInner
                   defaultValues={{
+                    email: getProfileData?.email,
                     bio: getProfileData?.bio,
                     username: getProfileData?.username,
                   }}
@@ -63,6 +92,15 @@ const SettingsPage = () => {
               </Form>
             )}
           </div>
+        </div>
+        <div className="flex w-full justify-center gap-4">
+          <Button
+            className="w-full"
+            disabled={!form.formState.isDirty}
+            onClick={form.handleSubmit(handleUpdateProfileSubmit)}
+          >
+            Simpan
+          </Button>
         </div>
       </DashboardLayout>
     </SessionRoute>

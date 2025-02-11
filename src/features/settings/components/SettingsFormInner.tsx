@@ -14,6 +14,7 @@ type SettingsFormInnerProps = {
   defaultValues: {
     username?: string;
     bio?: string | null;
+    email: string;
   };
 };
 
@@ -22,6 +23,20 @@ export const SettingsFormInner = (props: SettingsFormInnerProps) => {
 
   return (
     <>
+      <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input {...field} disabled />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       <FormField
         control={form.control}
         name="username"
