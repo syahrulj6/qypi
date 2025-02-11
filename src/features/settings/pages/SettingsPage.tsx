@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { TRPCClientError } from "@trpc/client";
 import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 const SettingsPage = () => {
   const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery();
@@ -58,18 +59,19 @@ const SettingsPage = () => {
     });
   };
 
-  // TODO: Update Profile
-
   return (
     <SessionRoute>
       <DashboardLayout>
         <SettingsHeader />
         <div className="mt-6 flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <Avatar className="size-20">
-              <AvatarFallback>P</AvatarFallback>
-              <AvatarImage src={getProfileData?.profilePictureUrl!} />
-            </Avatar>
+            <Link href={"/profile"}>
+              <Avatar className="size-20">
+                <AvatarFallback>P</AvatarFallback>
+                <AvatarImage src={getProfileData?.profilePictureUrl!} />
+              </Avatar>
+            </Link>
+
             <div className="flex flex-col gap-2">
               <p className="text-lg font-medium tracking-tight text-primary">
                 {getProfileData?.username}
@@ -80,6 +82,7 @@ const SettingsPage = () => {
             </div>
           </div>
           <div className="grid flex-1 grid-cols-2 gap-x-3 gap-y-4">
+            {/* TODO: Ui When Loading */}
             {!isLoading && getProfileData && (
               <Form {...form}>
                 <SettingsFormInner
