@@ -12,15 +12,14 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
 type SecuritySettingsFormInnerProps = {
-  defaultValues: {
-    email: string;
-    password: string;
-  };
+  handleChangeEmail: () => void;
+  handleChangePassword: () => void;
 };
 
-export const SecuritySettingsFormInner = (
-  props: SecuritySettingsFormInnerProps,
-) => {
+export const SecuritySettingsFormInner = ({
+  handleChangeEmail,
+  handleChangePassword,
+}: SecuritySettingsFormInnerProps) => {
   const form = useFormContext<SecuritySettingsFormSchema>();
   const [changeEmailInput, setChangeEmailInput] = useState(true);
   const [changePasswordInput, setChangePasswordInput] = useState(true);
@@ -37,13 +36,22 @@ export const SecuritySettingsFormInner = (
               <Input {...field} disabled={changeEmailInput} />
             </FormControl>
             <FormMessage />
-            <Button
-              variant="destructive"
-              type="button"
-              onClick={() => setChangeEmailInput((prev) => !prev)}
-            >
-              {changeEmailInput ? "Ganti  Email?" : "Cancel"}
-            </Button>
+            <div className="mt-2 flex gap-2">
+              <Button
+                variant="destructive"
+                type="button"
+                onClick={() => setChangeEmailInput((prev) => !prev)}
+              >
+                {changeEmailInput ? "Ganti Email?" : "Cancel"}
+              </Button>
+              <Button
+                type="button"
+                disabled={!form.formState.dirtyFields.email}
+                onClick={handleChangeEmail}
+              >
+                Simpan Perubahan Email
+              </Button>
+            </div>
           </FormItem>
         )}
       />
@@ -53,18 +61,31 @@ export const SecuritySettingsFormInner = (
         name="password"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Password Anda</FormLabel>
+            <FormLabel>Ganti Password</FormLabel>
             <FormControl>
-              <Input {...field} disabled={changePasswordInput} />
+              <Input
+                {...field}
+                type="password"
+                disabled={changePasswordInput}
+              />
             </FormControl>
             <FormMessage />
-            <Button
-              variant="destructive"
-              type="button"
-              onClick={() => setChangePasswordInput((prev) => !prev)}
-            >
-              {changePasswordInput ? "Ganti Password?" : "Cancel"}
-            </Button>
+            <div className="mt-2 flex gap-2">
+              <Button
+                variant="destructive"
+                type="button"
+                onClick={() => setChangePasswordInput((prev) => !prev)}
+              >
+                {changePasswordInput ? "Ganti Password?" : "Cancel"}
+              </Button>
+              <Button
+                type="button"
+                disabled={!form.formState.dirtyFields.password}
+                onClick={handleChangePassword}
+              >
+                Simpan Perubahan Password
+              </Button>
+            </div>
           </FormItem>
         )}
       />

@@ -31,33 +31,31 @@ const SecuritySettingsPage = () => {
     }
   }, [getProfileData, form]);
 
+  const handleChangeEmail = form.handleSubmit((values) => {
+    console.log("Updating email:", values.email);
+    // API call to update email
+  });
+
+  const handleChangePassword = form.handleSubmit((values) => {
+    console.log("Updating password:", values.password);
+    // API call to update password
+  });
+
   return (
     <SessionRoute>
       <DashboardLayout>
         <SettingsHeader />
         <div className="mt-6 flex flex-col gap-4">
           <div className="grid flex-1 grid-cols-1 gap-y-4">
-            {/* TODO: Ui When Loading */}
             {!isLoading && getProfileData && (
               <Form {...form}>
                 <SecuritySettingsFormInner
-                  defaultValues={{
-                    email: getProfileData?.email,
-                    password: "",
-                  }}
+                  handleChangeEmail={handleChangeEmail}
+                  handleChangePassword={handleChangePassword}
                 />
               </Form>
             )}
           </div>
-        </div>
-        <div className="flex w-full justify-center gap-4">
-          <Button
-            className="w-full"
-            disabled={!form.formState.isDirty}
-            // onClick={form.handleSubmit(handleUpdateProfileSubmit)}
-          >
-            Simpan
-          </Button>
         </div>
       </DashboardLayout>
     </SessionRoute>
