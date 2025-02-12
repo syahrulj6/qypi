@@ -17,6 +17,7 @@ import {
 } from "../forms/edit-profile";
 import { ProfilePictureActions } from "../components/ProfilePictureActions";
 import { useProfilePictureHandler } from "~/hooks/useProfilePictureHandler";
+import { Skeleton } from "~/components/ui/skeleton"; // Import Skeleton
 
 const ProfilePage = () => {
   const apiUtils = api.useUtils();
@@ -81,23 +82,38 @@ const ProfilePage = () => {
 
           <Card>
             <CardContent className="flex gap-6 pt-6">
-              <ProfilePictureActions
-                selectedImage={selectedImage}
-                profilePictureUrl={
-                  selectedProfilePicturePreview ??
-                  getProfileData?.profilePictureUrl ??
-                  ""
-                }
-                handleOpenFileExplorer={handleOpenFileExplorer}
-                handleRemoveSelectedImage={handleRemoveSelectedImage}
-                handleUpdateProfilePicture={handleUpdateProfilePicture}
-                handleDeleteProfilePicture={handleDeleteProfilePicture}
-                inputFileRef={inputFileRef}
-                onPickProfilePicture={onPickProfilePicture}
-              />
+              {isLoading ? (
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="size-24 rounded-full" />
+                  <Skeleton className="h-7" />
+                  <Skeleton className="h-7" />
+                </div>
+              ) : (
+                <ProfilePictureActions
+                  selectedImage={selectedImage}
+                  profilePictureUrl={
+                    selectedProfilePicturePreview ??
+                    getProfileData?.profilePictureUrl ??
+                    ""
+                  }
+                  handleOpenFileExplorer={handleOpenFileExplorer}
+                  handleRemoveSelectedImage={handleRemoveSelectedImage}
+                  handleUpdateProfilePicture={handleUpdateProfilePicture}
+                  handleDeleteProfilePicture={handleDeleteProfilePicture}
+                  inputFileRef={inputFileRef}
+                  onPickProfilePicture={onPickProfilePicture}
+                />
+              )}
 
               <div className="grid flex-1 grid-cols-2 gap-y-4">
-                {!isLoading && getProfileData && (
+                {isLoading ? (
+                  <>
+                    <Skeleton className="col-span-2 h-4 w-20" />{" "}
+                    <Skeleton className="col-span-2 h-8 w-24 md:w-36" />{" "}
+                    <Skeleton className="h-4 w-16" />{" "}
+                    <Skeleton className="col-span-2 h-20 w-full" />{" "}
+                  </>
+                ) : (
                   <Form {...form}>
                     <EditProfileFormInner
                       defaultValues={{
@@ -113,7 +129,7 @@ const ProfilePage = () => {
 
           <div className="flex w-full justify-end gap-4">
             <Button
-              disabled={!form.formState.isDirty}
+              disabled={!form.formState.isDirty || isLoading}
               onClick={form.handleSubmit(handleUpdateProfileSubmit)}
             >
               Simpan
