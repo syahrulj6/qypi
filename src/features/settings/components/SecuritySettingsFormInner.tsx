@@ -10,6 +10,17 @@ import { Input } from "~/components/ui/input";
 import { type SecuritySettingsFormSchema } from "../forms/security-settings";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 
 type SecuritySettingsFormInnerProps = {
   handleChangePassword: () => void;
@@ -20,6 +31,7 @@ export const SecuritySettingsFormInner = ({
 }: SecuritySettingsFormInnerProps) => {
   const form = useFormContext<SecuritySettingsFormSchema>();
   const [isEditing, setIsEditing] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <>
@@ -55,13 +67,42 @@ export const SecuritySettingsFormInner = ({
               >
                 {isEditing ? "Batal" : "Ganti Password?"}
               </Button>
-              <Button
-                type="button"
-                disabled={!form.formState.isDirty}
-                onClick={handleChangePassword}
-              >
-                Simpan Perubahan Password
-              </Button>
+
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    disabled={
+                      !form.formState.dirtyFields.currentPassword ||
+                      !form.formState.dirtyFields.newPassword
+                    }
+                  >
+                    Simpan Perubahan Password
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Konfirmasi Perubahan Password
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin mengubah password? Perubahan ini
+                      bersifat permanen.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        handleChangePassword();
+                      }}
+                    >
+                      Ya, Ubah Password
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </FormItem>
         )}

@@ -12,9 +12,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { SecuritySettingsFormInner } from "../components/SecuritySettingsFormInner";
 import { toast } from "sonner";
+import { useRouter } from "next/router";
 
 const SecuritySettingsPage = () => {
   const { data: profileData, isLoading } = api.profile.getProfile.useQuery();
+  const router = useRouter();
 
   const form = useForm<SecuritySettingsFormSchema>({
     resolver: zodResolver(securitySettingsFormSchema),
@@ -33,8 +35,9 @@ const SecuritySettingsPage = () => {
         newPassword: values.newPassword,
       });
 
-      toast.success("Password berhasil diubah!");
-      form.reset(); // Reset form after success
+      toast.success("Password berhasil diubah! Silakan login ulang.");
+      router.replace("/login");
+      form.reset();
     } catch (error) {
       toast.error("Gagal mengubah password");
     }

@@ -67,8 +67,6 @@ export const authRouter = createTRPCRouter({
         throw new Error("Failed to update password");
       }
 
-      console.log(data);
-
       return { success: true, data };
     }),
 
