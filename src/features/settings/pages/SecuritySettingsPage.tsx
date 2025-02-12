@@ -11,34 +11,33 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { SecuritySettingsFormInner } from "../components/SecuritySettingsFormInner";
-import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
 
 const SecuritySettingsPage = () => {
-  const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery();
+  const { data: profileData, isLoading } = api.profile.getProfile.useQuery();
+
   const form = useForm<SecuritySettingsFormSchema>({
     resolver: zodResolver(securitySettingsFormSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      currentPassword: "",
+      newPassword: "",
     },
   });
 
-  useEffect(() => {
-    if (getProfileData) {
-      form.reset({
-        email: getProfileData.email ?? "",
+  const changePasswordMutation = api.auth.changePassword.useMutation();
+
+  const handleChangePassword = form.handleSubmit(async (values) => {
+    try {
+      await changePasswordMutation.mutateAsync({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
       });
+
+      toast.success("Password berhasil diubah!");
+      form.reset(); // Reset form after success
+    } catch (error) {
+      toast.error("Gagal mengubah password");
     }
-  }, [getProfileData, form]);
-
-  const handleChangeEmail = form.handleSubmit((values) => {
-    console.log("Updating email:", values.email);
-    // API call to update email
-  });
-
-  const handleChangePassword = form.handleSubmit((values) => {
-    console.log("Updating password:", values.password);
-    // API call to update password
   });
 
   return (
@@ -47,10 +46,9 @@ const SecuritySettingsPage = () => {
         <SettingsHeader />
         <div className="mt-6 flex flex-col gap-4">
           <div className="grid flex-1 grid-cols-1 gap-y-4">
-            {!isLoading && getProfileData && (
+            {!isLoading && profileData && (
               <Form {...form}>
                 <SecuritySettingsFormInner
-                  handleChangeEmail={handleChangeEmail}
                   handleChangePassword={handleChangePassword}
                 />
               </Form>

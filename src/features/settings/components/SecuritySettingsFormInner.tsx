@@ -12,75 +12,52 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 
 type SecuritySettingsFormInnerProps = {
-  handleChangeEmail: () => void;
   handleChangePassword: () => void;
 };
 
 export const SecuritySettingsFormInner = ({
-  handleChangeEmail,
   handleChangePassword,
 }: SecuritySettingsFormInnerProps) => {
   const form = useFormContext<SecuritySettingsFormSchema>();
-  const [changeEmailInput, setChangeEmailInput] = useState(true);
-  const [changePasswordInput, setChangePasswordInput] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <>
       <FormField
         control={form.control}
-        name="email"
+        name="currentPassword"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email Anda</FormLabel>
+            <FormLabel>Password Saat Ini</FormLabel>
             <FormControl>
-              <Input {...field} disabled={changeEmailInput} />
+              <Input {...field} type="password" disabled={!isEditing} />
             </FormControl>
             <FormMessage />
-            <div className="mt-2 flex gap-2">
-              <Button
-                variant="destructive"
-                type="button"
-                onClick={() => setChangeEmailInput((prev) => !prev)}
-              >
-                {changeEmailInput ? "Ganti Email?" : "Cancel"}
-              </Button>
-              <Button
-                type="button"
-                disabled={!form.formState.dirtyFields.email}
-                onClick={handleChangeEmail}
-              >
-                Simpan Perubahan Email
-              </Button>
-            </div>
           </FormItem>
         )}
       />
 
       <FormField
         control={form.control}
-        name="password"
+        name="newPassword"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Ganti Password</FormLabel>
+            <FormLabel>Password Baru</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                type="password"
-                disabled={changePasswordInput}
-              />
+              <Input {...field} type="password" disabled={!isEditing} />
             </FormControl>
             <FormMessage />
             <div className="mt-2 flex gap-2">
               <Button
                 variant="destructive"
                 type="button"
-                onClick={() => setChangePasswordInput((prev) => !prev)}
+                onClick={() => setIsEditing((prev) => !prev)}
               >
-                {changePasswordInput ? "Ganti Password?" : "Cancel"}
+                {isEditing ? "Batal" : "Ganti Password?"}
               </Button>
               <Button
                 type="button"
-                disabled={!form.formState.dirtyFields.password}
+                disabled={!form.formState.isDirty}
                 onClick={handleChangePassword}
               >
                 Simpan Perubahan Password

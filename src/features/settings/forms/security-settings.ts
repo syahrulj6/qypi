@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { passwordSchema } from "~/schemas/auth";
 export const securitySettingsFormSchema = z.object({
-  password: passwordSchema,
-  email: z
-    .string({ message: "Email wajib diisi" })
-    .email({ message: "Format email tidak tepat" }),
+  currentPassword: passwordSchema,
+  newPassword: passwordSchema,
 });
 export type SecuritySettingsFormSchema = z.infer<
   typeof securitySettingsFormSchema

@@ -3,7 +3,11 @@ import { supabaseAdminClient } from "~/lib/supabase/server";
 import { passwordSchema } from "~/schemas/auth";
 import { generateFromEmail } from "unique-username-generator";
 import { supabase } from "~/lib/supabase/client";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
@@ -64,6 +68,44 @@ export const authRouter = createTRPCRouter({
       }
 
       console.log(data);
+
+      return { success: true, data };
+    }),
+
+  changePassword: privateProcedure
+    .input(
+      z.object({
+        currentPassword: passwordSchema,
+        newPassword: passwordSchema,
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { currentPassword, newPassword } = input;
+      const { user } = ctx;
+
+      if (!user) {
+        throw new Error("Unauthorized");
+      }
+
+      const userEmail = user.email;
+      const { error: signInError } =
+        await supabaseAdminClient.auth.signInWithPassword({
+          email: userEmail!,
+          password: currentPassword,
+        });
+
+      if (signInError) {
+        throw new Error("Current password is incorrect");
+      }
+
+      const { data, error: updateError } =
+        await supabaseAdminClient.auth.updateUser({
+          password: newPassword,
+        });
+
+      if (updateError) {
+        throw new Error("Failed to update password");
+      }
 
       return { success: true, data };
     }),
