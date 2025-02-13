@@ -50,7 +50,7 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
             height={30}
             className="rounded-full object-cover"
           />
-          <button className="rounded-full text-primary/60 transition-colors group-hover:text-primary">
+          <button className="rounded-full text-muted-foreground transition-colors group-hover:text-primary">
             <ChevronDown className="h-5 w-5" />
           </button>
         </div>
@@ -75,7 +75,7 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
         <DropdownMenuItem asChild>
           {mounted && (
             <Button
-              variant="ghost"
+              variant="secondary"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="hover:cursor-pointer"
@@ -87,7 +87,7 @@ export const ProfileDropdown = ({ handleSignOut }: ProfileDropdownProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Button
-            variant="ghost"
+            variant="destructive"
             onClick={handleSignOut}
             className="hover:cursor-pointer"
           >

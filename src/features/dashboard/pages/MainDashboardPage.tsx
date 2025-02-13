@@ -12,7 +12,7 @@ export default function MainDashboardPage() {
     <SessionRoute>
       <DashboardLayout>
         <div className="flex flex-col space-y-3">
-          <h1 className="text-xl font-bold tracking-tight text-primary md:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight md:text-3xl">
             Good morning, {getProfileData?.username}!
           </h1>
         </div>

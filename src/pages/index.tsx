@@ -14,13 +14,13 @@ export default function Home() {
         >
           <h1 className="text-center text-3xl font-semibold tracking-tighter md:text-5xl">
             Kepoin Semua Tentang Content Creator Favoritmu di{" "}
-            <span className="text-blue-500">Qypi!</span>
+            <span className="text-primary">Qypi!</span>
           </h1>
           <p className="text-center text-base tracking-tight text-muted-foreground md:text-xl">
             Dari YouTube hingga TikTok, dari gaming hingga edukasi – semua
             tentang content creator ada di sini! Temukan profil, tren terbaru,
             dan konten eksklusif hanya di{" "}
-            <span className="text-blue-500">Qypi.</span>
+            <span className="text-primary">Qypi.</span>
           </p>
           <Button>Jelajahi Sekarang</Button>
         </SectionContainer>

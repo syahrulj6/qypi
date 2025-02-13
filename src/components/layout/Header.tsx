@@ -33,7 +33,7 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b-2 border-border bg-primary-foreground px-4 transition-transform duration-300 md:h-20 md:px-8 ${
+      className={`fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b-2 border-border bg-secondary px-4 transition-transform duration-300 md:h-20 md:px-8 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
