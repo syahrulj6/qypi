@@ -1,4 +1,3 @@
-import { api } from "~/utils/api";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { useSession } from "~/hooks/useSession";
 import Link from "next/link";
