@@ -30,7 +30,6 @@ const searchMenuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Inbox", url: "/dashboard/inbox", icon: Inbox },
   { title: "Calendar", url: "/dashboard/calendar", icon: CalendarIcon },
-  { title: "Search", url: "/dashboard/search", icon: Search },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
@@ -162,10 +161,11 @@ export const DashboardSection = ({
       <div className="flex w-full items-start justify-between md:items-center">
         <Button
           variant="outline"
-          className="flex w-48 justify-between border-muted-foreground text-muted-foreground md:w-64"
+          className="ml-12 flex w-48 justify-between border-muted-foreground text-muted-foreground md:ml-0 md:w-64"
           onClick={() => setIsSearchOpen((prev) => !prev)}
         >
           <p>Search...</p>
+          <Search />
         </Button>
         <div className="relative mr-2 flex items-center gap-5 md:mr-12 md:items-center">
           <button onClick={() => setShowCalendar((prev) => !prev)}>

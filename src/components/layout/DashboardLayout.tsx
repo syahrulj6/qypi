@@ -32,7 +32,7 @@ export default function DashboardLayout({
         </aside>
 
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger asChild className="mt-2">
             <Button
               variant="ghost"
               className="absolute left-4 top-4 z-50 block md:hidden"
@@ -70,7 +70,6 @@ export default function DashboardLayout({
                 })}
                 <div className="flex items-center gap-2"></div>
               </div>
-              <div className=""></div>
             </div>
           </SheetContent>
         </Sheet>

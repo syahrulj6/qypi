@@ -28,7 +28,7 @@ export const SettingsHeader = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="flex w-fit items-center gap-4">
+    <nav className="mt-5 flex w-fit items-center gap-4 md:mt-7">
       {settings.map((setting, index) => {
         const isActive = pathname === setting.link;
         return (
