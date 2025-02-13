@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { TRPCClientError } from "@trpc/client";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
+import { Skeleton } from "~/components/ui/skeleton";
 
 const SettingsPage = () => {
   const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery();
@@ -64,25 +65,33 @@ const SettingsPage = () => {
       <DashboardLayout>
         <SettingsHeader />
         <div className="mt-6 flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Link href={"/profile"}>
-              <Avatar className="size-20">
-                <AvatarFallback>P</AvatarFallback>
-                <AvatarImage src={getProfileData?.profilePictureUrl!} />
-              </Avatar>
-            </Link>
-
-            <div className="flex flex-col gap-2">
-              <p className="text-lg font-medium tracking-tight text-primary">
-                {getProfileData?.username}
-              </p>
-              <p className="tracking-tight text-muted-foreground">
-                {getProfileData?.bio}
-              </p>
+          {isLoading ? (
+            <div className="flex flex-col gap-3">
+              <Skeleton className="size-24 rounded-full" />
+              <Skeleton className="h-7" />
+              <Skeleton className="h-7" />
             </div>
-          </div>
-          <div className="grid flex-1 grid-cols-2 gap-x-3 gap-y-4">
-            {/* TODO: Ui When Loading */}
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link href={"/profile"}>
+                <Avatar className="size-20">
+                  <AvatarFallback>P</AvatarFallback>
+                  <AvatarImage src={getProfileData?.profilePictureUrl!} />
+                </Avatar>
+              </Link>
+
+              <div className="flex flex-col gap-2">
+                <p className="text-lg font-medium tracking-tight text-primary">
+                  {getProfileData?.username}
+                </p>
+                <p className="tracking-tight text-muted-foreground">
+                  {getProfileData?.bio}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-1 flex-col gap-x-3 gap-y-4 md:grid md:grid-cols-2">
             {!isLoading && getProfileData && (
               <Form {...form}>
                 <SettingsFormInner

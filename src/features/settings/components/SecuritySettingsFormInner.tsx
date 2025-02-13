@@ -77,7 +77,7 @@ export const SecuritySettingsFormInner = ({
                       !form.formState.dirtyFields.newPassword
                     }
                   >
-                    Simpan Perubahan Password
+                    Simpan
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
