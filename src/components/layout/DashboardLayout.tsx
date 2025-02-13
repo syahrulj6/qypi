@@ -27,12 +27,10 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
-        {/* Sidebar for Desktop */}
         <aside className="hidden md:flex md:w-64">
           <AppSidebar />
         </aside>
 
-        {/* Sidebar for Mobile (Drawer) */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
@@ -77,7 +75,6 @@ export default function DashboardLayout({
           </SheetContent>
         </Sheet>
 
-        {/* Main Content Area */}
         <div className="flex flex-1 flex-col">
           <DashboardSection>{children}</DashboardSection>
         </div>

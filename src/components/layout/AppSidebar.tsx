@@ -10,13 +10,20 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "~/components/ui/sidebar";
-import { Home, Inbox, Calendar, Search, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Inbox,
+  Calendar,
+  Search,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import Link from "next/link";
 import { useSession } from "~/hooks/useSession";
 import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Inbox", url: "/dashboard/inbox", icon: Inbox },
   { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
   { title: "Search", url: "/dashboard/search", icon: Search },
