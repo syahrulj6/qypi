@@ -161,10 +161,10 @@ export const DashboardSection = ({
       <div className="flex w-full items-start justify-between md:items-center">
         <Button
           variant="outline"
-          className="ml-12 flex w-48 justify-between border-muted-foreground text-muted-foreground md:ml-0 md:w-64"
+          className="ml-12 mr-4 flex w-32 justify-between border-muted-foreground text-muted-foreground md:ml-0 md:mr-0 md:w-64"
           onClick={() => setIsSearchOpen((prev) => !prev)}
         >
-          <p>Search...</p>
+          <p className="text-sm md:text-base">Search...</p>
           <Search />
         </Button>
         <div className="relative mr-2 flex items-center gap-5 md:mr-12 md:items-center">

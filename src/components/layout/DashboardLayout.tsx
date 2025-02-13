@@ -32,7 +32,7 @@ export default function DashboardLayout({
         </aside>
 
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="mt-2">
+          <SheetTrigger asChild className="-ml-2 mt-2 md:ml-0">
             <Button
               variant="ghost"
               className="absolute left-4 top-4 z-50 block md:hidden"
