@@ -2,11 +2,25 @@ import { useState } from "react";
 import { SidebarProvider } from "~/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { DashboardSection } from "./DashboardSection";
-import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
 import { Button } from "~/components/ui/button";
-import { Calendar, Home, Inbox, Menu, Search, Settings } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Inbox,
+  LogOut,
+  Menu,
+  Search,
+  Settings,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useSession } from "~/hooks/useSession";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
@@ -21,6 +35,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { handleSignOut } = useSession();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -32,6 +47,8 @@ export default function DashboardLayout({
         </aside>
 
         <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+
           <SheetTrigger asChild className="-ml-2 mt-2 md:ml-0">
             <Button
               variant="ghost"
@@ -47,7 +64,7 @@ export default function DashboardLayout({
                 {menuItems.map(({ title, url, icon: Icon }, index) => {
                   const isActive = pathname === url;
                   return (
-                    <Link href={url}>
+                    <Link href={url} key={index}>
                       <button
                         className={`flex w-full items-center gap-4 ${isActive ? "hover:bg-none" : "hover:bg-violet-300"} rounded-md p-2 transition-colors`}
                       >
@@ -68,7 +85,16 @@ export default function DashboardLayout({
                     </Link>
                   );
                 })}
-                <div className="flex items-center gap-2"></div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleSignOut}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Logout
+                  </Button>
+                </div>
               </div>
             </div>
           </SheetContent>

@@ -148,7 +148,11 @@ export const DashboardSection = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(searchRef, () => setIsSearchOpen(false));
+
+  useOutsideClick(searchRef, () => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+  });
 
   const filteredItems = searchMenuItems.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -194,9 +198,9 @@ export const DashboardSection = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div
             ref={searchRef}
-            className="w-full max-w-md rounded-lg bg-white p-4 shadow-lg"
+            className="w-full max-w-md rounded-lg bg-secondary p-4 shadow-lg"
           >
-            <Command className="w-full">
+            <Command className="w-full bg-secondary">
               <CommandInput
                 placeholder="Type a command or search..."
                 value={searchQuery}
@@ -207,7 +211,7 @@ export const DashboardSection = ({
                 <CommandGroup heading="Menu">
                   {filteredItems.map((item) => (
                     <Link key={item.title} href={item.url} passHref>
-                      <CommandItem>
+                      <CommandItem className="cursor-pointer">
                         <item.icon className="mr-2 h-4 w-4" />
                         <span>{item.title}</span>
                       </CommandItem>
@@ -217,7 +221,7 @@ export const DashboardSection = ({
               </CommandList>
             </Command>
             <Button
-              variant="outline"
+              variant="default"
               className="mt-2 w-full"
               onClick={() => setIsSearchOpen(false)}
             >

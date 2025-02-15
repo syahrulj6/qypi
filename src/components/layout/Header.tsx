@@ -59,7 +59,7 @@ export const Header = () => {
                 {theme === "dark" ? <Sun /> : <Moon />}
               </Button>
             )}
-            <Button asChild variant="secondary">
+            <Button asChild variant="default">
               <Link href="/login">Login</Link>
             </Button>
           </div>

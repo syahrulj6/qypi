@@ -44,12 +44,14 @@ const RegisterPage = () => {
       <PageContainer>
         <SectionContainer
           padded
-          className="flex min-h-[calc(100vh-144px)] flex-col justify-center"
+          className="mb-4 mt-20 flex min-h-[calc(100vh-144px)] flex-col justify-center md:mb-0"
         >
           <Card className="w-full max-w-[480px] self-center">
             <CardHeader className="flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold text-primary">Buat Akun</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-center text-2xl font-bold text-primary md:text-3xl">
+                Buat Akun
+              </h1>
+              <p className="text-sm text-muted-foreground">
                 Qepoin kreator favorite kamu
               </p>
             </CardHeader>
