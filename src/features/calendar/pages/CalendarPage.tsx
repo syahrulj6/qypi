@@ -7,7 +7,7 @@ import { SessionRoute } from "~/components/layout/SessionRoute";
 import { useOutsideClick } from "~/hooks/useOutsideClick";
 import { Calendar } from "~/components/ui/calendar";
 
-const CalendarDropdown = ({
+const CalendarModal = ({
   date,
   setDate,
   showCalendar,
@@ -23,20 +23,29 @@ const CalendarDropdown = ({
 
   return (
     showCalendar && (
-      <div
-        ref={calendarRef}
-        className="absolute right-0 top-8 z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(selectedDate) => {
-            setDate(selectedDate);
-            setTimeout(() => setShowCalendar(true));
-          }}
-          className="rounded-md border shadow"
-        />
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+          ref={calendarRef}
+          className="relative w-[300px] rounded-lg bg-white p-4 shadow-lg"
+        >
+          <h3 className="mb-2 text-center text-lg font-semibold">
+            Select Date
+          </h3>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(selectedDate) => {
+              setDate(selectedDate);
+            }}
+            className="rounded-md border shadow"
+          />
+          <div className="mt-4 flex justify-between">
+            <Button variant="outline" onClick={() => setShowCalendar(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setShowCalendar(false)}>Save</Button>
+          </div>
+        </div>
       </div>
     )
   );
@@ -90,7 +99,10 @@ const CalendarPage = () => {
                 <h2 className="text-md font-bold md:text-xl">
                   {formatDate(date)}
                 </h2>
-                <button className="rounded-md p-2 transition-colors hover:bg-purple-300 hover:text-primary">
+                <button
+                  className="rounded-md p-2 transition-colors hover:bg-purple-300 hover:text-primary"
+                  onClick={() => setShowCalendar((prev) => !prev)}
+                >
                   <Edit className="h-5 w-5" />
                 </button>
               </div>
@@ -155,6 +167,13 @@ const CalendarPage = () => {
             </div>
           </div>
         )}
+
+        <CalendarModal
+          date={date}
+          setDate={setDate}
+          showCalendar={showCalendar}
+          setShowCalendar={setShowCalendar}
+        />
       </DashboardLayout>
     </SessionRoute>
   );
