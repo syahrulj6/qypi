@@ -55,16 +55,16 @@ export const AppSidebar = () => {
                   <SidebarMenuItem key={index}>
                     <Link href={url}>
                       <SidebarMenuButton
-                        className={`flex w-full items-center gap-4 ${isActive ? "hover:bg-none" : "hover:bg-violet-300"} transition-colors`}
+                        className={`flex w-full items-center gap-4 ${isActive ? "bg-primary hover:bg-primary" : "hover:bg-primary"} transition-colors`}
                       >
                         <Icon
                           className={`h-5 w-5 transition-colors ${
-                            isActive ? "text-primary" : "text-muted-foreground"
+                            isActive ? "text-white" : "text-muted-foreground"
                           }`}
                         />
                         <span
                           className={
-                            isActive ? "text-primary" : "text-muted-foreground"
+                            isActive ? "text-white" : "text-muted-foreground"
                           }
                         >
                           {title}

@@ -11,13 +11,36 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 
-    @@index([name])
+model Event {
+    id          Int      @id @default(autoincrement())
+    title       String
+    description String?
+    date        DateTime
+    startTime   DateTime
+    endTime     DateTime
+    color       String?  
+    
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    organizerId String
+    organizer   Profile @relation(fields: [organizerId], references: [userId], name: "Organizer")
+
+    participants Participant[]
+
+    @@index([date]) 
+}
+
+model Participant {
+    id      Int     @id @default(autoincrement())
+    userId  String
+    eventId Int
+
+    user    Profile @relation(fields: [userId], references: [userId])
+    event   Event   @relation(fields: [eventId], references: [id])
+
+    @@unique([userId, eventId]) // Ensures a user can't join the same event multiple times
 }
 
 model Profile {
@@ -28,4 +51,7 @@ model Profile {
 
     bio               String?
     profilePictureUrl String?
+
+    eventsOrganized Event[] @relation("Organizer") 
+    eventsJoined    Participant[]
 }
