@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { supabase } from "~/lib/supabase/client";
 import { supabaseAdminClient } from "~/lib/supabase/server";
 import { SUPABASE_BUCKET } from "~/lib/supabase/bucket";
 

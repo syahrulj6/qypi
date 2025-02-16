@@ -1,91 +1,98 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
-import { Edit, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
-import { useOutsideClick } from "~/hooks/useOutsideClick";
-import { Calendar } from "~/components/ui/calendar";
-
-const CalendarModal = ({
-  date,
-  setDate,
-  showCalendar,
-  setShowCalendar,
-}: {
-  date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
-  showCalendar: boolean;
-  setShowCalendar: (show: boolean) => void;
-}) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(calendarRef, () => setShowCalendar(false));
-
-  return (
-    showCalendar && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div
-          ref={calendarRef}
-          className="relative w-[300px] rounded-lg bg-white p-4 shadow-lg"
-        >
-          <h3 className="mb-2 text-center text-lg font-semibold">
-            Select Date
-          </h3>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={(selectedDate) => {
-              setDate(selectedDate);
-            }}
-            className="rounded-md border shadow"
-          />
-          <div className="mt-4 flex justify-between">
-            <Button variant="outline" onClick={() => setShowCalendar(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => setShowCalendar(false)}>Save</Button>
-          </div>
-        </div>
-      </div>
-    )
-  );
-};
-
-const events = [
-  {
-    id: 1,
-    title: "Meeting With Marc",
-    time: "11:30 AM - 12:30 PM",
-    date: "Monday 15",
-    color: "bg-red-100 border-red-500 text-red-700",
-  },
-  {
-    id: 2,
-    title: "Finishing Web AI",
-    time: "08:30 AM - 10:00 AM",
-    date: "Tuesday 16",
-    color: "bg-blue-100 border-blue-500 text-blue-700",
-  },
-  {
-    id: 3,
-    title: "Session Photoshoot",
-    time: "10:00 AM - 11:30 AM",
-    date: "Tuesday 16",
-    color: "bg-yellow-100 border-yellow-500 text-yellow-700",
-  },
-];
+import { api } from "~/utils/api";
+import { eventFormSchema, type EventFormSchema } from "../forms/event";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form } from "~/components/ui/form";
+import { EventFormInner } from "../components/EventFormInner";
+import { toast } from "sonner";
+import { TRPCClientError } from "@trpc/client";
 
 const CalendarPage = () => {
+  const { data: getEventsData, isLoading } = api.event.getEvents.useQuery();
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
 
-  const formatDate = (date: Date | undefined) => {
-    if (!date) return "";
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-    });
+  const form = useForm<EventFormSchema>({
+    resolver: zodResolver(eventFormSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      date: new Date().toISOString(),
+      startTime: "08:00",
+      endTime: "09:00",
+      color: "#f02f22",
+    },
+  });
+
+  useEffect(() => {
+    if (getEventsData?.length) {
+      const event = getEventsData[0];
+      form.reset({
+        title: event?.title || "",
+        description: event?.description || "",
+        date: event?.date
+          ? new Date(event.date).toISOString()
+          : new Date().toISOString(),
+        startTime:
+          typeof event?.startTime === "string" ? event.startTime : "08:00",
+        endTime: typeof event?.endTime === "string" ? event.endTime : "09:00",
+        color: event?.color || "#f02f22",
+      });
+    }
+  }, [getEventsData, form]);
+
+  const createEvent = api.event.createEvent.useMutation({
+    onSuccess: () => {
+      toast.success("Event successfully created!");
+      setShowModal(false);
+    },
+    onError: (err) => {
+      if (err instanceof TRPCClientError) {
+        toast.error("Failed to create event: " + err.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    },
+  });
+
+  const onSubmit = (values: EventFormSchema) => {
+    try {
+      // Convert the date string into a Date object
+      const selectedDate = new Date(values.date);
+
+      // Convert "HH:mm" into full Date objects
+      const [startHours, startMinutes] = values.startTime
+        .split(":")
+        .map(Number);
+      const [endHours, endMinutes] = values.endTime.split(":").map(Number);
+
+      const startDateTime = new Date(selectedDate);
+      startDateTime.setHours(startHours!, startMinutes, 0, 0);
+
+      const endDateTime = new Date(selectedDate);
+      endDateTime.setHours(endHours!, endMinutes, 0, 0);
+
+      // Ensure `date` is stored as a Date object
+      createEvent.mutate({
+        title: values.title,
+        description: values.description,
+        date: selectedDate, // Ensure this is a Date object, not a string
+        startTime: values.startTime, // Keep as "HH:mm"
+        endTime: values.endTime, // Keep as "HH:mm"
+        color: values.color,
+      });
+
+      toast.success("Event created successfully!");
+    } catch (error) {
+      toast.error("Failed to create event.");
+      console.error(error);
+    }
   };
 
   return (
@@ -94,86 +101,46 @@ const CalendarPage = () => {
         <div className="flex flex-1 flex-col pr-0 md:pr-8">
           <CalendarHeader />
           <div className="flex items-center justify-between py-4">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <h2 className="text-md font-bold md:text-xl">
-                  {formatDate(date)}
-                </h2>
-                <button
-                  className="rounded-md p-2 transition-colors hover:bg-purple-300 hover:text-primary"
-                  onClick={() => setShowCalendar((prev) => !prev)}
-                >
-                  <Edit className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+            <h2 className="text-md font-bold md:text-xl">
+              {date?.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+              })}
+            </h2>
             <Button onClick={() => setShowModal(true)}>
               <Plus className="mr-2" /> Create Schedule
             </Button>
           </div>
-          <div className="grid grid-cols-7 gap-2 border-t py-2 text-center">
-            {[
-              "Sunday 14",
-              "Monday 15",
-              "Tuesday 16",
-              "Wednesday 17",
-              "Thursday 18",
-              "Friday 19",
-              "Saturday 20",
-            ].map((day) => (
-              <div key={day} className="p-2 font-medium text-gray-700">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-2 border-t py-4">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className={`rounded-lg border p-3 shadow-md ${event.color}`}
-              >
-                <h3 className="text-sm font-semibold">{event.title}</h3>
-                <p className="text-xs">{event.time}</p>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-96 rounded-lg bg-white p-6 shadow-lg">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Create Schedule</h2>
-                <button onClick={() => setShowModal(false)}>
-                  <X />
-                </button>
+          {showModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="w-96 rounded-lg bg-white p-6 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">Create Schedule</h2>
+                  <button onClick={() => setShowModal(false)}>
+                    <X />
+                  </button>
+                </div>
+
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="mt-4 space-y-4"
+                  >
+                    <EventFormInner />
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={createEvent.isPending}
+                    >
+                      {createEvent.isPending ? "Saving..." : "Save Event"}
+                    </Button>
+                  </form>
+                </Form>
               </div>
-              <div className="mt-4">
-                <label className="block text-sm font-medium">Title</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full rounded border p-2"
-                  placeholder="Enter event title"
-                />
-                <label className="mt-4 block text-sm font-medium">
-                  Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  className="mt-1 w-full rounded border p-2"
-                />
-              </div>
-              <Button className="mt-4 w-full">Save Event</Button>
             </div>
-          </div>
-        )}
-
-        <CalendarModal
-          date={date}
-          setDate={setDate}
-          showCalendar={showCalendar}
-          setShowCalendar={setShowCalendar}
-        />
+          )}
+        </div>
       </DashboardLayout>
     </SessionRoute>
   );
