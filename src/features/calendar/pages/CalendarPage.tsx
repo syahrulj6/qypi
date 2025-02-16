@@ -63,10 +63,8 @@ const CalendarPage = () => {
 
   const onSubmit = (values: EventFormSchema) => {
     try {
-      // Convert the date string into a Date object
       const selectedDate = new Date(values.date);
 
-      // Convert "HH:mm" into full Date objects
       const [startHours, startMinutes] = values.startTime
         .split(":")
         .map(Number);
@@ -78,7 +76,6 @@ const CalendarPage = () => {
       const endDateTime = new Date(selectedDate);
       endDateTime.setHours(endHours!, endMinutes, 0, 0);
 
-      // Ensure `date` is stored as a Date object
       createEvent.mutate({
         title: values.title,
         description: values.description,
@@ -111,10 +108,22 @@ const CalendarPage = () => {
               <Plus className="mr-2" /> Create Schedule
             </Button>
           </div>
+          {isLoading && (
+            <div className="flex h-full w-full items-center justify-center">
+              Loading...
+            </div>
+          )}
+          {!isLoading &&
+            getEventsData?.map((event) => (
+              <div className="" key={event.id}>
+                {event.title}
+              </div>
+            ))}
+          <div className=""></div>
 
           {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="w-96 rounded-lg bg-white p-6 shadow-lg">
+            <div className="fixed inset-0 flex items-center justify-center">
+              <div className="w-96 rounded-lg border border-muted-foreground bg-card p-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Create Schedule</h2>
                   <button onClick={() => setShowModal(false)}>
