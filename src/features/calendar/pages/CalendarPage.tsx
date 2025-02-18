@@ -33,7 +33,6 @@ const CalendarPage = () => {
     },
   });
 
-  // Filter events based on the active tab
   const filteredEvents = getEventsData?.filter((event) => {
     const eventDate = new Date(event.date);
     const today = new Date();
@@ -90,7 +89,7 @@ const CalendarPage = () => {
               </h2>
             </div>
             <Button onClick={() => setShowModal(true)}>
-              <Plus className="mr-2" /> Create Schedule
+              <Plus className="mr-2" /> Buat Jadwal
             </Button>
           </div>
 
@@ -117,16 +116,23 @@ const CalendarPage = () => {
                 <div
                   className="mt-2 h-2 w-full rounded"
                   style={{ backgroundColor: event.color || "#FFD43A" }}
-                ></div>
+                >
+                  <h3 className="text-lg font-bold">{event.title}</h3>
+                </div>
               </div>
             ))}
           </div>
 
           {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="w-96 rounded-lg border border-muted-foreground bg-white p-6">
+            <div className="fixed inset-0 z-10 flex items-center justify-center">
+              <div className="w-80 rounded-lg border border-muted-foreground bg-white p-6 md:w-[30rem]">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">Create Schedule</h2>
+                  <div className="flex flex-col">
+                    <h2 className="text-xl font-semibold">Buat Jadwal</h2>
+                    <p className="text-sm text-muted-foreground md:text-base">
+                      isi data dibawah untuk menambahkan jadwal
+                    </p>
+                  </div>
                   <button onClick={() => setShowModal(false)}>
                     <X />
                   </button>
@@ -136,11 +142,11 @@ const CalendarPage = () => {
                     onSubmit={form.handleSubmit((values) =>
                       console.log(values),
                     )}
-                    className="mt-4 space-y-4"
+                    className="mt-4 grid grid-cols-2 gap-x-2 space-y-4"
                   >
                     <EventFormInner />
-                    <Button type="submit" className="w-full">
-                      Save Event
+                    <Button type="submit" className="col-span-2 w-full">
+                      Simpan Jadwal
                     </Button>
                   </form>
                 </Form>

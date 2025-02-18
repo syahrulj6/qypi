@@ -19,7 +19,7 @@ export const EventFormInner = () => {
         control={form.control}
         name="title"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-2">
             <FormLabel>Event Title</FormLabel>
             <FormControl>
               <Input {...field} placeholder="Enter event title" />
@@ -33,7 +33,7 @@ export const EventFormInner = () => {
         control={form.control}
         name="description"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-2">
             <FormLabel>Description</FormLabel>
             <FormControl>
               <Textarea {...field} rows={3} placeholder="Enter event details" />
@@ -47,7 +47,7 @@ export const EventFormInner = () => {
         control={form.control}
         name="date"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="col-span-2">
             <FormLabel>Date</FormLabel>
             <FormControl>
               <Input

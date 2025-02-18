@@ -37,10 +37,8 @@ export const eventRouter = createTRPCRouter({
       const { db, user } = ctx;
       if (!user) throw new Error("Unauthorized");
 
-      // Ensure `date` is a Date object
       const eventDate = new Date(input.date);
 
-      // Convert "HH:mm" strings into full DateTime objects
       const [startHours, startMinutes] = input.startTime.split(":").map(Number);
       const [endHours, endMinutes] = input.endTime.split(":").map(Number);
 
@@ -54,11 +52,11 @@ export const eventRouter = createTRPCRouter({
         data: {
           title: input.title,
           description: input.description,
-          date: eventDate, // ✅ Already a Date object
-          startTime: startDateTime, // ✅ Now a Date object
-          endTime: endDateTime, // ✅ Now a Date object
+          date: eventDate,
+          startTime: startDateTime,
+          endTime: endDateTime,
           color: input.color,
-          organizerId: user.id, // Ensure this is set correctly
+          organizerId: user.id,
         },
       });
     }),
