@@ -129,11 +129,8 @@ const CalendarPage = () => {
                         {
                           onSuccess: () => {
                             toast.success("Berhasil menghapus event!");
-                            setShowModal(false);
                             form.reset();
-                            queryClient.invalidateQueries({
-                              queryKey: ["getEvents"],
-                            });
+                            refetch();
                           },
                           onError: (err) => {
                             toast.error(
