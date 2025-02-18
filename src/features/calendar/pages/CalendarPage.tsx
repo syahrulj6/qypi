@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
 import { Plus, X } from "lucide-react";
@@ -11,7 +11,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { EventFormInner } from "../components/EventFormInner";
 import { toast } from "sonner";
-import { TRPCClientError } from "@trpc/client";
 
 const CalendarPage = () => {
   const { data: getEventsData, isLoading } = api.event.getEvents.useQuery();
@@ -19,17 +18,18 @@ const CalendarPage = () => {
   const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">(
     "weekly",
   );
-  const date: Date = new Date();
+
+  const date = new Date();
 
   const form = useForm<EventFormSchema>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       title: "",
       description: "",
-      date: new Date().toISOString(),
+      date: new Date().toISOString().split("T")[0], // Ensure it's formatted properly
       startTime: "08:00",
       endTime: "09:00",
-      color: "#f02f22",
+      color: "#FFD43A",
     },
   });
 
@@ -56,38 +56,38 @@ const CalendarPage = () => {
     return false;
   });
 
+  const createEvent = api.event.createEvent.useMutation();
+
   return (
     <SessionRoute>
       <DashboardLayout>
         <div className="flex flex-1 flex-col pr-0 md:pr-8">
           <CalendarHeader activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="mt-2 flex items-center justify-between border-b border-muted-foreground py-4 md:mt-3">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-lg font-bold md:text-xl">
-                {date?.toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-                {" - "}
-                {new Date(
-                  date.getTime() +
-                    (activeTab === "weekly"
-                      ? 7
-                      : activeTab === "monthly"
-                        ? 30
-                        : 365) *
-                      24 *
-                      60 *
-                      60 *
-                      1000,
-                ).toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </h2>
-            </div>
+            <h2 className="text-lg font-bold md:text-xl">
+              {date.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}{" "}
+              -{" "}
+              {new Date(
+                date.getTime() +
+                  (activeTab === "weekly"
+                    ? 7
+                    : activeTab === "monthly"
+                      ? 30
+                      : 365) *
+                    24 *
+                    60 *
+                    60 *
+                    1000,
+              ).toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </h2>
             <Button onClick={() => setShowModal(true)}>
               <Plus className="mr-2" /> Buat Jadwal
             </Button>
@@ -116,32 +116,46 @@ const CalendarPage = () => {
                 <div
                   className="mt-2 h-2 w-full rounded"
                   style={{ backgroundColor: event.color || "#FFD43A" }}
-                >
-                  <h3 className="text-lg font-bold">{event.title}</h3>
-                </div>
+                />
               </div>
             ))}
           </div>
 
           {showModal && (
-            <div className="fixed inset-0 z-10 flex items-center justify-center">
-              <div className="w-80 rounded-lg border border-muted-foreground bg-white p-6 md:w-[30rem]">
+            <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="w-96 rounded-lg border border-muted-foreground bg-white p-6 md:w-[30rem]">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
                     <h2 className="text-xl font-semibold">Buat Jadwal</h2>
                     <p className="text-sm text-muted-foreground md:text-base">
-                      isi data dibawah untuk menambahkan jadwal
+                      Isi data dibawah untuk menambahkan jadwal
                     </p>
                   </div>
                   <button onClick={() => setShowModal(false)}>
                     <X />
                   </button>
                 </div>
+
                 <Form {...form}>
                   <form
-                    onSubmit={form.handleSubmit((values) =>
-                      console.log(values),
-                    )}
+                    onSubmit={form.handleSubmit((data) => {
+                      createEvent.mutate(
+                        {
+                          ...data,
+                          date: new Date(data.date),
+                        },
+                        {
+                          onSuccess: () => {
+                            toast.success("Jadwal berhasil dibuat!");
+                            setShowModal(false);
+                            form.reset();
+                          },
+                          onError: (err) => {
+                            toast.error("Gagal membuat jadwal: " + err.message);
+                          },
+                        },
+                      );
+                    })}
                     className="mt-4 grid grid-cols-2 gap-x-2 space-y-4"
                   >
                     <EventFormInner />

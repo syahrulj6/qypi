@@ -78,12 +78,12 @@ const NotificationsDropdown = ({
 
   return (
     showNotifications && (
-      <div className="absolute right-0 top-8 z-10 flex w-40 flex-col gap-1 rounded-md border bg-secondary md:w-52">
+      <div className="absolute right-0 top-8 z-10 flex w-40 flex-col gap-1 rounded-md border bg-card md:w-52">
         {notifications.map((notif) => (
           <div
             ref={notificationsRef}
             key={notif.id}
-            className="rounded-md border-b px-2 py-1 transition-colors hover:bg-blue-600"
+            className="rounded-md border-b px-2 py-1 transition-colors hover:bg-primary/50"
           >
             <Link href={notif.link}>
               <div className="flex items-center gap-1 text-sm">
@@ -120,7 +120,7 @@ const CalendarDropdown = ({
     showCalendar && (
       <div
         ref={calendarRef}
-        className="absolute right-0 top-8 z-10"
+        className="absolute right-0 top-8 z-10 bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         <Calendar

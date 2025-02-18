@@ -9,12 +9,75 @@ import {
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { type EventFormSchema } from "../forms/event";
+import { ColorPicker, useColor } from "react-color-palette";
+import "react-color-palette/css";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
 export const EventFormInner = () => {
   const form = useFormContext<EventFormSchema>();
+  const [open, setOpen] = useState(false);
 
   return (
     <>
+      <FormField
+        control={form.control}
+        name="color"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Tandai Jadwal</FormLabel>
+            <div className="flex items-center gap-2">
+              <button
+                className="h-8 w-8 rounded-md border border-gray-300"
+                style={{ backgroundColor: field.value }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(true);
+                }}
+              />
+              <Input
+                type="text"
+                value={field.value}
+                readOnly
+                className="w-24 text-center"
+              />
+            </div>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogContent className="p-4">
+                <DialogHeader>
+                  <DialogTitle>Pilih Warna</DialogTitle>
+                </DialogHeader>
+
+                <ColorPicker
+                  color={useColor(field.value || "#FFD43A")[0]}
+                  height={100}
+                  hideInput={["rgb", "hsv"]}
+                  onChange={(newColor) => {
+                    field.onChange(newColor.hex);
+                  }}
+                />
+
+                <div className="mt-2 flex justify-end gap-2">
+                  <DialogClose asChild>
+                    <Button variant="outline">Tutup</Button>
+                  </DialogClose>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       <FormField
         control={form.control}
         name="title"
@@ -73,12 +136,7 @@ export const EventFormInner = () => {
           <FormItem>
             <FormLabel>Start Time</FormLabel>
             <FormControl>
-              <Input
-                type="time"
-                {...field}
-                value={field.value || ""}
-                onChange={(e) => field.onChange(e.target.value)}
-              />
+              <Input type="time" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -92,12 +150,7 @@ export const EventFormInner = () => {
           <FormItem>
             <FormLabel>End Time</FormLabel>
             <FormControl>
-              <Input
-                type="time"
-                {...field}
-                value={field.value || ""}
-                onChange={(e) => field.onChange(e.target.value)}
-              />
+              <Input type="time" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
