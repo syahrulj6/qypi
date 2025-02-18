@@ -13,7 +13,7 @@ datasource db {
 
 
 model Event {
-    id          Int      @id @default(autoincrement())
+    id          String      @id @default(uuid())
     title       String
     description String?
     date        DateTime
@@ -33,9 +33,9 @@ model Event {
 }
 
 model Participant {
-    id      Int     @id @default(autoincrement())
+    id      String     @id  @default(uuid())
     userId  String
-    eventId Int
+    eventId String
 
     user    Profile @relation(fields: [userId], references: [userId])
     event   Event   @relation(fields: [eventId], references: [id])

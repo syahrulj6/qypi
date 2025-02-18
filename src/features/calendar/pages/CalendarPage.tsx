@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash, X } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
@@ -11,9 +11,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { EventFormInner } from "../components/EventFormInner";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CalendarPage = () => {
-  const { data: getEventsData, isLoading } = api.event.getEvents.useQuery();
+  const queryClient = useQueryClient();
+  const {
+    data: getEventsData,
+    isLoading,
+    refetch,
+  } = api.event.getEvents.useQuery();
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">(
     "weekly",
@@ -26,7 +32,7 @@ const CalendarPage = () => {
     defaultValues: {
       title: "",
       description: "",
-      date: new Date().toISOString().split("T")[0], // Ensure it's formatted properly
+      date: new Date().toISOString().split("T")[0],
       startTime: "08:00",
       endTime: "09:00",
       color: "#FFD43A",
@@ -57,6 +63,13 @@ const CalendarPage = () => {
   });
 
   const createEvent = api.event.createEvent.useMutation();
+  const deleteEvent = api.event.deleteEventById.useMutation();
+
+  useEffect(() => {
+    if (!isLoading) {
+      refetch();
+    }
+  }, [isLoading, showModal, refetch]);
 
   return (
     <SessionRoute>
@@ -103,9 +116,37 @@ const CalendarPage = () => {
             {filteredEvents?.map((event) => (
               <div
                 key={event.id}
-                className="rounded-lg border border-gray-300 p-4 shadow-md"
+                className="flex flex-col rounded-lg border border-gray-300 p-4 shadow-md"
               >
-                <h3 className="text-lg font-semibold">{event.title}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{event.title}</h3>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() =>
+                      deleteEvent.mutate(
+                        { eventId: event.id },
+                        {
+                          onSuccess: () => {
+                            toast.success("Berhasil menghapus event!");
+                            setShowModal(false);
+                            form.reset();
+                            queryClient.invalidateQueries({
+                              queryKey: ["getEvents"],
+                            });
+                          },
+                          onError: (err) => {
+                            toast.error(
+                              "Gagal menghapus event: " + err.message,
+                            );
+                          },
+                        },
+                      )
+                    }
+                  >
+                    <Trash />
+                  </Button>
+                </div>
                 <p className="text-sm text-gray-600">
                   {new Date(event.date).toDateString()}
                 </p>
@@ -149,6 +190,9 @@ const CalendarPage = () => {
                             toast.success("Jadwal berhasil dibuat!");
                             setShowModal(false);
                             form.reset();
+                            queryClient.invalidateQueries({
+                              queryKey: ["getEvents"],
+                            });
                           },
                           onError: (err) => {
                             toast.error("Gagal membuat jadwal: " + err.message);
