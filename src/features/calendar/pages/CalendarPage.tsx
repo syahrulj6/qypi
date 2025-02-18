@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
-import { Plus, Trash, X } from "lucide-react";
+import { Edit, Plus, Trash, X } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
@@ -12,9 +12,11 @@ import { Form } from "~/components/ui/form";
 import { EventFormInner } from "../components/EventFormInner";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Calendar } from "~/components/ui/calendar";
 
 const CalendarPage = () => {
   const queryClient = useQueryClient();
+
   const {
     data: getEventsData,
     isLoading,
@@ -24,8 +26,9 @@ const CalendarPage = () => {
   const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">(
     "weekly",
   );
+  const [showCalendar, setShowCalendar] = useState(false);
 
-  const date = new Date();
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const form = useForm<EventFormSchema>({
     resolver: zodResolver(eventFormSchema),
@@ -41,25 +44,19 @@ const CalendarPage = () => {
 
   const filteredEvents = getEventsData?.filter((event) => {
     const eventDate = new Date(event.date);
-    const today = new Date();
+    const selectedDate = date ? new Date(date) : new Date();
+    const startDate = new Date(selectedDate);
+    const endDate = new Date(selectedDate);
 
     if (activeTab === "weekly") {
-      return (
-        eventDate >= today &&
-        eventDate <= new Date(today.setDate(today.getDate() + 7))
-      );
+      endDate.setDate(endDate.getDate() + 7);
     } else if (activeTab === "monthly") {
-      return (
-        eventDate >= today &&
-        eventDate <= new Date(today.setMonth(today.getMonth() + 1))
-      );
+      endDate.setMonth(endDate.getMonth() + 1);
     } else if (activeTab === "yearly") {
-      return (
-        eventDate >= today &&
-        eventDate <= new Date(today.setFullYear(today.getFullYear() + 1))
-      );
+      endDate.setFullYear(endDate.getFullYear() + 1);
     }
-    return false;
+
+    return eventDate >= startDate && eventDate <= endDate;
   });
 
   const createEvent = api.event.createEvent.useMutation();
@@ -69,7 +66,7 @@ const CalendarPage = () => {
     if (!isLoading) {
       refetch();
     }
-  }, [isLoading, showModal, refetch]);
+  }, [isLoading, showModal, refetch, date]);
 
   return (
     <SessionRoute>
@@ -77,30 +74,48 @@ const CalendarPage = () => {
         <div className="flex flex-1 flex-col pr-0 md:pr-8">
           <CalendarHeader activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="mt-2 flex items-center justify-between border-b border-muted-foreground py-4 md:mt-3">
-            <h2 className="text-lg font-bold md:text-xl">
-              {date.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}{" "}
-              -{" "}
-              {new Date(
-                date.getTime() +
-                  (activeTab === "weekly"
-                    ? 7
-                    : activeTab === "monthly"
-                      ? 30
-                      : 365) *
-                    24 *
-                    60 *
-                    60 *
-                    1000,
-              ).toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </h2>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <h2 className="text-md font-bold md:text-xl">
+                  {date?.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "long",
+                  })}
+                </h2>
+                <button
+                  className="rounded-md p-2 transition-colors hover:bg-purple-300 hover:text-primary"
+                  onClick={() => setShowCalendar((prev) => !prev)}
+                >
+                  <Edit className="h-5 w-5" />
+                </button>
+              </div>
+              <p className="text-md text-muted-foreground md:text-base">
+                {date?.toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}{" "}
+                -{" "}
+                {date
+                  ? new Date(
+                      date.getTime() +
+                        (activeTab === "weekly"
+                          ? 7
+                          : activeTab === "monthly"
+                            ? 30
+                            : 365) *
+                          24 *
+                          60 *
+                          60 *
+                          1000,
+                    ).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "Pilih tanggal"}
+              </p>
+            </div>
             <Button onClick={() => setShowModal(true)}>
               <Plus className="mr-2" /> Buat Jadwal
             </Button>
@@ -209,6 +224,30 @@ const CalendarPage = () => {
             </div>
           )}
         </div>
+        {showCalendar && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="relative w-[300px] rounded-lg bg-white p-4 shadow-lg">
+              <h3 className="mb-2 text-center text-lg font-semibold">
+                Select Date
+              </h3>
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border shadow"
+              />
+              <div className="mt-4 flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCalendar(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={() => setShowCalendar(false)}>Save</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </SessionRoute>
   );
