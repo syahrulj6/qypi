@@ -13,6 +13,7 @@ import { EventFormInner } from "../components/EventFormInner";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Calendar } from "~/components/ui/calendar";
+import { DatePicker } from "../components/DatePickerModal";
 
 const CalendarPage = () => {
   const queryClient = useQueryClient();
@@ -225,28 +226,11 @@ const CalendarPage = () => {
           )}
         </div>
         {showCalendar && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="relative w-[300px] rounded-lg bg-white p-4 shadow-lg">
-              <h3 className="mb-2 text-center text-lg font-semibold">
-                Select Date
-              </h3>
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border shadow"
-              />
-              <div className="mt-4 flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCalendar(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={() => setShowCalendar(false)}>Save</Button>
-              </div>
-            </div>
-          </div>
+          <DatePicker
+            onSelect={setDate}
+            selected={date}
+            setShowCalendar={setShowCalendar}
+          />
         )}
       </DashboardLayout>
     </SessionRoute>
