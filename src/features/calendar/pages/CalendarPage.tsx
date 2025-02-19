@@ -12,12 +12,10 @@ import { Form } from "~/components/ui/form";
 import { EventFormInner } from "../components/EventFormInner";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Calendar } from "~/components/ui/calendar";
 import { DatePicker } from "../components/DatePickerModal";
+import { CreateEventModal } from "../components/CreateEventModal";
 
 const CalendarPage = () => {
-  const queryClient = useQueryClient();
-
   const {
     data: getEventsData,
     isLoading,
@@ -60,7 +58,6 @@ const CalendarPage = () => {
     return eventDate >= startDate && eventDate <= endDate;
   });
 
-  const createEvent = api.event.createEvent.useMutation();
   const deleteEvent = api.event.deleteEventById.useMutation();
 
   useEffect(() => {
@@ -176,53 +173,10 @@ const CalendarPage = () => {
           </div>
 
           {showModal && (
-            <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="w-96 rounded-lg border border-muted-foreground bg-white p-6 md:w-[30rem]">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <h2 className="text-xl font-semibold">Buat Jadwal</h2>
-                    <p className="text-sm text-muted-foreground md:text-base">
-                      Isi data dibawah untuk menambahkan jadwal
-                    </p>
-                  </div>
-                  <button onClick={() => setShowModal(false)}>
-                    <X />
-                  </button>
-                </div>
-
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit((data) => {
-                      createEvent.mutate(
-                        {
-                          ...data,
-                          date: new Date(data.date),
-                        },
-                        {
-                          onSuccess: () => {
-                            toast.success("Jadwal berhasil dibuat!");
-                            setShowModal(false);
-                            form.reset();
-                            queryClient.invalidateQueries({
-                              queryKey: ["getEvents"],
-                            });
-                          },
-                          onError: (err) => {
-                            toast.error("Gagal membuat jadwal: " + err.message);
-                          },
-                        },
-                      );
-                    })}
-                    className="mt-4 grid grid-cols-2 gap-x-2 space-y-4"
-                  >
-                    <EventFormInner />
-                    <Button type="submit" className="col-span-2 w-full">
-                      Simpan Jadwal
-                    </Button>
-                  </form>
-                </Form>
-              </div>
-            </div>
+            <CreateEventModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+            />
           )}
         </div>
         {showCalendar && (
