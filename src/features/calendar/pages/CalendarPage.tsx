@@ -115,6 +115,12 @@ const CalendarPage = () => {
                   startTime: new Date(event.startTime).toLocaleTimeString(),
                   endTime: new Date(event.endTime).toLocaleTimeString(),
                   color: event.color || "#FFD43A",
+                  participants: event.participants.map((p) => ({
+                    userId: p.user.userId,
+                    email: p.user.email,
+                    username: p.user.username,
+                    profilePicture: p.user.profilePictureUrl || "",
+                  })),
                 }}
                 refetch={refetch}
               />

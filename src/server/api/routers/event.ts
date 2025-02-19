@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "../trpc";
-import { eventFormSchema } from "~/features/calendar/forms/event";
 import { createEventSchema } from "~/schemas/createEventSchema";
 
 export const eventRouter = createTRPCRouter({
@@ -14,6 +13,14 @@ export const eventRouter = createTRPCRouter({
           { organizerId: user.id },
           { participants: { some: { userId: user.id } } },
         ],
+      },
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+        organizer: true,
       },
     });
 

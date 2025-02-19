@@ -3,6 +3,7 @@ import { Trash } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 interface EventCardProps {
   event: {
@@ -12,6 +13,12 @@ interface EventCardProps {
     startTime: string;
     endTime: string;
     color?: string;
+    participants: {
+      userId: string;
+      email: string;
+      username?: string;
+      profilePicture?: string;
+    }[];
   };
   refetch: () => void;
 }
@@ -54,6 +61,22 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
         className="mt-2 h-2 w-full rounded"
         style={{ backgroundColor: event.color || "#FFD43A" }}
       />
+      {event.participants.length > 0 && (
+        <div className="mt-3">
+          <p className="text-sm font-medium">Participants:</p>
+          <div className="mt-1 flex items-center gap-1">
+            {event.participants.map((participant) => (
+              <Avatar className="size-8" key={participant.userId}>
+                <AvatarFallback>VF</AvatarFallback>
+                <AvatarImage
+                  src={participant.profilePicture}
+                  className="rounded-full"
+                />
+              </Avatar>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
