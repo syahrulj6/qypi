@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
-import { Edit, Plus, Trash, X } from "lucide-react";
+import { Edit, LoaderIcon, Plus } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
-import { eventFormSchema, type EventFormSchema } from "../forms/event";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "~/components/ui/form";
-import { EventFormInner } from "../components/EventFormInner";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { eventFormSchema, type EventFormSchema } from "../forms/event";
 import { DatePicker } from "../components/DatePickerModal";
 import { CreateEventModal } from "../components/CreateEventModal";
+import { EventCard } from "../components/EventCard"; // Import new component
 
 const CalendarPage = () => {
   const {
@@ -26,7 +23,6 @@ const CalendarPage = () => {
     "weekly",
   );
   const [showCalendar, setShowCalendar] = useState(false);
-
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const form = useForm<EventFormSchema>({
@@ -57,8 +53,6 @@ const CalendarPage = () => {
 
     return eventDate >= startDate && eventDate <= endDate;
   });
-
-  const deleteEvent = api.event.deleteEventById.useMutation();
 
   useEffect(() => {
     if (!isLoading) {
@@ -121,54 +115,24 @@ const CalendarPage = () => {
 
           {isLoading && (
             <div className="mt-4 flex h-full w-full items-center justify-center">
-              Loading...
+              <LoaderIcon className="animate-spin" />
             </div>
           )}
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredEvents?.map((event) => (
-              <div
+              <EventCard
                 key={event.id}
-                className="flex flex-col rounded-lg border border-gray-300 p-4 shadow-md"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{event.title}</h3>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() =>
-                      deleteEvent.mutate(
-                        { eventId: event.id },
-                        {
-                          onSuccess: () => {
-                            toast.success("Berhasil menghapus event!");
-                            form.reset();
-                            refetch();
-                          },
-                          onError: (err) => {
-                            toast.error(
-                              "Gagal menghapus event: " + err.message,
-                            );
-                          },
-                        },
-                      )
-                    }
-                  >
-                    <Trash />
-                  </Button>
-                </div>
-                <p className="text-sm text-gray-600">
-                  {new Date(event.date).toDateString()}
-                </p>
-                <p className="text-sm">
-                  {event.startTime.toLocaleDateString()} -{" "}
-                  {event.endTime.toLocaleDateString()}
-                </p>
-                <div
-                  className="mt-2 h-2 w-full rounded"
-                  style={{ backgroundColor: event.color || "#FFD43A" }}
-                />
-              </div>
+                event={{
+                  id: event.id,
+                  title: event.title,
+                  date: new Date(event.date),
+                  startTime: new Date(event.startTime).toLocaleTimeString(),
+                  endTime: new Date(event.endTime).toLocaleTimeString(),
+                  color: event.color || "#FFD43A",
+                }}
+                refetch={refetch}
+              />
             ))}
           </div>
 
