@@ -5,12 +5,9 @@ import { Edit, LoaderIcon, Plus } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { eventFormSchema, type EventFormSchema } from "../forms/event";
 import { DatePicker } from "../components/DatePickerModal";
 import { CreateEventModal } from "../components/CreateEventModal";
-import { EventCard } from "../components/EventCard"; // Import new component
+import { EventCard } from "../components/EventCard";
 
 const CalendarPage = () => {
   const {
@@ -24,18 +21,6 @@ const CalendarPage = () => {
   );
   const [showCalendar, setShowCalendar] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
-
-  const form = useForm<EventFormSchema>({
-    resolver: zodResolver(eventFormSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      date: new Date().toISOString().split("T")[0],
-      startTime: "08:00",
-      endTime: "09:00",
-      color: "#FFD43A",
-    },
-  });
 
   const filteredEvents = getEventsData?.filter((event) => {
     const eventDate = new Date(event.date);

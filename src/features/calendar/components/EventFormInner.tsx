@@ -29,6 +29,28 @@ export const EventFormInner = () => {
     <>
       <FormField
         control={form.control}
+        name="participantEmails"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Invite Participants (Emails, comma-separated)</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="example1@gmail.com, example2@gmail.com"
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value.split(",").map((email) => email.trim()),
+                  )
+                }
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="color"
         render={({ field }) => (
           <FormItem className="col-span-2">

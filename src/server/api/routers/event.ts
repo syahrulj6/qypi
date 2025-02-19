@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "../trpc";
+import { eventFormSchema } from "~/features/calendar/forms/event";
+import { createEventSchema } from "~/schemas/createEventSchema";
 
 export const eventRouter = createTRPCRouter({
   getEvents: privateProcedure.query(async ({ ctx }) => {
@@ -23,22 +25,12 @@ export const eventRouter = createTRPCRouter({
   }),
 
   createEvent: privateProcedure
-    .input(
-      z.object({
-        title: z.string(),
-        description: z.string().optional(),
-        date: z.date(),
-        startTime: z.string().regex(/^\d{2}:\d{2}$/),
-        endTime: z.string().regex(/^\d{2}:\d{2}$/),
-        color: z.string().optional(),
-      }),
-    )
+    .input(createEventSchema)
     .mutation(async ({ ctx, input }) => {
       const { db, user } = ctx;
       if (!user) throw new Error("Unauthorized");
 
       const eventDate = new Date(input.date);
-
       const [startHours, startMinutes] = input.startTime.split(":").map(Number);
       const [endHours, endMinutes] = input.endTime.split(":").map(Number);
 
@@ -47,6 +39,14 @@ export const eventRouter = createTRPCRouter({
 
       const endDateTime = new Date(eventDate);
       endDateTime.setHours(endHours!, endMinutes, 0, 0);
+
+      // Fetch participant userIds by emails
+      const participants = await db.profile.findMany({
+        where: {
+          email: { in: input.participantEmails || [] },
+        },
+        select: { userId: true },
+      });
 
       return await db.event.create({
         data: {
@@ -57,6 +57,11 @@ export const eventRouter = createTRPCRouter({
           endTime: endDateTime,
           color: input.color,
           organizerId: user.id,
+          participants: {
+            create: participants.map((participant) => ({
+              userId: participant.userId,
+            })),
+          },
         },
       });
     }),
