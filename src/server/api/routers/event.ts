@@ -47,7 +47,6 @@ export const eventRouter = createTRPCRouter({
       const endDateTime = new Date(eventDate);
       endDateTime.setHours(endHours!, endMinutes, 0, 0);
 
-      // Fetch participant userIds by emails
       const participants = await db.profile.findMany({
         where: {
           email: { in: input.participantEmails || [] },
@@ -82,6 +81,12 @@ export const eventRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
       const { eventId } = input;
+
+      await db.participant.deleteMany({
+        where: {
+          eventId: eventId,
+        },
+      });
 
       const deleteEvent = await db.event.delete({
         where: {

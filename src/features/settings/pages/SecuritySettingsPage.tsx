@@ -1,7 +1,6 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SettingsHeader } from "../components/SettingsHeader";
 import { SessionRoute } from "~/components/layout/SessionRoute";
-import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
 import {

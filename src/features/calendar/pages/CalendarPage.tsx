@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CalendarHeader } from "../components/CalendarHeader";
 import { Button } from "~/components/ui/button";
-import { Edit, LoaderIcon, Plus } from "lucide-react";
+import { Edit, LoaderCircleIcon, Plus } from "lucide-react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
@@ -100,11 +100,12 @@ const CalendarPage = () => {
 
           {isLoading && (
             <div className="mt-4 flex h-full w-full items-center justify-center">
-              <LoaderIcon className="animate-spin" />
+              <LoaderCircleIcon className="animate-spin" />
             </div>
           )}
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* TODO: Event UI */}
             {filteredEvents?.map((event) => (
               <EventCard
                 key={event.id}
