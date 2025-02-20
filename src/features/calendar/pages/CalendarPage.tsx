@@ -131,6 +131,7 @@ const CalendarPage = () => {
                     username: p.user.username,
                     profilePicture: p.user.profilePictureUrl || "",
                   })),
+                  organizer: event.organizer,
                 }}
                 refetch={refetch}
               />

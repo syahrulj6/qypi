@@ -15,7 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "~/lib/supabase/client";
 
 interface EventCardProps {
   event: {
@@ -31,11 +32,28 @@ interface EventCardProps {
       username?: string;
       profilePicture?: string;
     }[];
+    organizer: {
+      userId: string;
+      email: string;
+      username?: string;
+      profilePicture?: string;
+    };
   };
   refetch: () => void;
 }
 
 export const EventCard = ({ event, refetch }: EventCardProps) => {
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    void (async function () {
+      const { data } = await supabase.auth.getUser();
+      if (data.user?.id !== null) {
+        setUserId(data.user!.id);
+      }
+    })();
+  }, []);
+
   const deleteEvent = api.event.deleteEventById.useMutation();
 
   const form = useForm();
@@ -75,34 +93,36 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
             >
               {event.title}
             </h3>
-            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon" type="button">
-                  <Trash />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Konfirmasi hapus event</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Apakah Anda yakin ingin menghapus event? Perubahan ini
-                    bersifat permanen.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-red-500 transition-colors hover:bg-red-600"
-                    onClick={() => {
-                      setIsDialogOpen(false);
-                      handleDelete();
-                    }}
-                  >
-                    Ya, Hapus Event
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            {userId === event.organizer.userId && (
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon" type="button">
+                    <Trash />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Konfirmasi hapus event</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin menghapus event? Perubahan ini
+                      bersifat permanen.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-500 transition-colors hover:bg-red-600"
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        handleDelete();
+                      }}
+                    >
+                      Ya, Hapus Event
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
           <p
             className="text-sm text-muted-foreground"
