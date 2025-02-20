@@ -64,9 +64,17 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
           <LoaderCircleIcon className="animate-spin" />
         </div>
       ) : (
-        <div className="flex flex-col rounded-lg border border-gray-300 p-4 shadow-md">
+        <div
+          className="flex h-fit flex-col rounded-lg border p-4 shadow-md"
+          style={{ borderColor: event.color || "#FFD43A" }}
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{event.title}</h3>
+            <h3
+              className="text-lg font-semibold"
+              style={{ color: event.color || "#FFD43A" }}
+            >
+              {event.title}
+            </h3>
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" size="icon" type="button">
@@ -96,19 +104,17 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-          <p className="text-sm text-gray-600">
+          <p
+            className="text-sm text-muted-foreground"
+            style={{ color: event.color || "#FFD43A" }}
+          >
             {new Date(event.date).toLocaleDateString()}
           </p>
-          <p className="text-sm">
+          <p className={`text-sm`} style={{ color: event.color || "#FFD43A" }}>
             {event.startTime} - {event.endTime}
           </p>
-          <div
-            className="mt-2 h-2 w-full rounded"
-            style={{ backgroundColor: event.color || "#FFD43A" }}
-          />
           {event.participants.length > 0 && (
             <div className="mt-3">
-              <p className="text-sm font-medium">Participants:</p>
               <div className="mt-1 flex items-center gap-1">
                 {event.participants.map((participant) => (
                   <Avatar className="size-8" key={participant.userId}>

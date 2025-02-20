@@ -32,7 +32,9 @@ export const EventFormInner = () => {
         name="participantEmails"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Invite Participants (Emails, comma-separated)</FormLabel>
+            <FormLabel>
+              Undang Participants (Emails, dipisahkan dengan koma )
+            </FormLabel>
             <FormControl>
               <Input
                 {...field}
@@ -105,9 +107,11 @@ export const EventFormInner = () => {
         name="title"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Event Title</FormLabel>
+            <FormLabel>
+              Judul <span className="text-destructive">*</span>
+            </FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Enter event title" />
+              <Input {...field} placeholder="Masukkan judul jadwal" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -119,9 +123,13 @@ export const EventFormInner = () => {
         name="description"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Deskripsi</FormLabel>
             <FormControl>
-              <Textarea {...field} rows={3} placeholder="Enter event details" />
+              <Textarea
+                {...field}
+                rows={3}
+                placeholder="Masukkn Deskripsi (Opsional)"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -133,7 +141,9 @@ export const EventFormInner = () => {
         name="date"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Date</FormLabel>
+            <FormLabel>
+              Tanggal <span className="text-destructive">*</span>
+            </FormLabel>
             <FormControl>
               <Input
                 type="date"
@@ -156,7 +166,9 @@ export const EventFormInner = () => {
         name="startTime"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Start Time</FormLabel>
+            <FormLabel>
+              Waktu Mulai <span className="text-destructive">*</span>
+            </FormLabel>
             <FormControl>
               <Input type="time" {...field} />
             </FormControl>
@@ -170,7 +182,9 @@ export const EventFormInner = () => {
         name="endTime"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>End Time</FormLabel>
+            <FormLabel>
+              Waktu Selesai <span className="text-destructive">*</span>
+            </FormLabel>
             <FormControl>
               <Input type="time" {...field} />
             </FormControl>

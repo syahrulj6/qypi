@@ -104,7 +104,7 @@ const CalendarPage = () => {
             </div>
           )}
 
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {/* TODO: Event UI */}
             {filteredEvents?.map((event) => (
               <EventCard
@@ -113,8 +113,17 @@ const CalendarPage = () => {
                   id: event.id,
                   title: event.title,
                   date: new Date(event.date),
-                  startTime: new Date(event.startTime).toLocaleTimeString(),
-                  endTime: new Date(event.endTime).toLocaleTimeString(),
+                  startTime: new Date(event.startTime).toLocaleTimeString(
+                    "en-US",
+                    {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    },
+                  ),
+                  endTime: new Date(event.endTime).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                  }),
                   color: event.color || "#FFD43A",
                   participants: event.participants.map((p) => ({
                     userId: p.user.userId,
