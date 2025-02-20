@@ -6,7 +6,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
 } from "~/components/ui/sidebar";
@@ -21,6 +20,7 @@ import {
 import Link from "next/link";
 import { useSession } from "~/hooks/useSession";
 import { usePathname } from "next/navigation";
+import { Button } from "../ui/button";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -54,8 +54,9 @@ export const AppSidebar = () => {
                 return (
                   <SidebarMenuItem key={index}>
                     <Link href={url}>
-                      <SidebarMenuButton
-                        className={`flex w-full items-center gap-4 ${isActive ? "bg-primary hover:bg-primary" : "hover:bg-primary"} transition-colors`}
+                      <Button
+                        variant="ghost"
+                        className={`flex w-full items-center justify-start gap-4 ${isActive ? "bg-primary hover:bg-primary" : "hover:bg-primary"} transition-colors`}
                       >
                         <Icon
                           className={`h-5 w-5 transition-colors ${
@@ -69,7 +70,7 @@ export const AppSidebar = () => {
                         >
                           {title}
                         </span>
-                      </SidebarMenuButton>
+                      </Button>
                     </Link>
                   </SidebarMenuItem>
                 );
@@ -82,13 +83,14 @@ export const AppSidebar = () => {
         <SidebarFooter className="mb-4 mt-auto">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton
+              <Button
                 onClick={handleSignOut}
-                className="w-full gap-2 text-red-500 transition-colors hover:bg-red-600"
+                variant={"destructive"}
+                className="flex w-full justify-start gap-4"
               >
                 <LogOut className="h-5 w-5" />
-                Logout
-              </SidebarMenuButton>
+                <p>Logout</p>
+              </Button>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
