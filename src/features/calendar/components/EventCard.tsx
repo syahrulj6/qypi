@@ -1,5 +1,5 @@
 import { Button } from "~/components/ui/button";
-import { LoaderCircleIcon, Trash } from "lucide-react";
+import { ArrowLeftFromLineIcon, LoaderCircleIcon, Trash } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
@@ -55,8 +55,8 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
   }, []);
 
   const deleteEvent = api.event.deleteEventById.useMutation();
+  const leaveEvent = api.event.leaveEvent.useMutation();
 
-  const form = useForm();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDelete = () => {
@@ -65,11 +65,27 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
       {
         onSuccess: () => {
           toast.success("Berhasil menghapus event!");
-          form.reset();
           refetch();
         },
         onError: (err) => {
           toast.error("Gagal menghapus event: " + err.message);
+        },
+      },
+    );
+  };
+
+  const handleLeaveEvent = () => {
+    leaveEvent.mutate(
+      {
+        eventId: event.id,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Berhasil meninggalkan event");
+          refetch();
+        },
+        onError: (err) => {
+          toast.error("Gagal Meninggalkan event: " + err.message);
         },
       },
     );
@@ -93,7 +109,7 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
             >
               {event.title}
             </h3>
-            {userId === event.organizer.userId && (
+            {userId === event.organizer.userId ? (
               <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="icon" type="button">
@@ -118,6 +134,35 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
                       }}
                     >
                       Ya, Hapus Event
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon" type="button">
+                    <ArrowLeftFromLineIcon />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tinggalkan Event ini?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin meninggalkan event? Perubahan ini
+                      bersifat permanen.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-red-500 transition-colors hover:bg-red-600"
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        handleLeaveEvent();
+                      }}
+                    >
+                      Ya, Tinggalkan Event
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

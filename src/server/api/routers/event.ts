@@ -96,4 +96,33 @@ export const eventRouter = createTRPCRouter({
 
       return deleteEvent;
     }),
+
+  leaveEvent: privateProcedure
+    .input(
+      z.object({
+        eventId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      if (!user) throw new Error("Unauthorized");
+
+      const participant = await db.participant.findFirst({
+        where: {
+          eventId: input.eventId,
+          userId: user.id,
+        },
+      });
+
+      if (!participant)
+        throw new Error("You are not participant in this event");
+
+      await db.participant.delete({
+        where: {
+          id: participant.id,
+        },
+      });
+
+      return { success: true, message: "You have left the event." };
+    }),
 });
