@@ -13,21 +13,34 @@ import {
   LayoutDashboard,
   Inbox,
   Calendar,
-  Search,
   Settings,
   LogOut,
+  NotebookPen,
+  UsersRound,
+  ShieldCheck,
+  Microchip,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "~/hooks/useSession";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 
-const menuItems = [
+const mainMenuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Inbox", url: "/dashboard/inbox", icon: Inbox },
-  { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
-  { title: "Search", url: "/dashboard/search", icon: Search },
+  { title: "My Calendar", url: "/dashboard/calendar", icon: Calendar },
+  { title: "My Inbox", url: "/dashboard/inbox", icon: Inbox },
+  { title: "My Notes", url: "/dashboard/notes", icon: NotebookPen },
+  { title: "Teams", url: "/dashboard/teams", icon: UsersRound },
+];
+
+const otherMenuItems = [
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  { title: "Security", url: "/dashboard/settings/security", icon: ShieldCheck },
+  {
+    title: "Integrations",
+    url: "/dashboard/settings/integrations",
+    icon: Microchip,
+  },
 ];
 
 export const AppSidebar = () => {
@@ -45,18 +58,53 @@ export const AppSidebar = () => {
       <SidebarContent className="flex-1">
         <SidebarGroup>
           <SidebarGroupLabel className="text-muted-foreground">
-            Navigation
+            MAIN MENU
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="mt-2 flex flex-col gap-4">
-              {menuItems.map(({ title, url, icon: Icon }, index) => {
+            <SidebarMenu className="flex flex-col gap-2">
+              {mainMenuItems.map(({ title, url, icon: Icon }, index) => {
                 const isActive = pathname === url;
                 return (
                   <SidebarMenuItem key={index}>
                     <Link href={url}>
                       <Button
                         variant="ghost"
-                        className={`flex w-full items-center justify-start gap-4 ${isActive ? "bg-primary hover:bg-primary" : "hover:bg-primary"} transition-colors`}
+                        className={`flex w-full items-center justify-start gap-4 ${isActive && "bg-primary hover:bg-primary"} transition-colors`}
+                      >
+                        <Icon
+                          className={`h-5 w-5 transition-colors ${
+                            isActive ? "text-white" : "text-muted-foreground"
+                          }`}
+                        />
+                        <span
+                          className={
+                            isActive ? "text-white" : "text-muted-foreground"
+                          }
+                        >
+                          {title}
+                        </span>
+                      </Button>
+                    </Link>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-muted-foreground">
+            OTHERS
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="flex flex-col gap-2">
+              {otherMenuItems.map(({ title, url, icon: Icon }, index) => {
+                const isActive = pathname === url;
+                return (
+                  <SidebarMenuItem key={index}>
+                    <Link href={url}>
+                      <Button
+                        variant="ghost"
+                        className={`flex w-full items-center justify-start gap-4 ${isActive && "bg-primary hover:bg-primary"} transition-colors`}
                       >
                         <Icon
                           className={`h-5 w-5 transition-colors ${

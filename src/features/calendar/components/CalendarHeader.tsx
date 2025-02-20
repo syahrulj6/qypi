@@ -14,7 +14,7 @@ export const CalendarHeader = ({
   setActiveTab: any;
 }) => {
   return (
-    <div className="mt-2 flex gap-4 md:mt-4">
+    <div className="mt-2 flex gap-4 md:mt-2">
       {calendarTabs.map((tab) => (
         <button
           key={tab.id}
