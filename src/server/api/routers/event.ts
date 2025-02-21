@@ -125,4 +125,46 @@ export const eventRouter = createTRPCRouter({
 
       return { success: true, message: "You have left the event." };
     }),
+
+  updateEvent: privateProcedure
+    .input(
+      z.object({
+        eventId: z.string(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        date: z.date().optional(),
+        startTime: z.date().optional(),
+        endTime: z.date().optional(),
+        color: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      if (!user) throw new Error("Unauthorized");
+
+      const event = await db.event.findUnique({
+        where: { id: input.eventId },
+      });
+
+      if (!event) throw new Error("Event not found");
+      if (event.organizerId !== user.id) throw new Error("Unauthorized");
+
+      const updatedEvent = await db.event.update({
+        where: { id: input.eventId },
+        data: {
+          title: input.title ?? event.title,
+          description: input.description ?? event.description,
+          date: input.date ? new Date(input.date) : event.date,
+          startTime: input.startTime
+            ? new Date(`${input.date}T${input.startTime}:00Z`)
+            : event.startTime,
+          endTime: input.endTime
+            ? new Date(`${input.date}T${input.endTime}:00Z`)
+            : event.endTime,
+          color: input.color ?? event.color,
+        },
+      });
+
+      return updatedEvent;
+    }),
 });
