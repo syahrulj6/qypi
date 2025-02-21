@@ -20,7 +20,7 @@ export const DatePicker = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center">
       <div
-        className="relative w-[300px] rounded-lg bg-white p-4 shadow-lg"
+        className="relative w-[300px] rounded-lg border border-current bg-card p-4 shadow-lg"
         ref={datePickerModalRef}
       >
         <h3 className="mb-2 text-center text-lg font-semibold">
@@ -32,10 +32,7 @@ export const DatePicker = ({
           onSelect={onSelect}
           className="rounded-md border shadow"
         />
-        <div className="mt-4 flex justify-between">
-          <Button variant="outline" onClick={() => setShowCalendar(false)}>
-            Cancel
-          </Button>
+        <div className="mt-4 flex justify-end">
           <Button onClick={() => setShowCalendar(false)}>Save</Button>
         </div>
       </div>

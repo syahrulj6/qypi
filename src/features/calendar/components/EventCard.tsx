@@ -93,7 +93,7 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
 
   return (
     <>
-      {deleteEvent.isPending ? (
+      {deleteEvent.isPending || leaveEvent.isPending ? (
         <div className="flex w-full items-center justify-center">
           <LoaderCircleIcon className="animate-spin" />
         </div>

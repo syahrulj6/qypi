@@ -58,7 +58,7 @@ export const CreateEventModal = ({
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-96 rounded-lg border border-muted-foreground bg-white p-6 md:w-[30rem]">
+      <div className="w-96 rounded-lg border border-muted-foreground bg-card p-6 md:w-[30rem]">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold">Buat Jadwal</h2>
