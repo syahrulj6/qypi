@@ -1,5 +1,8 @@
 import { useForm } from "react-hook-form";
-import { eventFormSchema, type EventFormSchema } from "../forms/event";
+import {
+  createEventFormSchema,
+  type CreateEventFormSchema,
+} from "../forms/create-event";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { EventFormInner } from "./EventFormInner";
@@ -20,8 +23,8 @@ export const CreateEventModal = ({
 }: CreateEventModalProps) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<EventFormSchema>({
-    resolver: zodResolver(eventFormSchema),
+  const form = useForm<CreateEventFormSchema>({
+    resolver: zodResolver(createEventFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -34,7 +37,7 @@ export const CreateEventModal = ({
 
   const createEvent = api.event.createEvent.useMutation();
 
-  const handleCreateEvent = (data: EventFormSchema) => {
+  const handleCreateEvent = (data: CreateEventFormSchema) => {
     createEvent.mutate(
       {
         ...data,

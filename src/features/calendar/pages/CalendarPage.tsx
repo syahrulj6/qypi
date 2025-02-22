@@ -8,6 +8,7 @@ import { api } from "~/utils/api";
 import { DatePicker } from "../components/DatePickerModal";
 import { CreateEventModal } from "../components/CreateEventModal";
 import { EventCard } from "../components/EventCard";
+import { UpdateEventModal } from "../components/UpdateEventModal";
 
 const CalendarPage = () => {
   const {
@@ -107,34 +108,40 @@ const CalendarPage = () => {
           <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {/* TODO: Event UI */}
             {filteredEvents?.map((event) => (
-              <EventCard
-                key={event.id}
-                event={{
-                  id: event.id,
-                  title: event.title,
-                  date: new Date(event.date),
-                  startTime: new Date(event.startTime).toLocaleTimeString(
-                    "en-US",
-                    {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    },
-                  ),
-                  endTime: new Date(event.endTime).toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit",
-                  }),
-                  color: event.color || "#FFD43A",
-                  participants: event.participants.map((p) => ({
-                    userId: p.user.userId,
-                    email: p.user.email,
-                    username: p.user.username,
-                    profilePicture: p.user.profilePictureUrl || "",
-                  })),
-                  organizer: event.organizer,
-                }}
-                refetch={refetch}
-              />
+              <>
+                <EventCard
+                  key={event.id}
+                  event={{
+                    id: event.id,
+                    title: event.title,
+                    date: new Date(event.date),
+                    startTime: new Date(event.startTime).toLocaleTimeString(
+                      "en-US",
+                      {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      },
+                    ),
+                    endTime: new Date(event.endTime).toLocaleTimeString(
+                      "en-US",
+                      {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      },
+                    ),
+                    color: event.color || "#FFD43A",
+                    participants: event.participants.map((p) => ({
+                      userId: p.user.userId,
+                      email: p.user.email,
+                      username: p.user.username,
+                      profilePicture: p.user.profilePictureUrl || "",
+                    })),
+                    organizer: event.organizer,
+                  }}
+                  refetch={refetch}
+                />
+                <UpdateEventModal eventId={event.id} />
+              </>
             ))}
           </div>
 

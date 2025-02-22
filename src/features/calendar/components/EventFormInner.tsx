@@ -8,7 +8,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { type EventFormSchema } from "../forms/event";
+import { type CreateEventFormSchema } from "../forms/create-event";
 import { ColorPicker, useColor } from "react-color-palette";
 import "react-color-palette/css";
 import { useState } from "react";
@@ -22,7 +22,7 @@ import {
 import { Button } from "~/components/ui/button";
 
 export const EventFormInner = () => {
-  const form = useFormContext<EventFormSchema>();
+  const form = useFormContext<CreateEventFormSchema>();
   const [open, setOpen] = useState(false);
 
   return (

@@ -17,8 +17,6 @@ import {
   LogOut,
   NotebookPen,
   UsersRound,
-  ShieldCheck,
-  Microchip,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "~/hooks/useSession";
@@ -35,12 +33,6 @@ const mainMenuItems = [
 
 const otherMenuItems = [
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
-  { title: "Security", url: "/dashboard/settings/security", icon: ShieldCheck },
-  {
-    title: "Integrations",
-    url: "/dashboard/settings/integrations",
-    icon: Microchip,
-  },
 ];
 
 export const AppSidebar = () => {

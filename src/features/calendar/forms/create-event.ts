@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const eventFormSchema = z.object({
+export const createEventFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
@@ -14,4 +14,4 @@ export const eventFormSchema = z.object({
   participantEmails: z.array(z.string().email()).optional(),
 });
 
-export type EventFormSchema = z.infer<typeof eventFormSchema>;
+export type CreateEventFormSchema = z.infer<typeof createEventFormSchema>;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "../trpc";
-import { createEventSchema } from "~/schemas/createEventSchema";
+import { createEventSchema, updateEventSchema } from "~/schemas/event";
 
 export const eventRouter = createTRPCRouter({
   getEvents: privateProcedure.query(async ({ ctx }) => {
@@ -30,6 +30,25 @@ export const eventRouter = createTRPCRouter({
       endTime: event.endTime,
     }));
   }),
+
+  getEventById: privateProcedure
+    .input(
+      z.object({
+        eventId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      if (!user) throw new Error("Unauthorized");
+
+      const getEvent = await db.event.findFirst({
+        where: {
+          id: input.eventId,
+        },
+      });
+
+      return getEvent;
+    }),
 
   createEvent: privateProcedure
     .input(createEventSchema)
@@ -127,41 +146,65 @@ export const eventRouter = createTRPCRouter({
     }),
 
   updateEvent: privateProcedure
-    .input(
-      z.object({
-        eventId: z.string(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        date: z.date().optional(),
-        startTime: z.date().optional(),
-        endTime: z.date().optional(),
-        color: z.string().optional(),
-      }),
-    )
+    .input(updateEventSchema)
     .mutation(async ({ ctx, input }) => {
       const { db, user } = ctx;
       if (!user) throw new Error("Unauthorized");
 
       const event = await db.event.findUnique({
         where: { id: input.eventId },
+        include: { participants: true }, // Fetch existing participants
       });
 
       if (!event) throw new Error("Event not found");
       if (event.organizerId !== user.id) throw new Error("Unauthorized");
 
+      const eventDate = new Date(input.date);
+      const [startHours, startMinutes] = input.startTime.split(":").map(Number);
+      const [endHours, endMinutes] = input.endTime.split(":").map(Number);
+
+      const startDateTime = new Date(eventDate);
+      startDateTime.setHours(startHours!, startMinutes, 0, 0);
+
+      const endDateTime = new Date(eventDate);
+      endDateTime.setHours(endHours!, endMinutes, 0, 0);
+
+      // Get all users matching the input emails
+      const newParticipants = await db.profile.findMany({
+        where: { email: { in: input.participantEmails || [] } },
+        select: { userId: true, email: true },
+      });
+
+      // Convert to a set for easy comparison
+      const existingParticipantIds = new Set(
+        event.participants.map((p) => p.userId),
+      );
+      const newParticipantIds = newParticipants.map((p) => p.userId);
+
+      // Find participants to add (those not in existing list)
+      const participantsToAdd = newParticipants.filter(
+        (p) => !existingParticipantIds.has(p.userId),
+      );
+
+      // Find participants to remove (those in existing list but not in new list)
+      const participantsToRemove = event.participants.filter(
+        (p) => !newParticipantIds.includes(p.userId),
+      );
+
+      // Update the event
       const updatedEvent = await db.event.update({
         where: { id: input.eventId },
         data: {
-          title: input.title ?? event.title,
-          description: input.description ?? event.description,
-          date: input.date ? new Date(input.date) : event.date,
-          startTime: input.startTime
-            ? new Date(`${input.date}T${input.startTime}:00Z`)
-            : event.startTime,
-          endTime: input.endTime
-            ? new Date(`${input.date}T${input.endTime}:00Z`)
-            : event.endTime,
-          color: input.color ?? event.color,
+          title: input.title,
+          description: input.description,
+          date: eventDate,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          color: input.color,
+          participants: {
+            create: participantsToAdd.map((p) => ({ userId: p.userId })), // Add only new participants
+            deleteMany: participantsToRemove.map((p) => ({ userId: p.userId })), // Remove those not in the updated list
+          },
         },
       });
 
