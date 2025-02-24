@@ -169,29 +169,32 @@ export const eventRouter = createTRPCRouter({
       const endDateTime = new Date(eventDate);
       endDateTime.setHours(endHours!, endMinutes, 0, 0);
 
-      // Get all users matching the input emails
-      const newParticipants = await db.profile.findMany({
-        where: { email: { in: input.participantEmails || [] } },
-        select: { userId: true, email: true },
-      });
+      let participantsData = {};
+      if (input.participantEmails) {
+        const newParticipants = await db.profile.findMany({
+          where: { email: { in: input.participantEmails } },
+          select: { userId: true },
+        });
 
-      // Convert to a set for easy comparison
-      const existingParticipantIds = new Set(
-        event.participants.map((p) => p.userId),
-      );
-      const newParticipantIds = newParticipants.map((p) => p.userId);
+        const existingParticipantIds = new Set(
+          event.participants.map((p) => p.userId),
+        );
+        const newParticipantIds = newParticipants.map((p) => p.userId);
 
-      // Find participants to add (those not in existing list)
-      const participantsToAdd = newParticipants.filter(
-        (p) => !existingParticipantIds.has(p.userId),
-      );
+        const participantsToAdd = newParticipants.filter(
+          (p) => !existingParticipantIds.has(p.userId),
+        );
 
-      // Find participants to remove (those in existing list but not in new list)
-      const participantsToRemove = event.participants.filter(
-        (p) => !newParticipantIds.includes(p.userId),
-      );
+        const participantsToRemove = event.participants.filter(
+          (p) => !newParticipantIds.includes(p.userId),
+        );
 
-      // Update the event
+        participantsData = {
+          create: participantsToAdd.map((p) => ({ userId: p.userId })),
+          deleteMany: participantsToRemove.map((p) => ({ userId: p.userId })),
+        };
+      }
+
       const updatedEvent = await db.event.update({
         where: { id: input.eventId },
         data: {
@@ -201,10 +204,9 @@ export const eventRouter = createTRPCRouter({
           startTime: startDateTime,
           endTime: endDateTime,
           color: input.color,
-          participants: {
-            create: participantsToAdd.map((p) => ({ userId: p.userId })), // Add only new participants
-            deleteMany: participantsToRemove.map((p) => ({ userId: p.userId })), // Remove those not in the updated list
-          },
+          ...(input.participantEmails
+            ? { participants: participantsData }
+            : {}),
         },
       });
 
