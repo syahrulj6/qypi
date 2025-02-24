@@ -84,17 +84,19 @@ export const notesRouter = createTRPCRouter({
 
       if (!user) throw new Error("Unauthorized");
 
-      const notebook = await db.notebook.findUnique({
-        where: { id: notebookId, ownerId: user.id },
-      });
+      if (notebookId) {
+        const notebook = await db.notebook.findUnique({
+          where: { id: notebookId, ownerId: user.id },
+        });
 
-      if (!notebook) throw new Error("Notebook not found!");
+        if (!notebook) throw new Error("Notebook not found!");
+      }
 
       const createNote = await db.note.create({
         data: {
           title,
           content,
-          notebookId,
+          notebookId: notebookId || null,
         },
       });
 

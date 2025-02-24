@@ -73,10 +73,10 @@ model Notebook {
 model Note {
     id        String   @id @default(uuid())
     title     String
-    content   String?  // Optional, can store text
+    content   String?  
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    notebookId String
-    notebook   Notebook @relation(fields: [notebookId], references: [id])
+    notebookId String?   
+    notebook   Notebook? @relation(fields: [notebookId], references: [id])  
 }

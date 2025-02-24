@@ -1,7 +1,15 @@
 import { Folder, File, Plus } from "lucide-react";
 import { useState } from "react";
 
-export const CreateNoteMenuButton = () => {
+interface CreateNoteMenuButton {
+  onOpenNote: () => void;
+  onOpenNotebook: () => void;
+}
+
+export const CreateNoteMenuButton = ({
+  onOpenNote,
+  onOpenNotebook,
+}: CreateNoteMenuButton) => {
   const [openMenuButton, setOpenMenuButton] = useState(false);
 
   return (
@@ -14,10 +22,16 @@ export const CreateNoteMenuButton = () => {
             : "pointer-events-none translate-y-4 opacity-0"
         }`}
       >
-        <button className="rounded-xl bg-purple-300 p-3 transition-colors hover:bg-purple-400">
+        <button
+          className="rounded-xl bg-purple-300 p-3 transition-colors hover:bg-purple-400"
+          onClick={onOpenNotebook}
+        >
           <Folder className="h-6 w-6 text-primary" />
         </button>
-        <button className="rounded-xl bg-purple-300 p-3 transition-colors hover:bg-purple-400">
+        <button
+          className="rounded-xl bg-purple-300 p-3 transition-colors hover:bg-purple-400"
+          onClick={onOpenNote}
+        >
           <File className="h-6 w-6 text-primary" />
         </button>
       </div>

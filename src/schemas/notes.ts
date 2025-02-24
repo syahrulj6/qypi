@@ -8,5 +8,5 @@ export const createNoteBook = z.object({
 export const createNote = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().optional(),
-  notebookId: z.string(),
+  notebookId: z.string().optional(),
 });
