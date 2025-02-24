@@ -16,18 +16,16 @@ interface UpdateEventModal {
   eventId: string;
   isOpen: boolean;
   onClose: () => void;
+  refetch: () => void;
 }
 
 export const UpdateEventModal = ({
   isOpen,
   onClose,
   eventId,
+  refetch,
 }: UpdateEventModal) => {
-  const {
-    data: getEventData,
-    isLoading,
-    refetch,
-  } = api.event.getEventById.useQuery({
+  const { data: getEventData } = api.event.getEventById.useQuery({
     eventId,
   });
 

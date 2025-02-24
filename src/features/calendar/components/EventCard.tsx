@@ -212,6 +212,7 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
 
       {showUpdateModal && (
         <UpdateEventModal
+          refetch={refetch}
           eventId={event.id}
           isOpen={showUpdateModal}
           onClose={() => setShowUpdateModal(false)}
