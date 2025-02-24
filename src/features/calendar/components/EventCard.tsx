@@ -1,5 +1,10 @@
 import { Button } from "~/components/ui/button";
-import { ArrowLeftFromLineIcon, LoaderCircleIcon, Trash } from "lucide-react";
+import {
+  ArrowLeftFromLineIcon,
+  Edit2,
+  LoaderCircleIcon,
+  Trash,
+} from "lucide-react";
 import { toast } from "sonner";
 import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
@@ -17,6 +22,7 @@ import {
 } from "~/components/ui/alert-dialog";
 import { useEffect, useState } from "react";
 import { supabase } from "~/lib/supabase/client";
+import { UpdateEventModal } from "./UpdateEventModal";
 
 interface EventCardProps {
   event: {
@@ -44,6 +50,7 @@ interface EventCardProps {
 
 export const EventCard = ({ event, refetch }: EventCardProps) => {
   const [userId, setUserId] = useState("");
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   useEffect(() => {
     void (async function () {
@@ -110,34 +117,41 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
               {event.title}
             </h3>
             {userId === event.organizer.userId ? (
-              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="icon" type="button">
-                    <Trash />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Konfirmasi hapus event</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Apakah Anda yakin ingin menghapus event? Perubahan ini
-                      bersifat permanen.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-500 transition-colors hover:bg-red-600"
-                      onClick={() => {
-                        setIsDialogOpen(false);
-                        handleDelete();
-                      }}
-                    >
-                      Ya, Hapus Event
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <div className="flex items-center gap-1">
+                <Button size="icon" onClick={() => setShowUpdateModal(true)}>
+                  <Edit2 />
+                </Button>
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="icon" type="button">
+                      <Trash />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Konfirmasi hapus event
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menghapus event? Perubahan ini
+                        bersifat permanen.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 transition-colors hover:bg-red-600"
+                        onClick={() => {
+                          setIsDialogOpen(false);
+                          handleDelete();
+                        }}
+                      >
+                        Ya, Hapus Event
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             ) : (
               <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
@@ -194,6 +208,14 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
             </div>
           )}
         </div>
+      )}
+
+      {showUpdateModal && (
+        <UpdateEventModal
+          eventId={event.id}
+          isOpen={showUpdateModal}
+          onClose={() => setShowUpdateModal(false)}
+        />
       )}
     </>
   );

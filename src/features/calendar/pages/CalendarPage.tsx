@@ -8,7 +8,6 @@ import { api } from "~/utils/api";
 import { DatePicker } from "../components/DatePickerModal";
 import { CreateEventModal } from "../components/CreateEventModal";
 import { EventCard } from "../components/EventCard";
-import { UpdateEventModal } from "../components/UpdateEventModal";
 
 const CalendarPage = () => {
   const {
@@ -140,7 +139,6 @@ const CalendarPage = () => {
                   }}
                   refetch={refetch}
                 />
-                <UpdateEventModal eventId={event.id} />
               </>
             ))}
           </div>
