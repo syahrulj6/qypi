@@ -3,6 +3,7 @@ import { SessionRoute } from "~/components/layout/SessionRoute";
 import { CreateNoteMenuButton } from "../components/CreateNoteMenuButton";
 import { useState } from "react";
 import { CreateNoteModal } from "../components/CreateNoteModal";
+import { CreateNotebookModal } from "../components/CreateNotebookModal";
 
 export const NotesPage = () => {
   const [showCreateNoteModal, setShowCreateNoteModal] = useState(false);
@@ -20,6 +21,12 @@ export const NotesPage = () => {
           <CreateNoteModal
             isOpen={showCreateNoteModal}
             onClose={() => setShowCreateNoteModal(false)}
+          />
+        )}
+        {showCreateNotebooksModal && (
+          <CreateNotebookModal
+            isOpen={showCreateNotebooksModal}
+            onClose={() => setShowCreateNotebooksModal(false)}
           />
         )}
         <div className="flex flex-col">
