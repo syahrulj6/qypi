@@ -38,7 +38,7 @@ export const notesRouter = createTRPCRouter({
 
     const [notebooks, notes] = await Promise.all([
       db.notebook.findMany({
-        include: { notes: true }, // Fetch notes inside each notebook
+        include: { notes: true },
       }),
       db.note.findMany({
         include: { notebook: true },
@@ -49,7 +49,7 @@ export const notesRouter = createTRPCRouter({
       ...notebooks.map((notebook) => ({
         id: notebook.id,
         title: notebook.title,
-        type: "folder",
+        type: "folder" as const,
         color: notebook.color,
         createdAt: notebook.createdAt,
         updatedAt: notebook.updatedAt,
@@ -58,7 +58,7 @@ export const notesRouter = createTRPCRouter({
       ...notes.map((note) => ({
         id: note.id,
         title: note.title,
-        type: "file",
+        type: "file" as const, // 👈 Explicitly define the type
         content: note.content,
         notebookId: note.notebookId,
         createdAt: note.createdAt,
