@@ -31,6 +31,48 @@ export const notesRouter = createTRPCRouter({
     return notes;
   }),
 
+  getAllNotesAndNotebooks: privateProcedure.query(async ({ ctx }) => {
+    const { db, user } = ctx;
+
+    if (!user) throw new Error("Unauthorized!");
+
+    const [notebooks, notes] = await Promise.all([
+      db.notebook.findMany({
+        include: { notes: true }, // Fetch notes inside each notebook
+      }),
+      db.note.findMany({
+        include: { notebook: true },
+      }),
+    ]);
+
+    const combinedData = [
+      ...notebooks.map((notebook) => ({
+        id: notebook.id,
+        title: notebook.title,
+        type: "folder",
+        color: notebook.color,
+        createdAt: notebook.createdAt,
+        updatedAt: notebook.updatedAt,
+        notesCount: notebook.notes.length,
+      })),
+      ...notes.map((note) => ({
+        id: note.id,
+        title: note.title,
+        type: "file",
+        content: note.content,
+        notebookId: note.notebookId,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt,
+      })),
+    ];
+
+    combinedData.sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+
+    return combinedData;
+  }),
+
   getNoteOrFolder: privateProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
