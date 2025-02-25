@@ -15,6 +15,7 @@ const CalendarPage = () => {
     isLoading,
     refetch,
   } = api.event.getEvents.useQuery();
+
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">(
     "weekly",

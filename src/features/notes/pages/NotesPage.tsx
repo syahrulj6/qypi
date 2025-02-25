@@ -1,7 +1,7 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SessionRoute } from "~/components/layout/SessionRoute";
 import { CreateNoteMenuButton } from "../components/CreateNoteMenuButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateNoteModal } from "../components/CreateNoteModal";
 import { CreateNotebookModal } from "../components/CreateNotebookModal";
 import { api } from "~/utils/api";
@@ -23,8 +23,17 @@ export const NotesPage = () => {
   const [showCreateNotebooksModal, setShowCreateNotebooksModal] =
     useState(false);
 
-  const { data: notesAndNotebooks, isLoading } =
-    api.notes.getAllNotesAndNotebooks.useQuery();
+  const {
+    data: notesAndNotebooks,
+    isLoading,
+    refetch,
+  } = api.notes.getAllNotesAndNotebooks.useQuery();
+
+  useEffect(() => {
+    if (!isLoading) {
+      refetch();
+    }
+  }, [isLoading, showCreateNoteModal, showCreateNotebooksModal, refetch]);
 
   return (
     <SessionRoute>
@@ -35,25 +44,27 @@ export const NotesPage = () => {
         />
         {showCreateNoteModal && (
           <CreateNoteModal
+            refetch={refetch}
             isOpen={showCreateNoteModal}
             onClose={() => setShowCreateNoteModal(false)}
           />
         )}
         {showCreateNotebooksModal && (
           <CreateNotebookModal
+            refetch={refetch}
             isOpen={showCreateNotebooksModal}
             onClose={() => setShowCreateNotebooksModal(false)}
           />
         )}
 
-        <div className="mt-2 flex flex-col">
+        <div className="mt-2 flex flex-col md:pr-10">
           <h1 className="text-lg font-semibold md:text-2xl">My Notes</h1>
           {isLoading ? (
             <div className="md:mt-15 mt-10 flex w-full items-center justify-center">
               <LoaderCircleIcon className="animate-spin" />
             </div>
           ) : (
-            <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {notesAndNotebooks?.map((item) => (
                 <NotesCard key={item.id} {...(item as NotesCardProps)} />
               ))}

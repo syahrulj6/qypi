@@ -14,9 +14,14 @@ import { Button } from "~/components/ui/button";
 interface CreateNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
+  refetch: () => void;
 }
 
-export const CreateNoteModal = ({ isOpen, onClose }: CreateNoteModalProps) => {
+export const CreateNoteModal = ({
+  isOpen,
+  onClose,
+  refetch,
+}: CreateNoteModalProps) => {
   const form = useForm<CreateNoteFormSchema>({
     resolver: zodResolver(createNoteFormSchema),
     defaultValues: {
@@ -35,6 +40,7 @@ export const CreateNoteModal = ({ isOpen, onClose }: CreateNoteModalProps) => {
       {
         onSuccess: () => {
           toast.success("Berhasil membuat Note");
+          refetch();
           onClose();
           form.reset();
         },

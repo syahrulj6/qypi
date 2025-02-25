@@ -14,11 +14,13 @@ import { Button } from "~/components/ui/button";
 interface CreateNotebookModalProps {
   isOpen: boolean;
   onClose: () => void;
+  refetch: () => void;
 }
 
 export const CreateNotebookModal = ({
   isOpen,
   onClose,
+  refetch,
 }: CreateNotebookModalProps) => {
   const form = useForm<CreateNotebookFormSchema>({
     resolver: zodResolver(createNotebookFormSchema),
@@ -35,6 +37,7 @@ export const CreateNotebookModal = ({
     createNotebook.mutate(data, {
       onSuccess: () => {
         toast.success("Berhasil membuat Notebook");
+        refetch();
         onClose();
         form.reset();
       },
