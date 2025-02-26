@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
 import { EditNoteModal } from "./EditNoteModal";
+import { EditNotebookModal } from "./EditNotebookModal";
 
 interface NotesCardProps {
   id: string;
@@ -41,7 +42,9 @@ export const NotesCard = ({
   refetch,
 }: NotesCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditNoteModal, setShowEditNoteModal] = useState(false);
+  const [showEditNotebookModal, setShowEditNotebookModal] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const defaultColor = "#AA60C8";
   const bgColor = type === "folder" && color ? color : defaultColor;
@@ -70,7 +73,7 @@ export const NotesCard = ({
   const handleDeleteNotes = () => {
     deleteNotes.mutate(
       {
-        notesId: id,
+        notebookId: id,
       },
       {
         onSuccess: () => {
@@ -104,21 +107,34 @@ export const NotesCard = ({
                 <Folder />
                 <p>{notesCount} Notes</p>
               </div>
-              <DropdownMenu>
+              <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={setIsDropdownOpen}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
                     size={"icon"}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsDropdownOpen((prev) => !prev);
+                    }}
                   >
                     <EllipsisIcon />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="z-20 flex w-fit flex-col gap-2"
+                  className="flex w-fit flex-col gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Button variant="secondary" size={"icon"}>
+                  <Button
+                    variant="secondary"
+                    size={"icon"}
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      setShowEditNotebookModal(true);
+                    }}
+                  >
                     <Edit />
                   </Button>
 
@@ -164,24 +180,33 @@ export const NotesCard = ({
                 <File />
                 <p>Note</p>
               </div>
-              <DropdownMenu>
+              <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={setIsDropdownOpen}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
                     size={"icon"}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsDropdownOpen((prev) => !prev);
+                    }}
                   >
                     <EllipsisIcon />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="z-20 flex w-fit flex-col gap-2"
+                  className="flex w-fit flex-col gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Button
                     variant="secondary"
                     size={"icon"}
-                    onClick={() => setShowEditModal(true)}
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      setShowEditNoteModal(true);
+                    }}
                   >
                     <Edit />
                   </Button>
@@ -227,12 +252,21 @@ export const NotesCard = ({
         </div>
       </div>
 
-      {showEditModal && (
+      {showEditNoteModal && (
         <EditNoteModal
           refetch={refetch}
           noteId={id}
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
+          isOpen={showEditNoteModal}
+          onClose={() => setShowEditNoteModal(false)}
+        />
+      )}
+
+      {showEditNotebookModal && (
+        <EditNotebookModal
+          refetch={refetch}
+          notebookId={id}
+          isOpen={showEditNotebookModal}
+          onClose={() => setShowEditNotebookModal(false)}
         />
       )}
     </>

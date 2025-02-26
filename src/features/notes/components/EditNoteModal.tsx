@@ -1,8 +1,5 @@
 import { useForm } from "react-hook-form";
-import {
-  editNoteFormSchema,
-  type EditNoteFormSchema,
-} from "../forms/edit-note";
+import { noteFormSchema, type NoteFormSchema } from "../forms/note";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { Button } from "~/components/ui/button";
@@ -10,7 +7,7 @@ import { api } from "~/utils/api";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import { EditNoteFormInner } from "./EditNoteFormInner";
+import { NoteFormInner } from "./NoteFormInner";
 
 interface EditNoteModalProps {
   noteId: string;
@@ -29,8 +26,8 @@ export const EditNoteModal = ({
     noteId,
   });
 
-  const form = useForm<EditNoteFormSchema>({
-    resolver: zodResolver(editNoteFormSchema),
+  const form = useForm<NoteFormSchema>({
+    resolver: zodResolver(noteFormSchema),
     defaultValues: {
       title: "",
       content: "",
@@ -48,7 +45,7 @@ export const EditNoteModal = ({
 
   const editNote = api.notes.editNote.useMutation();
 
-  const handleEditNote = (data: EditNoteFormSchema) => {
+  const handleEditNote = (data: NoteFormSchema) => {
     editNote.mutate(
       {
         noteId,
@@ -90,7 +87,7 @@ export const EditNoteModal = ({
             onSubmit={form.handleSubmit(handleEditNote)}
             className="mt-2 grid grid-cols-2 gap-x-2 space-y-2"
           >
-            <EditNoteFormInner />
+            <NoteFormInner />
             <Button type="submit" className="col-span-2 w-full">
               Simpan Perubahan
             </Button>

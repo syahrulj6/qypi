@@ -1,14 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  createNoteFormSchema,
-  CreateNoteFormSchema,
-} from "../forms/create-note";
+import { noteFormSchema, NoteFormSchema } from "../forms/note";
 import { api } from "~/utils/api";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Form } from "~/components/ui/form";
-import { CreateNoteFormInner } from "./CreateNoteFormInner";
+import { NoteFormInner } from "./NoteFormInner";
 import { Button } from "~/components/ui/button";
 
 interface CreateNoteModalProps {
@@ -22,8 +19,8 @@ export const CreateNoteModal = ({
   onClose,
   refetch,
 }: CreateNoteModalProps) => {
-  const form = useForm<CreateNoteFormSchema>({
-    resolver: zodResolver(createNoteFormSchema),
+  const form = useForm<NoteFormSchema>({
+    resolver: zodResolver(noteFormSchema),
     defaultValues: {
       title: "",
       content: "",
@@ -32,7 +29,7 @@ export const CreateNoteModal = ({
 
   const createNote = api.notes.createNote.useMutation();
 
-  const handleCreateNote = (data: CreateNoteFormSchema) => {
+  const handleCreateNote = (data: NoteFormSchema) => {
     createNote.mutate(
       {
         ...data,
@@ -73,7 +70,7 @@ export const CreateNoteModal = ({
             onSubmit={form.handleSubmit(handleCreateNote)}
             className="mt-2 grid grid-cols-2 gap-x-2 space-y-2"
           >
-            <CreateNoteFormInner />
+            <NoteFormInner />
             <Button type="submit" className="col-span-2 w-full">
               Simpan Note
             </Button>

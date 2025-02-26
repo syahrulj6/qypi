@@ -7,22 +7,13 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { CreateNotebookFormSchema } from "../forms/create-notebook";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { NotebookFormSchema } from "../forms/notebook";
 import { ColorPicker, useColor } from "react-color-palette";
-import { Button } from "~/components/ui/button";
-import { useState } from "react";
 
 import "react-color-palette/css";
 
-export const CreateNotebookFormInner = () => {
-  const form = useFormContext<CreateNotebookFormSchema>();
+export const NotebookFormInner = () => {
+  const form = useFormContext<NotebookFormSchema>();
   const [color, setColor] = useColor(form.watch("color") || "#FFD43A");
 
   return (
@@ -66,8 +57,8 @@ export const CreateNotebookFormInner = () => {
               height={50}
               hideInput={["rgb", "hsv"]}
               onChange={(newColor) => {
-                setColor(newColor); // Update local state
-                field.onChange(newColor.hex); // Update form field
+                setColor(newColor);
+                field.onChange(newColor.hex);
               }}
             />
 

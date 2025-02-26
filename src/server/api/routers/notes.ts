@@ -24,20 +24,20 @@ export const notesRouter = createTRPCRouter({
   getNotebookById: privateProcedure
     .input(
       z.object({
-        notesId: z.string(),
+        notebookId: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { notesId } = input;
+      const { notebookId } = input;
 
-      const editNotebook = await db.notebook.findUnique({
+      const getNotebook = await db.notebook.findUnique({
         where: {
-          id: notesId,
+          id: notebookId,
         },
       });
 
-      return editNotebook;
+      return getNotebook;
     }),
 
   getAllNoteBooks: privateProcedure.query(async ({ ctx }) => {
@@ -204,30 +204,30 @@ export const notesRouter = createTRPCRouter({
   deleteNotesById: privateProcedure
     .input(
       z.object({
-        notesId: z.string(),
+        notebookId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { notesId } = input;
+      const { notebookId } = input;
 
       const childNode = await db.note.findMany({
         where: {
-          notebookId: notesId,
+          notebookId: notebookId,
         },
       });
 
       if (childNode !== null) {
         await db.note.deleteMany({
           where: {
-            notebookId: notesId,
+            notebookId: notebookId,
           },
         });
       }
 
       const deleteNotes = await db.notebook.delete({
         where: {
-          id: notesId,
+          id: notebookId,
         },
       });
 

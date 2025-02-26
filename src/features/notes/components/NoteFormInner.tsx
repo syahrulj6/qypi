@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import { CreateNoteFormSchema } from "../forms/create-note";
+import { NoteFormSchema } from "../forms/note";
 import {
   FormControl,
   FormField,
@@ -10,8 +10,8 @@ import {
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 
-export const CreateNoteFormInner = () => {
-  const form = useFormContext<CreateNoteFormSchema>();
+export const NoteFormInner = () => {
+  const form = useFormContext<NoteFormSchema>();
 
   return (
     <>
