@@ -46,6 +46,7 @@ export const NotesCard = ({
   const bgColorWithOpacity = `${bgColor}99`;
 
   const deleteNote = api.notes.deleteNoteById.useMutation();
+  const deleteNotes = api.notes.deleteNotesById.useMutation();
 
   const handleDeleteNote = () => {
     deleteNote.mutate(
@@ -59,6 +60,23 @@ export const NotesCard = ({
         },
         onError: (err) => {
           toast.error("Gagal menghapus note" + err.message);
+        },
+      },
+    );
+  };
+
+  const handleDeleteNotes = () => {
+    deleteNotes.mutate(
+      {
+        notesId: id,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Berhasil menghapus notes!");
+          refetch();
+        },
+        onError: (err) => {
+          toast.error("Gagal menghapus notes" + err.message);
         },
       },
     );
@@ -101,9 +119,36 @@ export const NotesCard = ({
                   <Edit />
                 </Button>
 
-                <Button variant="destructive" size={"icon"}>
-                  <Trash />
-                </Button>
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="icon" type="button">
+                      <Trash />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Konfirmasi hapus Notes
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menghapus notes? Perubahan ini
+                        bersifat permanen.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 transition-colors hover:bg-red-600"
+                        onClick={() => {
+                          setIsDialogOpen(false);
+                          handleDeleteNotes();
+                        }}
+                      >
+                        Ya, Hapus Notes
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
