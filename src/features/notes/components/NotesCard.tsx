@@ -1,11 +1,21 @@
 import { Edit, EllipsisIcon, File, Folder, Trash } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
@@ -29,6 +39,8 @@ export const NotesCard = ({
   notesCount,
   refetch,
 }: NotesCardProps) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const defaultColor = "#AA60C8";
   const bgColor = type === "folder" && color ? color : defaultColor;
   const bgColorWithOpacity = `${bgColor}99`;
@@ -119,13 +131,34 @@ export const NotesCard = ({
                   <Edit />
                 </Button>
 
-                <Button
-                  variant="destructive"
-                  size={"icon"}
-                  onClick={handleDeleteNote}
-                >
-                  <Trash />
-                </Button>
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="icon" type="button">
+                      <Trash />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Konfirmasi hapus Note</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menghapus note? Perubahan ini
+                        bersifat permanen.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 transition-colors hover:bg-red-600"
+                        onClick={() => {
+                          setIsDialogOpen(false);
+                          handleDeleteNote();
+                        }}
+                      >
+                        Ya, Hapus Note
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

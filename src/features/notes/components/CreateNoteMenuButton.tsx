@@ -1,5 +1,6 @@
 import { Folder, File, Plus } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useOutsideClick } from "~/hooks/useOutsideClick";
 
 interface CreateNoteMenuButton {
   onOpenNote: () => void;
@@ -12,10 +13,13 @@ export const CreateNoteMenuButton = ({
 }: CreateNoteMenuButton) => {
   const [openMenuButton, setOpenMenuButton] = useState(false);
 
+  const menuButtonRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(menuButtonRef, () => setOpenMenuButton(false));
+
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-center space-y-3 md:bottom-16 md:right-16">
-      {/* Folder & File Buttons */}
       <div
+        ref={menuButtonRef}
         className={`flex flex-col items-center space-y-3 transition-all duration-300 ${
           openMenuButton
             ? "translate-y-0 opacity-100"
