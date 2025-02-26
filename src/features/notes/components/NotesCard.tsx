@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
+import { EditNoteModal } from "./EditNoteModal";
 
 interface NotesCardProps {
   id: string;
@@ -40,6 +41,7 @@ export const NotesCard = ({
   refetch,
 }: NotesCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const defaultColor = "#AA60C8";
   const bgColor = type === "folder" && color ? color : defaultColor;
@@ -83,133 +85,156 @@ export const NotesCard = ({
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: bgColorWithOpacity,
-        transition: "background-color 0.3s ease",
-      }}
-      className="h-32 cursor-pointer rounded-md p-4 transition hover:opacity-100"
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = bgColor)}
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.backgroundColor = bgColorWithOpacity)
-      }
-    >
-      <div className="flex flex-col space-y-2">
-        {type === "folder" ? (
-          <div className="flex items-center justify-between gap-2 text-neutral-700">
-            <div className="flex gap-2">
-              <Folder />
-              <p>{notesCount} Notes</p>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size={"icon"}
+    <>
+      <div
+        style={{
+          backgroundColor: bgColorWithOpacity,
+          transition: "background-color 0.3s ease",
+        }}
+        className="h-32 cursor-pointer rounded-md p-4 transition hover:opacity-100"
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = bgColor)}
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = bgColorWithOpacity)
+        }
+      >
+        <div className="flex flex-col space-y-2">
+          {type === "folder" ? (
+            <div className="flex items-center justify-between gap-2 text-neutral-700">
+              <div className="flex gap-2">
+                <Folder />
+                <p>{notesCount} Notes</p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size={"icon"}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <EllipsisIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="z-20 flex w-fit flex-col gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <EllipsisIcon />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="z-20 flex w-fit flex-col gap-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button variant="secondary" size={"icon"}>
-                  <Edit />
-                </Button>
+                  <Button variant="secondary" size={"icon"}>
+                    <Edit />
+                  </Button>
 
-                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="icon" type="button">
-                      <Trash />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Konfirmasi hapus Notes
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Apakah Anda yakin ingin menghapus notes? Perubahan ini
-                        bersifat permanen.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Batal</AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-500 transition-colors hover:bg-red-600"
-                        onClick={() => {
-                          setIsDialogOpen(false);
-                          handleDeleteNotes();
-                        }}
-                      >
-                        Ya, Hapus Notes
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-2 text-neutral-700">
-            <div className="flex gap-2">
-              <File />
-              <p>Note</p>
+                  <AlertDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon" type="button">
+                        <Trash />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Konfirmasi hapus Notes
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Apakah Anda yakin ingin menghapus notes? Perubahan ini
+                          bersifat permanen.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-500 transition-colors hover:bg-red-600"
+                          onClick={() => {
+                            setIsDialogOpen(false);
+                            handleDeleteNotes();
+                          }}
+                        >
+                          Ya, Hapus Notes
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size={"icon"}
+          ) : (
+            <div className="flex items-center justify-between gap-2 text-neutral-700">
+              <div className="flex gap-2">
+                <File />
+                <p>Note</p>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size={"icon"}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <EllipsisIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="z-20 flex w-fit flex-col gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <EllipsisIcon />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="z-20 flex w-fit flex-col gap-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button variant="secondary" size={"icon"}>
-                  <Edit />
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size={"icon"}
+                    onClick={() => setShowEditModal(true)}
+                  >
+                    <Edit />
+                  </Button>
 
-                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="icon" type="button">
-                      <Trash />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Konfirmasi hapus Note</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Apakah Anda yakin ingin menghapus note? Perubahan ini
-                        bersifat permanen.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Batal</AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-500 transition-colors hover:bg-red-600"
-                        onClick={() => {
-                          setIsDialogOpen(false);
-                          handleDeleteNote();
-                        }}
-                      >
-                        Ya, Hapus Note
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-        <p className="font-semibold">{title}</p>
+                  <AlertDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon" type="button">
+                        <Trash />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Konfirmasi hapus Note
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Apakah Anda yakin ingin menghapus note? Perubahan ini
+                          bersifat permanen.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-500 transition-colors hover:bg-red-600"
+                          onClick={() => {
+                            setIsDialogOpen(false);
+                            handleDeleteNote();
+                          }}
+                        >
+                          Ya, Hapus Note
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+          <p className="font-semibold">{title}</p>
+        </div>
       </div>
-    </div>
+
+      {showEditModal && (
+        <EditNoteModal
+          refetch={refetch}
+          noteId={id}
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+    </>
   );
 };

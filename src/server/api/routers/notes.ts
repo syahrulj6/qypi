@@ -3,6 +3,24 @@ import { createTRPCRouter, privateProcedure } from "../trpc";
 import { z } from "zod";
 
 export const notesRouter = createTRPCRouter({
+  getNoteById: privateProcedure
+    .input(
+      z.object({
+        noteId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { noteId } = input;
+
+      const getNote = await db.note.findUnique({
+        where: {
+          id: noteId,
+        },
+      });
+      return getNote;
+    }),
+
   getAllNoteBooks: privateProcedure.query(async ({ ctx }) => {
     const { db, user } = ctx;
 
@@ -195,5 +213,30 @@ export const notesRouter = createTRPCRouter({
       });
 
       return deleteNotes;
+    }),
+
+  editNote: privateProcedure
+    .input(
+      z.object({
+        noteId: z.string(),
+        title: z.string().min(1, "Title is required"),
+        content: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { title, content, noteId } = input;
+
+      const editNote = await db.note.update({
+        where: {
+          id: noteId,
+        },
+        data: {
+          title,
+          content,
+        },
+      });
+
+      return editNote;
     }),
 });

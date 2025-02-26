@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createNoteFormSchema = z.object({
+export const editNoteFormSchema = z.object({
   title: z
     .string()
     .min(1, "Title is required!")
@@ -8,4 +8,4 @@ export const createNoteFormSchema = z.object({
   content: z.string().optional(),
 });
 
-export type CreateNoteFormSchema = z.infer<typeof createNoteFormSchema>;
+export type EditNoteFormSchema = z.infer<typeof editNoteFormSchema>;
