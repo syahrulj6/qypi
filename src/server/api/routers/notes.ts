@@ -144,4 +144,56 @@ export const notesRouter = createTRPCRouter({
 
       return createNote;
     }),
+
+  deleteNoteById: privateProcedure
+    .input(
+      z.object({
+        noteId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { noteId } = input;
+
+      const deleteNote = await db.note.delete({
+        where: {
+          id: noteId,
+        },
+      });
+
+      return deleteNote;
+    }),
+
+  deleteNotesById: privateProcedure
+    .input(
+      z.object({
+        notesId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { notesId } = input;
+
+      const childNode = await db.note.findMany({
+        where: {
+          notebookId: notesId,
+        },
+      });
+
+      if (childNode !== null) {
+        await db.note.deleteMany({
+          where: {
+            notebookId: notesId,
+          },
+        });
+      }
+
+      const deleteNotes = await db.notebook.delete({
+        where: {
+          id: notesId,
+        },
+      });
+
+      return deleteNotes;
+    }),
 });

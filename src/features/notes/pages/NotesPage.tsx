@@ -66,7 +66,11 @@ export const NotesPage = () => {
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {notesAndNotebooks?.map((item) => (
-                <NotesCard key={item.id} {...(item as NotesCardProps)} />
+                <NotesCard
+                  refetch={refetch}
+                  key={item.id}
+                  {...(item as NotesCardProps)}
+                />
               ))}
             </div>
           )}
