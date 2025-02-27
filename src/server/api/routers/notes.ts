@@ -78,6 +78,7 @@ export const notesRouter = createTRPCRouter({
         include: { notes: true },
       }),
       db.note.findMany({
+        where: { notebookId: null },
         include: { notebook: true },
       }),
     ]);
@@ -86,7 +87,7 @@ export const notesRouter = createTRPCRouter({
       ...notebooks.map((notebook) => ({
         id: notebook.id,
         title: notebook.title,
-        type: "folder" as const,
+        type: "notebook" as const,
         color: notebook.color,
         createdAt: notebook.createdAt,
         updatedAt: notebook.updatedAt,
@@ -95,7 +96,7 @@ export const notesRouter = createTRPCRouter({
       ...notes.map((note) => ({
         id: note.id,
         title: note.title,
-        type: "file" as const, // 👈 Explicitly define the type
+        type: "note" as const, // 👈 Explicitly define the type
         content: note.content,
         notebookId: note.notebookId,
         createdAt: note.createdAt,

@@ -11,7 +11,7 @@ import { LoaderCircleIcon } from "lucide-react";
 interface NotesCardProps {
   id: string;
   title: string;
-  type: "folder" | "file";
+  type: "notebook" | "note";
   color?: string | null;
   content?: string | null;
   notesCount?: number;

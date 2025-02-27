@@ -1,4 +1,4 @@
-import { Edit, EllipsisIcon, File, Trash } from "lucide-react";
+import { Edit, EllipsisIcon, File, Folder, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -108,7 +108,7 @@ export const NotesCard = ({
           {type === "notebook" ? (
             <div className="flex items-center justify-between gap-2 text-neutral-700">
               <div className="flex gap-2">
-                <File />
+                <Folder />
                 <p>{notesCount} Notes</p>
               </div>
               <DropdownMenu
