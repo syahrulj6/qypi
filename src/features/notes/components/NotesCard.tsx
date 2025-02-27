@@ -1,4 +1,4 @@
-import { Edit, EllipsisIcon, File, Folder, Trash } from "lucide-react";
+import { Edit, EllipsisIcon, File, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,7 +26,7 @@ import { useRouter } from "next/router";
 interface NotesCardProps {
   id: string;
   title: string;
-  type: "folder" | "file";
+  type: "notebook" | "note";
   color?: string | null;
   content?: string | null;
   notesCount?: number;
@@ -50,7 +50,7 @@ export const NotesCard = ({
   const router = useRouter();
 
   const defaultColor = "#AA60C8";
-  const bgColor = type === "folder" && color ? color : defaultColor;
+  const bgColor = type === "notebook" && color ? color : defaultColor;
   const bgColorWithOpacity = `${bgColor}99`;
 
   const deleteNote = api.notes.deleteNoteById.useMutation();
@@ -105,10 +105,10 @@ export const NotesCard = ({
         }
       >
         <div className="flex flex-col space-y-2">
-          {type === "folder" ? (
+          {type === "notebook" ? (
             <div className="flex items-center justify-between gap-2 text-neutral-700">
               <div className="flex gap-2">
-                <Folder />
+                <File />
                 <p>{notesCount} Notes</p>
               </div>
               <DropdownMenu

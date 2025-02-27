@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import DashboardLayout from "~/components/layout/DashboardLayout";
-import { LoaderCircleIcon, Plus } from "lucide-react";
+import { ArrowLeft, LoaderCircleIcon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { CreateNoteModal } from "../components/CreateNoteModal";
+import { NotesCard } from "../components/NotesCard";
 
 const NoteDetailPage = () => {
   const [showCreateNoteModal, setShowCreateNoteModal] = useState(false);
@@ -59,6 +60,10 @@ const NoteDetailPage = () => {
           />
         )}
 
+        <button className="group" onClick={() => router.back()}>
+          <ArrowLeft className="text-neutral-700 transition-colors group-hover:text-current" />
+        </button>
+
         {data.type === "notebook" ? (
           <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <div className="col-span-2 flex items-center justify-between lg:col-span-4">
@@ -69,24 +74,18 @@ const NoteDetailPage = () => {
                 Create Note <Plus />
               </Button>
             </div>
-            {data.notes?.map((note) => (
-              <div
+            {data?.notes?.map((note) => (
+              <NotesCard
                 key={note.id}
-                onClick={() => router.push(`/dashboard/notes/${id}`)}
-                style={{
-                  backgroundColor: bgColorWithOpacity,
-                  transition: "background-color 0.3s ease",
-                }}
-                className="h-32 cursor-pointer rounded-md p-4 transition hover:opacity-100"
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = bgColor)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = bgColorWithOpacity)
-                }
-              >
-                <h1>{note.title}</h1>
-              </div>
+                id={note.id}
+                refetch={refetch}
+                title={note.title}
+                type="note"
+                color={data.color}
+                content={note.content}
+                notesCount={data.notes.length}
+                updatedAt={note.updatedAt}
+              />
             ))}
           </div>
         ) : (
