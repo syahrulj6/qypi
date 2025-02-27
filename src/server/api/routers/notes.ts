@@ -110,30 +110,36 @@ export const notesRouter = createTRPCRouter({
     return combinedData;
   }),
 
-  getNoteOrFolder: privateProcedure
-    .input(z.object({ slug: z.string() }))
-    .query(async ({ input, ctx }) => {
+  getNoteOrNotebookById: privateProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { slug } = input;
+      const { id } = input;
 
-      const folder = await db.notebook.findUnique({
-        where: { id: slug },
+      const notebook = await db.notebook.findUnique({
+        where: { id },
         include: { notes: true },
       });
 
-      if (folder) {
-        return { type: "folder", folder };
+      if (notebook) {
+        return {
+          ...notebook,
+          type: "notebook" as const,
+        };
       }
 
       const note = await db.note.findUnique({
-        where: { id: slug },
+        where: { id },
       });
 
       if (note) {
-        return { type: "file", note };
+        return {
+          ...note,
+          type: "note" as const,
+        };
       }
 
-      throw new Error("Not Found");
+      return null;
     }),
 
   createNoteBook: privateProcedure

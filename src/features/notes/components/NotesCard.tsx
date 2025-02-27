@@ -21,6 +21,7 @@ import {
 import { api } from "~/utils/api";
 import { EditNoteModal } from "./EditNoteModal";
 import { EditNotebookModal } from "./EditNotebookModal";
+import { useRouter } from "next/router";
 
 interface NotesCardProps {
   id: string;
@@ -45,6 +46,8 @@ export const NotesCard = ({
   const [showEditNoteModal, setShowEditNoteModal] = useState(false);
   const [showEditNotebookModal, setShowEditNotebookModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const router = useRouter();
 
   const defaultColor = "#AA60C8";
   const bgColor = type === "folder" && color ? color : defaultColor;
@@ -90,6 +93,7 @@ export const NotesCard = ({
   return (
     <>
       <div
+        onClick={() => router.push(`/dashboard/notes/${id}`)}
         style={{
           backgroundColor: bgColorWithOpacity,
           transition: "background-color 0.3s ease",

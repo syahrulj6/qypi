@@ -12,12 +12,14 @@ interface CreateNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
   refetch: () => void;
+  notebookId?: string;
 }
 
 export const CreateNoteModal = ({
   isOpen,
   onClose,
   refetch,
+  notebookId,
 }: CreateNoteModalProps) => {
   const form = useForm<NoteFormSchema>({
     resolver: zodResolver(noteFormSchema),
@@ -32,6 +34,7 @@ export const CreateNoteModal = ({
   const handleCreateNote = (data: NoteFormSchema) => {
     createNote.mutate(
       {
+        notebookId,
         ...data,
       },
       {
