@@ -5,7 +5,9 @@ import { CreateNoteModal } from "../components/CreateNoteModal";
 import { CreateNotebookModal } from "../components/CreateNotebookModal";
 import { api } from "~/utils/api";
 import { NotesCard } from "../components/NotesCard";
-import { LoaderCircleIcon } from "lucide-react";
+import { LoaderCircleIcon, Search } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { debounce } from "lodash";
 
 interface NotesCardProps {
   id: string;
@@ -21,18 +23,32 @@ export const NotesPage = () => {
   const [showCreateNoteModal, setShowCreateNoteModal] = useState(false);
   const [showCreateNotebooksModal, setShowCreateNotebooksModal] =
     useState(false);
+  const [search, setSearch] = useState("");
 
   const {
     data: notesAndNotebooks,
     isLoading,
     refetch,
-  } = api.notes.getAllNotesAndNotebooks.useQuery();
+  } = api.notes.getAllNotesAndNotebooks.useQuery(
+    { title: search },
+    { staleTime: 5000 },
+  );
+
+  const handleSearch = debounce((e) => {
+    setSearch(e.target.value);
+  }, 300);
 
   useEffect(() => {
     if (!isLoading) {
       refetch();
     }
-  }, [isLoading, showCreateNoteModal, showCreateNotebooksModal, refetch]);
+  }, [
+    isLoading,
+    showCreateNoteModal,
+    showCreateNotebooksModal,
+    refetch,
+    search,
+  ]);
 
   return (
     <DashboardLayout>
@@ -56,7 +72,15 @@ export const NotesPage = () => {
       )}
 
       <div className="mt-2 flex flex-col md:pr-10">
-        <h1 className="text-lg font-semibold md:text-2xl">My Notes</h1>
+        <div className="relative w-4/5 md:w-2/6">
+          <Input
+            placeholder="Search note/notebook..."
+            onChange={handleSearch}
+            className="pl-10 text-sm md:pl-12 md:text-base"
+          />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground md:h-5 md:w-5" />
+        </div>
+
         {isLoading ? (
           <div className="md:mt-15 mt-10 flex w-full items-center justify-center">
             <LoaderCircleIcon className="animate-spin" />

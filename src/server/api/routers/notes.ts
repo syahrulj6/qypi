@@ -1,6 +1,7 @@
 import { createNote, createNoteBook } from "~/schemas/notes";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 
 export const notesRouter = createTRPCRouter({
   getNoteById: privateProcedure
@@ -68,48 +69,62 @@ export const notesRouter = createTRPCRouter({
     return notes;
   }),
 
-  getAllNotesAndNotebooks: privateProcedure.query(async ({ ctx }) => {
-    const { db, user } = ctx;
-
-    if (!user) throw new Error("Unauthorized!");
-
-    const [notebooks, notes] = await Promise.all([
-      db.notebook.findMany({
-        include: { notes: true },
+  getAllNotesAndNotebooks: privateProcedure
+    .input(
+      z.object({
+        title: z.string().optional(),
       }),
-      db.note.findMany({
-        where: { notebookId: null },
-        include: { notebook: true },
-      }),
-    ]);
+    )
+    .query(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { title } = input;
 
-    const combinedData = [
-      ...notebooks.map((notebook) => ({
-        id: notebook.id,
-        title: notebook.title,
-        type: "notebook" as const,
-        color: notebook.color,
-        createdAt: notebook.createdAt,
-        updatedAt: notebook.updatedAt,
-        notesCount: notebook.notes.length,
-      })),
-      ...notes.map((note) => ({
-        id: note.id,
-        title: note.title,
-        type: "note" as const, // 👈 Explicitly define the type
-        content: note.content,
-        notebookId: note.notebookId,
-        createdAt: note.createdAt,
-        updatedAt: note.updatedAt,
-      })),
-    ];
+      const searchFilter = title
+        ? { title: { contains: title, mode: Prisma.QueryMode.insensitive } }
+        : {};
 
-    combinedData.sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
+      if (!user) throw new Error("Unauthorized!");
 
-    return combinedData;
-  }),
+      const [notebooks, notes] = await Promise.all([
+        db.notebook.findMany({
+          where: searchFilter,
+          include: { notes: true },
+        }),
+        db.note.findMany({
+          where: { ...searchFilter, notebookId: null },
+          include: { notebook: true },
+        }),
+      ]);
+
+      const combinedData = [
+        ...notebooks.map((notebook) => ({
+          id: notebook.id,
+          title: notebook.title,
+          type: "notebook" as const,
+          color: notebook.color,
+          createdAt: notebook.createdAt,
+          updatedAt: notebook.updatedAt,
+          notesCount: notebook.notes.length,
+        })),
+        ...notes.map((note) => ({
+          id: note.id,
+          title: note.title,
+          type: "note" as const, // 👈 Explicitly define the type
+          content: note.content,
+          notebookId: note.notebookId,
+          createdAt: note.createdAt,
+          updatedAt: note.updatedAt,
+        })),
+      ];
+
+      combinedData.sort((a, b) => {
+        return (
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      });
+
+      return combinedData;
+    }),
 
   getNoteOrNotebookById: privateProcedure
     .input(z.object({ id: z.string() }))
