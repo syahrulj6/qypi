@@ -1,36 +1,21 @@
 import { ProfileDropdown } from "./ProfileDropdown";
 import { useSession } from "~/hooks/useSession";
 import Link from "next/link";
-import {
-  Bell,
-  Calendar as CalendarIcon,
-  LayoutDashboard,
-  Inbox,
-  Search,
-  Settings,
-  Home,
-  UserRound,
-} from "lucide-react";
+import { Bell, Calendar as CalendarIcon } from "lucide-react";
 import { useState, useRef } from "react";
 import { Calendar } from "~/components/ui/calendar";
 import { useOutsideClick } from "~/hooks/useOutsideClick";
-import { Button } from "../ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
+import { useRouter } from "next/router";
+import { api } from "~/utils/api";
 
-const searchMenuItems = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Profile", url: "/profile", icon: UserRound },
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Inbox", url: "/dashboard/inbox", icon: Inbox },
-  { title: "Calendar", url: "/dashboard/calendar", icon: CalendarIcon },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
+const menuItems = [
+  { title: "Profile", url: "/profile" },
+  { title: "", url: "/dashboard" },
+  { title: "My Inbox", url: "/dashboard/inbox" },
+  { title: "My Calendar", url: "/dashboard/calendar" },
+  { title: "My Notes", url: "/dashboard/notes" },
+  { title: "Settings", url: "/dashboard/settings" },
+  { title: "Teams", url: "/dashboard/teams" },
 ];
 
 type NotificationsType = {
@@ -41,7 +26,6 @@ type NotificationsType = {
   link: string;
 };
 
-// Inbox Dummy
 const notifications: NotificationsType[] = [
   {
     id: "1",
@@ -142,35 +126,33 @@ export const DashboardSection = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const { data: profileData } = api.profile.getProfile.useQuery();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const searchRef = useRef<HTMLDivElement>(null);
 
-  useOutsideClick(searchRef, () => {
-    setIsSearchOpen(false);
-    setSearchQuery("");
-  });
-
-  const filteredItems = searchMenuItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const router = useRouter();
 
   const { session, handleSignOut } = useSession();
+
+  const username = profileData?.username;
+
+  let title = "Dashboard";
+  if (router.pathname === "/dashboard") {
+    title = `Hi, ${username}`;
+  } else {
+    const currentPage = menuItems.find((item) => item.url === router.pathname);
+    if (currentPage) {
+      title = currentPage.title;
+    }
+  }
 
   return (
     <section className="flex w-full flex-col gap-y-5 p-6">
       <div className="flex w-full items-start justify-between md:items-center">
-        <Button
-          variant="outline"
-          className="ml-12 mr-4 flex w-32 justify-between border-muted-foreground text-muted-foreground md:ml-0 md:mr-0 md:w-64"
-          onClick={() => setIsSearchOpen((prev) => !prev)}
-        >
-          <p className="text-sm md:text-base">Search...</p>
-          <Search />
-        </Button>
+        <h3 className="ml-8 mt-1 text-xl font-bold md:ml-0 md:mt-0 md:text-2xl">
+          {title}
+        </h3>
         <div className="relative mr-2 flex items-center gap-5 md:mr-12 md:items-center">
           <button onClick={() => setShowCalendar((prev) => !prev)}>
             <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
@@ -194,42 +176,6 @@ export const DashboardSection = ({
         </div>
       </div>
       {children}
-      {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div
-            ref={searchRef}
-            className="w-full max-w-md rounded-lg bg-secondary p-4 shadow-lg"
-          >
-            <Command className="w-full bg-secondary">
-              <CommandInput
-                placeholder="Type a command or search..."
-                value={searchQuery}
-                onValueChange={setSearchQuery}
-              />
-              <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
-                <CommandGroup heading="Menu">
-                  {filteredItems.map((item) => (
-                    <Link key={item.title} href={item.url} passHref>
-                      <CommandItem className="cursor-pointer">
-                        <item.icon className="mr-2 h-4 w-4" />
-                        <span>{item.title}</span>
-                      </CommandItem>
-                    </Link>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-            <Button
-              variant="default"
-              className="mt-2 w-full"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              Close
-            </Button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
