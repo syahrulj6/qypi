@@ -13,13 +13,13 @@ type Message = {
 
 const Inbox = () => {
   const [message, setMessage] = useState("");
-  const [receiverEmail, setReceiverEmail] = useState(""); // Receiver email input
+  const [receiverEmail, setReceiverEmail] = useState("");
 
-  const { data: inboxData = [] } = api.inbox.getInbox.useQuery(); // ✅ Provide default empty array
+  const { data: inboxData = [] } = api.inbox.getInbox.useQuery();
 
   const { data: profileData } = api.profile.getProfileByEmail.useQuery(
     { email: receiverEmail },
-    { enabled: !!receiverEmail }, // Only fetch when email is provided
+    { enabled: !!receiverEmail },
   );
 
   const { data: messages = [] } = api.inbox.onNewMessage.useSubscription(
@@ -34,7 +34,7 @@ const Inbox = () => {
   const sendMessage = api.inbox.sendInbox.useMutation();
 
   const handleSend = async () => {
-    if (!message.trim() || !profileData?.userId) return; // Ensure userId exists
+    if (!message.trim() || !profileData?.userId) return;
     await sendMessage.mutateAsync({ message, receiverId: profileData.userId });
     setMessage("");
   };
@@ -47,18 +47,7 @@ const Inbox = () => {
           value={receiverEmail}
           onChange={(e) => setReceiverEmail(e.target.value)}
         />
-        <div>
-          {messages.map((msg: Message) => (
-            <p key={msg.id}>{msg.message}</p>
-          ))}
-        </div>
-        <div className="flex flex-col gap-2">
-          {inboxData.length > 0 ? ( // ✅ Check if inboxData has items
-            inboxData.map((inbox) => <div key={inbox.id}>{inbox.message}</div>)
-          ) : (
-            <p>No messages found.</p> // ✅ Handle empty state
-          )}
-        </div>
+
         <Input
           placeholder="Type your message..."
           value={message}
@@ -67,6 +56,19 @@ const Inbox = () => {
         <Button onClick={handleSend} disabled={!profileData?.userId}>
           Send
         </Button>
+
+        <div className="flex flex-col gap-2">
+          {inboxData.length > 0 ? (
+            inboxData.map((inbox) => <div key={inbox.id}>{inbox.message}</div>)
+          ) : (
+            <p>No messages found.</p>
+          )}
+        </div>
+      </div>
+      <div>
+        {messages.map((msg: Message) => (
+          <p key={msg.id}>{msg.message}</p>
+        ))}
       </div>
     </DashboardLayout>
   );

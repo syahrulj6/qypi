@@ -39,27 +39,25 @@ export const inboxRouter = createTRPCRouter({
       return sendMessage;
     }),
 
-  onNewMessage: privateProcedure
-    .input(z.void()) // Fix: Ensure correct procedure structure
-    .subscription(() => {
-      return observable<Message[]>((emit) => {
-        const channel = supabase
-          .channel("inbox-realtime")
-          .on(
-            "postgres_changes",
-            { event: "INSERT", schema: "public", table: "inbox" },
-            (payload) => {
-              const newMessage = payload.new as Message;
-              emit.next([newMessage]); // Fix: Ensure emitted data is an array
-            },
-          )
-          .subscribe();
+  onNewMessage: privateProcedure.input(z.void()).subscription(() => {
+    return observable<Message[]>((emit) => {
+      const channel = supabase
+        .channel("inbox-realtime")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "inbox" },
+          (payload) => {
+            const newMessage = payload.new as Message;
+            emit.next([newMessage]); // Fix: Ensure emitted data is an array
+          },
+        )
+        .subscribe();
 
-        return () => {
-          supabase.removeChannel(channel);
-        };
-      });
-    }),
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    });
+  }),
   getInbox: privateProcedure.query(async ({ ctx }) => {
     const { db, user } = ctx;
     if (!user) {
@@ -73,8 +71,8 @@ export const inboxRouter = createTRPCRouter({
         createdAt: "desc",
       },
       include: {
-        sender: true, // include sender profile details if needed
-        receiver: true, // include receiver profile details if needed
+        sender: true,
+        receiver: true,
       },
     });
   }),
