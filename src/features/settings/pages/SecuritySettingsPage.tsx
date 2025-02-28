@@ -1,6 +1,5 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { SettingsHeader } from "../components/SettingsHeader";
-import { SessionRoute } from "~/components/layout/SessionRoute";
 import { api } from "~/utils/api";
 import { useForm } from "react-hook-form";
 import {
@@ -43,22 +42,20 @@ const SecuritySettingsPage = () => {
   });
 
   return (
-    <SessionRoute>
-      <DashboardLayout>
-        <SettingsHeader />
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="grid flex-1 grid-cols-1 gap-y-4">
-            {!isLoading && profileData && (
-              <Form {...form}>
-                <SecuritySettingsFormInner
-                  handleChangePassword={handleChangePassword}
-                />
-              </Form>
-            )}
-          </div>
+    <DashboardLayout>
+      <SettingsHeader />
+      <div className="mt-6 flex flex-col gap-4">
+        <div className="grid flex-1 grid-cols-1 gap-y-4">
+          {!isLoading && profileData && (
+            <Form {...form}>
+              <SecuritySettingsFormInner
+                handleChangePassword={handleChangePassword}
+              />
+            </Form>
+          )}
         </div>
-      </DashboardLayout>
-    </SessionRoute>
+      </div>
+    </DashboardLayout>
   );
 };
 

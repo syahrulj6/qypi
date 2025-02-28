@@ -126,7 +126,7 @@ export const DashboardSection = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { data: profileData } = api.profile.getProfile.useQuery();
+  const { data: profileData, isLoading } = api.profile.getProfile.useQuery();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -138,7 +138,8 @@ export const DashboardSection = ({
   const username = profileData?.username;
 
   let title = "Dashboard";
-  if (router.pathname === "/dashboard") {
+
+  if (router.pathname === "/dashboard" && !isLoading) {
     title = `Hi, ${username}`;
   } else {
     const currentPage = menuItems.find((item) => item.url === router.pathname);

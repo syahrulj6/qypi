@@ -1,5 +1,4 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
-import { SessionRoute } from "~/components/layout/SessionRoute";
 import { SettingsHeader } from "../components/SettingsHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { api } from "~/utils/api";
@@ -61,61 +60,59 @@ const SettingsPage = () => {
   };
 
   return (
-    <SessionRoute>
-      <DashboardLayout>
-        <SettingsHeader />
-        <div className="mt-6 flex flex-col gap-4">
-          {isLoading ? (
-            <div className="flex flex-col gap-3">
-              <Skeleton className="size-24 rounded-full" />
-              <Skeleton className="h-7" />
-              <Skeleton className="h-7" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <Link href={"/profile"}>
-                <Avatar className="size-20">
-                  <AvatarFallback>P</AvatarFallback>
-                  <AvatarImage src={getProfileData?.profilePictureUrl!} />
-                </Avatar>
-              </Link>
-
-              <div className="flex flex-col gap-2">
-                <p className="text-lg font-medium tracking-tight text-primary">
-                  {getProfileData?.username}
-                </p>
-                <p className="tracking-tight text-muted-foreground">
-                  {getProfileData?.bio}
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-1 flex-col gap-x-3 gap-y-4 md:grid md:grid-cols-2">
-            {!isLoading && getProfileData && (
-              <Form {...form}>
-                <SettingsFormInner
-                  defaultValues={{
-                    email: getProfileData?.email,
-                    bio: getProfileData?.bio,
-                    username: getProfileData?.username,
-                  }}
-                />
-              </Form>
-            )}
+    <DashboardLayout>
+      <SettingsHeader />
+      <div className="mt-6 flex flex-col gap-4">
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            <Skeleton className="size-24 rounded-full" />
+            <Skeleton className="h-7" />
+            <Skeleton className="h-7" />
           </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link href={"/profile"}>
+              <Avatar className="size-20">
+                <AvatarFallback>P</AvatarFallback>
+                <AvatarImage src={getProfileData?.profilePictureUrl!} />
+              </Avatar>
+            </Link>
+
+            <div className="flex flex-col gap-2">
+              <p className="text-lg font-medium tracking-tight text-primary">
+                {getProfileData?.username}
+              </p>
+              <p className="tracking-tight text-muted-foreground">
+                {getProfileData?.bio}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-1 flex-col gap-x-3 gap-y-4 md:grid md:grid-cols-2">
+          {!isLoading && getProfileData && (
+            <Form {...form}>
+              <SettingsFormInner
+                defaultValues={{
+                  email: getProfileData?.email,
+                  bio: getProfileData?.bio,
+                  username: getProfileData?.username,
+                }}
+              />
+            </Form>
+          )}
         </div>
-        <div className="flex w-full justify-center gap-4">
-          <Button
-            className="w-full"
-            disabled={!form.formState.isDirty}
-            onClick={form.handleSubmit(handleUpdateProfileSubmit)}
-          >
-            Simpan
-          </Button>
-        </div>
-      </DashboardLayout>
-    </SessionRoute>
+      </div>
+      <div className="flex w-full justify-center gap-4">
+        <Button
+          className="w-full"
+          disabled={!form.formState.isDirty}
+          onClick={form.handleSubmit(handleUpdateProfileSubmit)}
+        >
+          Simpan
+        </Button>
+      </div>
+    </DashboardLayout>
   );
 };
 
