@@ -81,7 +81,7 @@ const NoteDetailPage = () => {
                 refetch={refetch}
                 title={note.title}
                 type="note"
-                color={data.color}
+                color={bgColorWithOpacity}
                 content={note.content}
                 notesCount={data.notes.length}
                 updatedAt={note.updatedAt}
@@ -89,6 +89,7 @@ const NoteDetailPage = () => {
             ))}
           </div>
         ) : (
+          // TODO : Note UI
           <div className="mt-4 rounded-lg border bg-white p-4 shadow">
             <p>{data.content || "No content available"}</p>
           </div>
