@@ -50,7 +50,7 @@ export const NotesCard = ({
   const router = useRouter();
 
   const defaultColor = "#AA60C8";
-  const bgColor = type === "notebook" && color ? color : defaultColor;
+  const bgColor = color ? color : defaultColor;
   const bgColorWithOpacity = `${bgColor}99`;
 
   const deleteNote = api.notes.deleteNoteById.useMutation();

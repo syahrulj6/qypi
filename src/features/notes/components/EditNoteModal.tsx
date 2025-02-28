@@ -88,7 +88,11 @@ export const EditNoteModal = ({
             className="mt-2 grid grid-cols-2 gap-x-2 space-y-2"
           >
             <NoteFormInner />
-            <Button type="submit" className="col-span-2 w-full">
+            <Button
+              type="submit"
+              className="col-span-2 w-full"
+              disabled={editNote.isPending}
+            >
               Simpan Perubahan
             </Button>
           </form>

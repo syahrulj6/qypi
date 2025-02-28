@@ -23,6 +23,25 @@ export const profileRouter = createTRPCRouter({
     return profile;
   }),
 
+  getProfileByEmail: privateProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { email } = input;
+
+      const profile = await db.profile.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      return profile;
+    }),
+
   updateProfile: privateProcedure
     .input(
       z.object({

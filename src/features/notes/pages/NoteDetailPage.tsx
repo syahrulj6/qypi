@@ -23,11 +23,6 @@ const NoteDetailPage = () => {
     { enabled: !!id },
   );
 
-  const defaultColor = "#AA60C8";
-  const bgColor =
-    data?.type === "notebook" && data.color ? data.color : defaultColor;
-  const bgColorWithOpacity = `${bgColor}99`;
-
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -81,7 +76,7 @@ const NoteDetailPage = () => {
                 refetch={refetch}
                 title={note.title}
                 type="note"
-                color={bgColorWithOpacity}
+                color={data.color}
                 content={note.content}
                 notesCount={data.notes.length}
                 updatedAt={note.updatedAt}

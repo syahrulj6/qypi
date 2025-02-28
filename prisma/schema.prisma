@@ -54,8 +54,12 @@ model Profile {
 
     eventsOrganized Event[] @relation("Organizer") 
     eventsJoined    Participant[]
-    notebooks Notebook[]
+    notebooks       Notebook[]
+
+    sentMessages    Inbox[] @relation("SentMessages") 
+    receivedMessages Inbox[] @relation("ReceivedMessages") 
 }
+
 
 model Notebook {
     id        String   @id @default(uuid())
@@ -80,3 +84,18 @@ model Note {
     notebookId String?   
     notebook   Notebook? @relation(fields: [notebookId], references: [id])  
 }
+
+model Inbox {
+    id         String   @id @default(uuid())
+    message    String
+    createdAt  DateTime @default(now())
+
+    senderId   String
+    sender     Profile  @relation("SentMessages", fields: [senderId], references: [userId])
+
+    receiverId String
+    receiver   Profile  @relation("ReceivedMessages", fields: [receiverId], references: [userId])
+
+    @@index([receiverId]) // Optimize queries for fetching received messages
+}
+
