@@ -7,7 +7,8 @@ type Message = {
   id: string;
   message: string;
   senderId: string;
-  created_at: string;
+  receiverId: string;
+  createdAt: string;
 };
 
 export const inboxRouter = createTRPCRouter({
@@ -26,21 +27,22 @@ export const inboxRouter = createTRPCRouter({
         },
       });
 
-      // Save to Supabase (for real-time updates)
+      // Save to Supabase for real-time updates
       await supabase.from("inbox").insert([
         {
           id: sendMessage.id,
           message: sendMessage.message,
           senderId: sendMessage.senderId,
-          created_at: new Date().toISOString(),
+          receiverId: sendMessage.receiverId,
+          createdAt: sendMessage.createdAt.toISOString(),
         },
       ]);
 
       return sendMessage;
     }),
 
-  onNewMessage: privateProcedure.input(z.void()).subscription(() => {
-    return observable<Message[]>((emit) => {
+  onNewMessage: privateProcedure.subscription(({ ctx }) => {
+    return observable<Message>((emit) => {
       const channel = supabase
         .channel("inbox-realtime")
         .on(
@@ -48,7 +50,7 @@ export const inboxRouter = createTRPCRouter({
           { event: "INSERT", schema: "public", table: "inbox" },
           (payload) => {
             const newMessage = payload.new as Message;
-            emit.next([newMessage]); // Fix: Ensure emitted data is an array
+            emit.next(newMessage);
           },
         )
         .subscribe();
@@ -58,6 +60,7 @@ export const inboxRouter = createTRPCRouter({
       };
     });
   }),
+
   getInbox: privateProcedure.query(async ({ ctx }) => {
     const { db, user } = ctx;
     if (!user) {

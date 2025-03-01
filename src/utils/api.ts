@@ -18,16 +18,21 @@ import superjson from "superjson";
 import { type AppRouter } from "~/server/api/root";
 
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+  if (typeof window !== "undefined") return ""; // Browser should use relative URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use Vercel URL
+  return `http://localhost:${process.env.PORT ?? 3000}`; // Dev SSR should use localhost
 };
 
-// Create WebSocket client only in browser
+const getWsUrl = () => {
+  if (typeof window === "undefined") return ""; // No WS on SSR
+  if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  return `${protocol}://${window.location.hostname}:3001`; // Adjust based on environment
+};
+
+// Create WebSocket client only if window is available
 const wsClient =
-  typeof window !== "undefined"
-    ? createWSClient({ url: "ws://localhost:3001" }) // Update to your WebSocket server URL
-    : null;
+  typeof window !== "undefined" ? createWSClient({ url: getWsUrl() }) : null;
 
 /** A set of type-safe react-query hooks for your tRPC API. */
 export const api = createTRPCNext<AppRouter>({
@@ -47,10 +52,15 @@ export const api = createTRPCNext<AppRouter>({
 
         splitLink({
           condition: (op) => op.type === "subscription",
-          true: wsLink({ client: wsClient! }), // Use WebSocket for subscriptions
+          true: wsClient
+            ? wsLink({ client: wsClient, transformer: superjson })
+            : httpBatchLink({
+                url: `${getBaseUrl()}/api/trpc`,
+                transformer: superjson,
+              }), // Fallback to HTTP
           false: httpBatchLink({
+            url: `${getBaseUrl()}/api/trpc`,
             transformer: superjson,
-            url: `${getBaseUrl()}/api/trpc`, // Use HTTP for queries/mutations
           }),
         }),
       ],
