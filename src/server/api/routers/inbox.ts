@@ -7,6 +7,7 @@ type Message = {
   id: string;
   message: string;
   senderEmail: string;
+  senderProfilePicture: string;
   receiverEmail: string;
   createdAt: string;
 };
@@ -76,7 +77,13 @@ export const inboxRouter = createTRPCRouter({
         createdAt: "desc",
       },
       include: {
-        sender: true,
+        sender: {
+          select: {
+            email: true,
+            username: true,
+            profilePictureUrl: true,
+          },
+        },
         receiver: true,
       },
     });
