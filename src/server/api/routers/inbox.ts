@@ -6,34 +6,36 @@ import { supabase } from "~/lib/supabase/client";
 type Message = {
   id: string;
   message: string;
-  senderId: string;
-  receiverId: string;
+  senderEmail: string;
+  receiverEmail: string;
   createdAt: string;
 };
 
 export const inboxRouter = createTRPCRouter({
   sendInbox: privateProcedure
-    .input(z.object({ message: z.string(), receiverId: z.string() }))
+    .input(z.object({ message: z.string(), receiverEmail: z.string().email() }))
     .mutation(async ({ ctx, input }) => {
-      const { message, receiverId } = input;
+      const { message, receiverEmail } = input;
       const { db, user } = ctx;
 
-      // Save to Prisma
+      if (!user?.email) {
+        throw new Error("Sender email not found");
+      }
+
       const sendMessage = await db.inbox.create({
         data: {
-          senderId: user!.id,
-          receiverId,
           message,
+          senderEmail: user.email,
+          receiverEmail,
         },
       });
 
-      // Save to Supabase for real-time updates
       await supabase.from("inbox").insert([
         {
           id: sendMessage.id,
           message: sendMessage.message,
-          senderId: sendMessage.senderId,
-          receiverId: sendMessage.receiverId,
+          senderEmail: sendMessage.senderEmail,
+          receiverEmail: sendMessage.receiverEmail,
           createdAt: sendMessage.createdAt.toISOString(),
         },
       ]);
@@ -68,7 +70,7 @@ export const inboxRouter = createTRPCRouter({
     }
     return await db.inbox.findMany({
       where: {
-        receiverId: user.id,
+        receiverEmail: user.email,
       },
       orderBy: {
         createdAt: "desc",

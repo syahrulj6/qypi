@@ -90,12 +90,12 @@ model Inbox {
     message    String
     createdAt  DateTime @default(now())
 
-    senderId   String
-    sender     Profile  @relation("SentMessages", fields: [senderId], references: [userId])
+    senderEmail   String 
+    sender     Profile  @relation("SentMessages", fields: [senderEmail], references: [email])
 
-    receiverId String
-    receiver   Profile  @relation("ReceivedMessages", fields: [receiverId], references: [userId])
+    receiverEmail String 
+    receiver   Profile  @relation("ReceivedMessages", fields: [receiverEmail], references: [email])
 
-    @@index([receiverId]) // Optimize queries for fetching received messages
+    @@index([receiverEmail]) // Optimize queries for fetching received messages
 }
 
