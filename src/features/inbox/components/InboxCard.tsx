@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 interface Message {
@@ -16,7 +17,8 @@ export const InboxCard = ({
   senderProfilePicture,
 }: Message) => {
   return (
-    <div
+    <Link
+      href={`/dashboard/inbox/${id}`}
       key={id}
       className="flex flex-col space-y-2 rounded-lg border px-4 py-2"
     >
@@ -38,6 +40,6 @@ export const InboxCard = ({
           {new Date(createdAt).toLocaleString()}
         </p>
       </div>
-    </div>
+    </Link>
   );
 };

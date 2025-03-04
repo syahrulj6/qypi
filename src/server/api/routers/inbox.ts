@@ -92,18 +92,27 @@ export const inboxRouter = createTRPCRouter({
   getInboxById: privateProcedure
     .input(
       z.object({
-        inboxId: z.string(),
+        id: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { inboxId } = input;
+      const { id } = input;
 
-      if (!inboxId) throw new Error("Id Not found");
+      if (!id) throw new Error("Id Not found");
 
       const getInbox = await db.inbox.findUnique({
         where: {
-          id: inboxId,
+          id: id,
+        },
+        include: {
+          sender: {
+            select: {
+              email: true,
+              username: true,
+              profilePictureUrl: true,
+            },
+          },
         },
       });
 

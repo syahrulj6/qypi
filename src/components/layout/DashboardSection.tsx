@@ -16,6 +16,7 @@ const menuItems = [
   { title: "My Notes", url: "/dashboard/notes" },
   { title: "Settings", url: "/dashboard/settings" },
   { title: "Teams", url: "/dashboard/teams" },
+  { title: "Inbox", url: "/dashboard/inbox/[id]" },
 ];
 
 type NotificationsType = {
