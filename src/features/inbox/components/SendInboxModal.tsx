@@ -6,7 +6,7 @@ import { inboxFormSchema, InboxFormSchema } from "../forms/inbox";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { Button } from "~/components/ui/button";
-import { X } from "lucide-react";
+import { LoaderCircleIcon, X } from "lucide-react";
 
 interface SendInboxProps {
   isOpen: boolean;
@@ -65,8 +65,16 @@ export const SendInboxModal = ({ isOpen, onClose }: SendInboxProps) => {
             className="mt-2 grid grid-cols-2 gap-x-2 space-y-2"
           >
             <InboxFormInner />
-            <Button type="submit" className="col-span-2 w-full">
-              Kirim Inbox
+            <Button
+              type="submit"
+              className="col-span-2 w-full"
+              disabled={sendMessage.isPending}
+            >
+              {sendMessage.isPending ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                "Send Message"
+              )}
             </Button>
           </form>
         </Form>
