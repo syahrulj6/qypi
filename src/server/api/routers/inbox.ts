@@ -123,4 +123,23 @@ export const inboxRouter = createTRPCRouter({
 
       return getInbox;
     }),
+
+  deleteInboxById: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { db } = ctx;
+      const { id } = input;
+
+      const deleteInbox = await db.inbox.delete({
+        where: {
+          id,
+        },
+      });
+
+      return deleteInbox;
+    }),
 });

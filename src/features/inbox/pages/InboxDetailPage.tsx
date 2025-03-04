@@ -1,7 +1,26 @@
-import { ArrowLeft, ChevronDown, LoaderCircleIcon, Trash } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  CornerUpLeft,
+  CornerUpRight,
+  LoaderCircleIcon,
+  Trash,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import DashboardLayout from "~/components/layout/DashboardLayout";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -26,6 +45,8 @@ const InboxDetailPage = () => {
     { enabled: !!id },
   );
 
+  const deleteInbox = api.inbox.deleteInboxById.useMutation();
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -44,17 +65,54 @@ const InboxDetailPage = () => {
     );
   }
 
+  const handleDeleteInbox = () => {
+    deleteInbox.mutate(
+      { id: inboxData.id },
+      {
+        onSuccess: () => {
+          router.push("/dashboard/inbox");
+          toast.success("Berhasil menghapus inbox!");
+        },
+        onError: (error) => {
+          toast.error("Gagal menghapus inbox: " + error.message);
+        },
+      },
+    );
+  };
+
   return (
     <DashboardLayout>
       <div className="mt-2 flex flex-col space-y-8 md:mt-4 md:pr-10">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <button className="group" onClick={() => router.back()}>
             <ArrowLeft className="text-neutral-700 transition-colors group-hover:text-current" />
           </button>
-
-          <Button variant="destructive" size="icon">
-            <Trash />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="icon" type="button">
+                <Trash />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Konfirmasi hapus inbox</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus inbox? Perubahan ini
+                  bersifat permanen.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-500 transition-colors hover:bg-red-600"
+                  onClick={handleDeleteInbox}
+                >
+                  Ya, Hapus inbox
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         <div className="flex justify-between">
           <div className="flex items-center gap-4">
@@ -103,6 +161,22 @@ const InboxDetailPage = () => {
                 </DropdownMenu>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* CONTENT */}
+
+        <div className="mt-4 flex flex-col gap-4">
+          <h1 className="text-xl font-bold">Message:</h1>
+          <h2 className="font-semibold">{inboxData.message}</h2>
+
+          <div className="mt-4 flex items-center gap-4 md:mt-6">
+            <Button variant="outline">
+              <CornerUpLeft /> Reply
+            </Button>
+            <Button variant="outline">
+              <CornerUpRight /> Forward
+            </Button>
           </div>
         </div>
       </div>
