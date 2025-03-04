@@ -113,6 +113,11 @@ export const inboxRouter = createTRPCRouter({
               profilePictureUrl: true,
             },
           },
+          receiver: {
+            select: {
+              email: true,
+            },
+          },
         },
       });
 
