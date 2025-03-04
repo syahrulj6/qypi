@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import { SendInboxModal } from "../components/SendInboxModal";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { InboxCard } from "../components/InboxCard";
+import { LoaderCircleIcon } from "lucide-react";
 
 type Message = {
   id: string;
@@ -19,7 +20,7 @@ const InboxPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showModal, setShowModal] = useState(false);
 
-  const { data: inboxData = [] } = api.inbox.getInbox.useQuery();
+  const { data: inboxData = [], isLoading } = api.inbox.getInbox.useQuery();
 
   useEffect(() => {
     if (inboxData) {
@@ -51,6 +52,16 @@ const InboxPage = () => {
       ]);
     },
   });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="mt-10 flex w-full items-center justify-center">
+          <LoaderCircleIcon className="animate-spin" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

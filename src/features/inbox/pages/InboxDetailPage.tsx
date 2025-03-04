@@ -93,8 +93,12 @@ const InboxDetailPage = () => {
                       <p className="text-muted-foreground">To:</p>
                       <p className="font-semibold">{inboxData.receiverEmail}</p>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <p className="text-muted-foreground">Date:</p>
+                      <p className="font-semibold">
+                        {inboxData.createdAt.toLocaleString()}
+                      </p>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
