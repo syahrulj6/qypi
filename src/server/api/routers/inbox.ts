@@ -88,4 +88,25 @@ export const inboxRouter = createTRPCRouter({
       },
     });
   }),
+
+  getInboxById: privateProcedure
+    .input(
+      z.object({
+        inboxId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { inboxId } = input;
+
+      if (!inboxId) throw new Error("Id Not found");
+
+      const getInbox = await db.inbox.findUnique({
+        where: {
+          id: inboxId,
+        },
+      });
+
+      return getInbox;
+    }),
 });

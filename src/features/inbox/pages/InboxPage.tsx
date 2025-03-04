@@ -4,6 +4,7 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { SendInboxModal } from "../components/SendInboxModal";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { InboxCard } from "../components/InboxCard";
 
 type Message = {
   id: string;
@@ -61,29 +62,13 @@ const InboxPage = () => {
         <div className="flex flex-col gap-2">
           {messages.length > 0 ? (
             messages.map((msg) => (
-              <div
-                key={msg.id}
-                className="flex flex-col space-y-2 rounded-lg border px-4 py-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="size-10">
-                      <AvatarFallback>VF</AvatarFallback>
-                      <AvatarImage src={msg.senderProfilePicture} />
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <p className="font-semibold">{msg.senderEmail}</p>
-                      <div className="flex gap-2">
-                        <p className="text-muted-foreground">Message:</p>
-                        <p className="font-medium">{msg.message}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(msg.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
+              <InboxCard
+                id={msg.id}
+                createdAt={msg.createdAt}
+                message={msg.message}
+                senderEmail={msg.senderEmail}
+                senderProfilePicture={msg.senderProfilePicture}
+              />
             ))
           ) : (
             <p>No messages found.</p>
