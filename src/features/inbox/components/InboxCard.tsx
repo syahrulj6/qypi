@@ -61,12 +61,8 @@ export const InboxCard = ({
     >
       {parentId && (
         <div className="flex gap-2">
-          <p className="font-semibold">
-            {"<"}
-            {receiverEmail}
-            {">"}
-          </p>
-          <p className="text-muted-foreground">Replies your message</p>
+          <p className="font-semibold">{senderEmail}</p>
+          <p className="text-muted-foreground">Replies your inbox</p>
         </div>
       )}
       <div className="flex justify-between">

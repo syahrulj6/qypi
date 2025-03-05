@@ -185,7 +185,7 @@ const InboxDetailPage = () => {
         {/* REPLES */}
         {inboxData.parent && (
           <div className="gap flex flex-col gap-3 opacity-70 md:gap-5">
-            <h1 className="text-xl font-semibold">Message that you send</h1>
+            <h1 className="text-xl font-semibold">Inbox you send</h1>
             <div className="flex gap-4">
               <Avatar className="size-10">
                 <AvatarFallback>VF</AvatarFallback>
