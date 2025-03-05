@@ -181,6 +181,35 @@ const InboxDetailPage = () => {
             </Button>
           </div>
         </div>
+
+        {/* REPLES */}
+        {inboxData.parent && (
+          <div className="gap flex flex-col gap-3 opacity-70 md:gap-5">
+            <h1 className="text-xl font-semibold">Message that you send</h1>
+            <div className="flex gap-4">
+              <Avatar className="size-10">
+                <AvatarFallback>VF</AvatarFallback>
+                <AvatarImage src={inboxData.parent.sender.profilePictureUrl!} />
+              </Avatar>
+              <div className="flex flex-col">
+                <div className="flex gap-2">
+                  <p className="font-semibold">
+                    {inboxData.parent.sender.username}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {"<"}
+                    {inboxData.parent.senderEmail}
+                    {">"}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <p className="text-lg font-semibold">Message:</p>
+              <p className="font-semibold">{inboxData.parent.message}</p>
+            </div>
+          </div>
+        )}
       </div>
       {showModal && (
         <ReplyInboxModal

@@ -174,6 +174,17 @@ export const inboxRouter = createTRPCRouter({
               email: true,
             },
           },
+          parent: {
+            include: {
+              sender: {
+                select: {
+                  email: true,
+                  username: true,
+                  profilePictureUrl: true,
+                },
+              },
+            },
+          },
         },
       });
 
