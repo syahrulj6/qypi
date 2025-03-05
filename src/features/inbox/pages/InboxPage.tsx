@@ -20,7 +20,11 @@ const InboxPage = () => {
   const [messages, setMessages] = useState<Inbox[]>([]);
   const [showModal, setShowModal] = useState(false);
 
-  const { data: inboxData = [], isLoading } = api.inbox.getInbox.useQuery();
+  const {
+    data: inboxData = [],
+    isLoading,
+    refetch,
+  } = api.inbox.getInbox.useQuery();
 
   useEffect(() => {
     if (inboxData) {
@@ -77,6 +81,7 @@ const InboxPage = () => {
             messages.map((msg) => (
               <InboxCard
                 parentId={msg.parentId}
+                refetch={refetch}
                 id={msg.id}
                 createdAt={msg.createdAt}
                 message={msg.message}

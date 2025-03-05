@@ -25,13 +25,14 @@ interface Message {
   createdAt: string;
   receiverEmail: string;
   parentId: string;
+  refetch: () => void;
 }
 
 export const InboxCard = ({
   id,
   createdAt,
+  refetch,
   message,
-  receiverEmail,
   senderEmail,
   senderProfilePicture,
   parentId,
@@ -44,8 +45,8 @@ export const InboxCard = ({
       { id },
       {
         onSuccess: () => {
-          router.push("/dashboard/inbox");
           toast.success("Berhasil menghapus inbox!");
+          refetch();
         },
         onError: (error) => {
           toast.error("Gagal menghapus inbox: " + error.message);
@@ -54,10 +55,10 @@ export const InboxCard = ({
     );
   };
   return (
-    <Link
-      href={`/dashboard/inbox/${id}`}
+    <div
+      onClick={() => router.push(`/dashboard/inbox/${id}`)}
       key={id}
-      className="flex flex-col space-y-2 rounded-lg border px-4 py-2"
+      className="flex flex-col space-y-2 rounded-lg border px-4 py-2 hover:cursor-pointer"
     >
       {parentId && (
         <div className="flex gap-2">
@@ -86,7 +87,12 @@ export const InboxCard = ({
           </p>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" type="button" className="h-7 w-7">
+              <Button
+                onClick={(e) => e.stopPropagation()}
+                variant="destructive"
+                type="button"
+                className="h-7 w-7"
+              >
                 <Trash />
               </Button>
             </AlertDialogTrigger>
@@ -102,7 +108,10 @@ export const InboxCard = ({
                 <AlertDialogCancel>Batal</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-red-500 transition-colors hover:bg-red-600"
-                  onClick={handleDeleteInbox}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteInbox();
+                  }}
                 >
                   Ya, Hapus inbox
                 </AlertDialogAction>
@@ -111,6 +120,6 @@ export const InboxCard = ({
           </AlertDialog>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
