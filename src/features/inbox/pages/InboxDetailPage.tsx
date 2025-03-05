@@ -7,7 +7,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import {
@@ -30,8 +30,10 @@ import {
   DropdownMenuItem,
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/utils/api";
+import { ReplyInboxModal } from "../components/ReplyInboxModal";
 
 const InboxDetailPage = () => {
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
   const { id } = router.query;
 
@@ -171,7 +173,7 @@ const InboxDetailPage = () => {
           <h2 className="font-semibold">{inboxData.message}</h2>
 
           <div className="mt-4 flex items-center gap-4 md:mt-6">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => setShowModal(true)}>
               <CornerUpLeft /> Reply
             </Button>
             <Button variant="outline">
@@ -180,6 +182,14 @@ const InboxDetailPage = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <ReplyInboxModal
+          receiverEmail={inboxData.senderEmail}
+          inboxId={inboxData.id}
+          onClose={() => setShowModal(false)}
+          isOpen={showModal}
+        />
+      )}
     </DashboardLayout>
   );
 };

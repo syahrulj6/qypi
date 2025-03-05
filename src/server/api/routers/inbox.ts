@@ -64,6 +64,53 @@ export const inboxRouter = createTRPCRouter({
     });
   }),
 
+  replyInbox: privateProcedure
+    .input(
+      z.object({
+        message: z.string(),
+        inboxId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { message, inboxId } = input;
+      const { db, user } = ctx;
+
+      if (!user?.email) {
+        throw new Error("Sender email not found");
+      }
+
+      // Get the original message
+      const originalMessage = await db.inbox.findUnique({
+        where: { id: inboxId },
+      });
+
+      if (!originalMessage) {
+        throw new Error("Original message not found");
+      }
+
+      const replyMessage = await db.inbox.create({
+        data: {
+          message,
+          senderEmail: user.email,
+          receiverEmail: originalMessage.senderEmail,
+          parentId: inboxId,
+        },
+      });
+
+      await supabase.from("inbox").insert([
+        {
+          id: replyMessage.id,
+          message: replyMessage.message,
+          senderEmail: replyMessage.senderEmail,
+          receiverEmail: replyMessage.receiverEmail,
+          createdAt: replyMessage.createdAt.toISOString(),
+          parentId: inboxId,
+        },
+      ]);
+
+      return replyMessage;
+    }),
+
   getInbox: privateProcedure.query(async ({ ctx }) => {
     const { db, user } = ctx;
     if (!user) {
@@ -85,6 +132,14 @@ export const inboxRouter = createTRPCRouter({
           },
         },
         receiver: true,
+        replies: {
+          include: {
+            sender: {
+              select: { email: true, username: true, profilePictureUrl: true },
+            },
+          },
+          orderBy: { createdAt: "asc" },
+        },
       },
     });
   }),

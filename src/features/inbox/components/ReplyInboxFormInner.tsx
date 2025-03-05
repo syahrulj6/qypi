@@ -6,32 +6,15 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
 
 import { InboxFormSchema } from "../forms/inbox";
 import { Textarea } from "~/components/ui/textarea";
 
-export const InboxFormInner = () => {
+export const ReplyInboxFormInner = () => {
   const form = useFormContext<InboxFormSchema>();
 
   return (
     <>
-      <FormField
-        control={form.control}
-        name="receiverEmail"
-        render={({ field }) => (
-          <FormItem className="col-span-2">
-            <FormLabel>
-              Penerima <span className="text-destructive">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="example1@gmail.com" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
       <FormField
         control={form.control}
         name="message"

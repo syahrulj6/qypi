@@ -94,8 +94,11 @@ model Inbox {
     sender     Profile  @relation("SentMessages", fields: [senderEmail], references: [email])
 
     receiverEmail String 
-    receiver   Profile  @relation("ReceivedMessages", fields: [receiverEmail], references: [email])
+    receiver    Profile  @relation("ReceivedMessages", fields: [receiverEmail], references: [email])
 
-    @@index([receiverEmail]) // Optimize queries for fetching received messages
+    parentId       String?  
+    parent         Inbox?   @relation("ReplyThread", fields: [parentId], references: [id])
+    replies        Inbox[]  @relation("ReplyThread")
+    @@index([receiverEmail]) 
 }
 
