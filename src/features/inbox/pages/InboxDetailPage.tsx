@@ -185,7 +185,6 @@ const InboxDetailPage = () => {
       {showModal && (
         <ReplyInboxModal
           receiverEmail={inboxData.senderEmail}
-          router={router}
           inboxId={inboxData.id}
           onClose={() => setShowModal(false)}
           isOpen={showModal}

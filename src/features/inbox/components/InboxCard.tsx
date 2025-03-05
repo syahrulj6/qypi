@@ -23,14 +23,18 @@ interface Message {
   senderEmail: string;
   senderProfilePicture: string;
   createdAt: string;
+  receiverEmail: string;
+  parentId: string;
 }
 
 export const InboxCard = ({
   id,
   createdAt,
   message,
+  receiverEmail,
   senderEmail,
   senderProfilePicture,
+  parentId,
 }: Message) => {
   const router = useRouter();
 
@@ -55,6 +59,16 @@ export const InboxCard = ({
       key={id}
       className="flex flex-col space-y-2 rounded-lg border px-4 py-2"
     >
+      {parentId && (
+        <div className="flex gap-2">
+          <p className="font-semibold">
+            {"<"}
+            {receiverEmail}
+            {">"}
+          </p>
+          <p className="text-muted-foreground">Replies your message</p>
+        </div>
+      )}
       <div className="flex justify-between">
         <div className="flex items-center gap-4">
           <Avatar className="size-10">

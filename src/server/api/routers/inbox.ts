@@ -10,6 +10,7 @@ type Inbox = {
   senderProfilePicture: string;
   receiverEmail: string;
   createdAt: string;
+  parentId: string;
 };
 
 export const inboxRouter = createTRPCRouter({

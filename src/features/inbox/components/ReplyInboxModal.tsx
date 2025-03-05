@@ -13,14 +13,12 @@ interface ReplyInboxModalProps {
   inboxId: string;
   isOpen: boolean;
   onClose: () => void;
-  router: any;
   receiverEmail: string;
 }
 
 export const ReplyInboxModal = ({
   isOpen,
   onClose,
-  router,
   inboxId,
   receiverEmail,
 }: ReplyInboxModalProps) => {
@@ -44,7 +42,6 @@ export const ReplyInboxModal = ({
         onSuccess: () => {
           toast.success("Inbox berhasil Dikirim!");
           onClose();
-          router.push();
           form.reset();
         },
         onError: (err) => {

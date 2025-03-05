@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { SendInboxModal } from "../components/SendInboxModal";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { InboxCard } from "../components/InboxCard";
 import { LoaderCircleIcon } from "lucide-react";
 
@@ -14,6 +13,7 @@ type Inbox = {
   senderProfilePicture: string;
   receiverEmail: string;
   createdAt: string;
+  parentId: string;
 };
 
 const InboxPage = () => {
@@ -32,6 +32,7 @@ const InboxPage = () => {
           senderProfilePicture: msg.sender.profilePictureUrl ?? "",
           receiverEmail: msg.receiver.email,
           createdAt: new Date(msg.createdAt).toISOString(),
+          parentId: msg.parentId ?? "",
         })),
       );
     }
@@ -48,6 +49,7 @@ const InboxPage = () => {
           senderProfilePicture: newInbox.senderProfilePicture,
           receiverEmail: newInbox.receiverEmail,
           createdAt: new Date(newInbox.createdAt).toISOString(),
+          parentId: newInbox.parentId,
         },
       ]);
     },
@@ -74,10 +76,12 @@ const InboxPage = () => {
           {messages.length > 0 ? (
             messages.map((msg) => (
               <InboxCard
+                parentId={msg.parentId}
                 id={msg.id}
                 createdAt={msg.createdAt}
                 message={msg.message}
                 senderEmail={msg.senderEmail}
+                receiverEmail={msg.receiverEmail}
                 senderProfilePicture={msg.senderProfilePicture}
               />
             ))
