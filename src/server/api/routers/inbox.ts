@@ -3,7 +3,7 @@ import { observable } from "@trpc/server/observable";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { supabase } from "~/lib/supabase/client";
 
-type Message = {
+type Inbox = {
   id: string;
   message: string;
   senderEmail: string;
@@ -44,15 +44,15 @@ export const inboxRouter = createTRPCRouter({
       return sendMessage;
     }),
 
-  onNewMessage: privateProcedure.subscription(({ ctx }) => {
-    return observable<Message>((emit) => {
+  onNewInbox: privateProcedure.subscription(({ ctx }) => {
+    return observable<Inbox>((emit) => {
       const channel = supabase
         .channel("inbox-realtime")
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "inbox" },
           (payload) => {
-            const newMessage = payload.new as Message;
+            const newMessage = payload.new as Inbox;
             emit.next(newMessage);
           },
         )
@@ -79,36 +79,36 @@ export const inboxRouter = createTRPCRouter({
         throw new Error("Sender email not found");
       }
 
-      // Get the original message
-      const originalMessage = await db.inbox.findUnique({
+      // Get the original inbox
+      const originalInbox = await db.inbox.findUnique({
         where: { id: inboxId },
       });
 
-      if (!originalMessage) {
-        throw new Error("Original message not found");
+      if (!originalInbox) {
+        throw new Error("Original inbox not found");
       }
 
-      const replyMessage = await db.inbox.create({
+      const replyInbox = await db.inbox.create({
         data: {
           message,
           senderEmail: user.email,
-          receiverEmail: originalMessage.senderEmail,
+          receiverEmail: originalInbox.senderEmail,
           parentId: inboxId,
         },
       });
 
       await supabase.from("inbox").insert([
         {
-          id: replyMessage.id,
-          message: replyMessage.message,
-          senderEmail: replyMessage.senderEmail,
-          receiverEmail: replyMessage.receiverEmail,
-          createdAt: replyMessage.createdAt.toISOString(),
+          id: replyInbox.id,
+          message: replyInbox.message,
+          senderEmail: replyInbox.senderEmail,
+          receiverEmail: replyInbox.receiverEmail,
+          createdAt: replyInbox.createdAt.toISOString(),
           parentId: inboxId,
         },
       ]);
 
-      return replyMessage;
+      return replyInbox;
     }),
 
   getInbox: privateProcedure.query(async ({ ctx }) => {

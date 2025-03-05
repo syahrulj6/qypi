@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { InboxCard } from "../components/InboxCard";
 import { LoaderCircleIcon } from "lucide-react";
 
-type Message = {
+type Inbox = {
   id: string;
   message: string;
   senderEmail: string;
@@ -17,7 +17,7 @@ type Message = {
 };
 
 const InboxPage = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Inbox[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   const { data: inboxData = [], isLoading } = api.inbox.getInbox.useQuery();
@@ -37,17 +37,17 @@ const InboxPage = () => {
     }
   }, [inboxData]);
 
-  api.inbox.onNewMessage.useSubscription(undefined, {
-    onData(newMessage) {
+  api.inbox.onNewInbox.useSubscription(undefined, {
+    onData(newInbox) {
       setMessages((prev) => [
         ...prev,
         {
-          id: newMessage.id,
-          message: newMessage.message,
-          senderEmail: newMessage.senderEmail,
-          senderProfilePicture: newMessage.senderProfilePicture,
-          receiverEmail: newMessage.receiverEmail,
-          createdAt: new Date(newMessage.createdAt).toISOString(),
+          id: newInbox.id,
+          message: newInbox.message,
+          senderEmail: newInbox.senderEmail,
+          senderProfilePicture: newInbox.senderProfilePicture,
+          receiverEmail: newInbox.receiverEmail,
+          createdAt: new Date(newInbox.createdAt).toISOString(),
         },
       ]);
     },
@@ -82,7 +82,7 @@ const InboxPage = () => {
               />
             ))
           ) : (
-            <p>No messages found.</p>
+            <p>No inbox found.</p>
           )}
         </div>
 
