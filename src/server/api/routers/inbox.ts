@@ -12,6 +12,7 @@ type Inbox = {
   receiverEmail: string;
   createdAt: string;
   parentId: string;
+  isRead: boolean;
 };
 
 export const inboxRouter = createTRPCRouter({
@@ -219,5 +220,23 @@ export const inboxRouter = createTRPCRouter({
       });
 
       return deleteInbox;
+    }),
+
+  markAsRead: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { id } = input;
+
+      const updatedInbox = await db.inbox.update({
+        where: { id },
+        data: { isRead: true },
+      });
+
+      return updatedInbox;
     }),
 });

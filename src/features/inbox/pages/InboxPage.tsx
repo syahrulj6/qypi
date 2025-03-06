@@ -15,6 +15,7 @@ type Inbox = {
   receiverEmail: string;
   createdAt: string;
   parentId: string;
+  isRead: boolean;
 };
 
 const InboxPage = () => {
@@ -26,6 +27,8 @@ const InboxPage = () => {
     isLoading,
     refetch,
   } = api.inbox.getInbox.useQuery();
+
+  const markAsRead = api.inbox.markAsRead.useMutation();
 
   useEffect(() => {
     if (inboxData) {
@@ -39,6 +42,7 @@ const InboxPage = () => {
           receiverEmail: msg.receiver.email,
           createdAt: new Date(msg.createdAt).toISOString(),
           parentId: msg.parentId ?? "",
+          isRead: msg.isRead,
         })),
       );
     }
@@ -57,10 +61,16 @@ const InboxPage = () => {
           receiverEmail: newInbox.receiverEmail,
           createdAt: new Date(newInbox.createdAt).toISOString(),
           parentId: newInbox.parentId,
+          isRead: newInbox.isRead, // Tambahkan ini
         },
       ]);
     },
   });
+
+  const handleMarkAsRead = async (id: string) => {
+    await markAsRead.mutateAsync({ id });
+    refetch();
+  };
 
   if (isLoading) {
     return (
@@ -93,6 +103,8 @@ const InboxPage = () => {
                 senderEmail={msg.senderEmail}
                 receiverEmail={msg.receiverEmail}
                 senderProfilePicture={msg.senderProfilePicture}
+                isRead={msg.isRead}
+                onMarkAsRead={() => handleMarkAsRead(msg.id)}
               />
             ))
           ) : (

@@ -91,9 +91,12 @@ export const DashboardSection = ({
           <button onClick={() => setShowCalendar((prev) => !prev)}>
             <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
           </button>
-          <button onClick={() => setShowNotifications((prev) => !prev)}>
-            <Bell className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
-          </button>
+
+          <NotificationsDropdown
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+          />
+
           <ProfileDropdown handleSignOut={handleSignOut} session={session} />
 
           <CalendarDropdown
@@ -101,11 +104,6 @@ export const DashboardSection = ({
             setDate={setDate}
             showCalendar={showCalendar}
             setShowCalendar={setShowCalendar}
-          />
-
-          <NotificationsDropdown
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
           />
         </div>
       </div>

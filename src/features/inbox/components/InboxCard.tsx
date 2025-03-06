@@ -25,6 +25,8 @@ interface Message {
   createdAt: string;
   receiverEmail: string;
   parentId: string;
+  isRead: boolean;
+  onMarkAsRead: () => void;
   refetch: () => void;
 }
 
@@ -37,8 +39,17 @@ export const InboxCard = ({
   senderEmail,
   senderProfilePicture,
   parentId,
+  isRead,
+  onMarkAsRead,
 }: Message) => {
   const router = useRouter();
+
+  const handleMarkAsRead = () => {
+    if (!isRead) {
+      onMarkAsRead();
+    }
+    router.push(`/dashboard/inbox/${id}`);
+  };
 
   const deleteInbox = api.inbox.deleteInboxById.useMutation();
   const handleDeleteInbox = () => {
@@ -57,8 +68,8 @@ export const InboxCard = ({
   };
   return (
     <div
-      onClick={() => router.push(`/dashboard/inbox/${id}`)}
-      className="flex flex-col space-y-2 rounded-lg border px-4 py-2 hover:cursor-pointer"
+      onClick={handleMarkAsRead}
+      className={`flex flex-col space-y-2 rounded-lg border px-4 py-2 hover:cursor-pointer ${isRead && "opacity-65"} `}
     >
       {parentId && (
         <div className="flex gap-2">
