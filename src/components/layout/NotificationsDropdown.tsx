@@ -71,6 +71,11 @@ export const NotificationsDropdown = ({
           ref={notificationsRef}
           className="absolute right-0 top-10 z-20 flex w-40 flex-col gap-1 rounded-md border bg-card shadow-lg md:w-52"
         >
+          {inboxData.length === 0 && (
+            <div className="flex items-center justify-center py-3">
+              <p>no notifications found</p>
+            </div>
+          )}
           {isLoading ? (
             <div className="flex items-center justify-center p-2">
               <LoaderCircleIcon className="animate-spin" />
