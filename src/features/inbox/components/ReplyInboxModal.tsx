@@ -25,6 +25,7 @@ export const ReplyInboxModal = ({
   const form = useForm<InboxFormSchema>({
     resolver: zodResolver(inboxFormSchema),
     defaultValues: {
+      subject: "",
       message: "",
       receiverEmail: receiverEmail ?? "",
     },

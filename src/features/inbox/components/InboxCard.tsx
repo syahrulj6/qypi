@@ -85,7 +85,7 @@ export const InboxCard = ({
           </Avatar>
           <div className="flex flex-col">
             <p className="font-semibold">{senderEmail}</p>
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <p className="font-medium">{subject} - </p>
               <p className="text-muted-foreground">{message}</p>
             </div>

@@ -84,7 +84,7 @@ const InboxDetailPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="mt-2 flex flex-col space-y-8 md:mt-4 md:pr-10">
+      <div className="mt-2 flex flex-col gap-4 md:mt-4 md:pr-10">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button className="group" onClick={() => router.back()}>
@@ -116,6 +116,7 @@ const InboxDetailPage = () => {
             </AlertDialogContent>
           </AlertDialog>
         </div>
+        <h2 className="text-xl font-medium md:text-2xl">{inboxData.subject}</h2>
         <div className="flex justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="size-10">
