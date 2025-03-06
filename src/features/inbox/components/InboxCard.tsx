@@ -1,5 +1,4 @@
 import { Trash } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import {
@@ -19,6 +18,7 @@ import { api } from "~/utils/api";
 
 interface Message {
   id: string;
+  subject: string;
   message: string;
   senderEmail: string;
   senderProfilePicture: string;
@@ -33,6 +33,7 @@ export const InboxCard = ({
   createdAt,
   refetch,
   message,
+  subject,
   senderEmail,
   senderProfilePicture,
   parentId,
@@ -57,7 +58,6 @@ export const InboxCard = ({
   return (
     <div
       onClick={() => router.push(`/dashboard/inbox/${id}`)}
-      key={id}
       className="flex flex-col space-y-2 rounded-lg border px-4 py-2 hover:cursor-pointer"
     >
       {parentId && (
@@ -75,8 +75,8 @@ export const InboxCard = ({
           <div className="flex flex-col">
             <p className="font-semibold">{senderEmail}</p>
             <div className="flex gap-2">
-              <p className="text-muted-foreground">Message:</p>
-              <p className="font-medium">{message}</p>
+              <p className="font-medium">{subject} - </p>
+              <p className="text-muted-foreground">{message}</p>
             </div>
           </div>
         </div>

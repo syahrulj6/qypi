@@ -17,6 +17,7 @@ export const SendInboxModal = ({ isOpen, onClose }: SendInboxProps) => {
   const form = useForm<InboxFormSchema>({
     resolver: zodResolver(inboxFormSchema),
     defaultValues: {
+      subject: "",
       message: "",
       receiverEmail: "",
     },

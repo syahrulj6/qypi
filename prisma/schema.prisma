@@ -87,7 +87,9 @@ model Note {
 
 model Inbox {
     id         String   @id @default(uuid())
+    subject     String
     message    String
+    isRead Boolean @default(false)
     createdAt  DateTime @default(now())
 
     senderEmail   String 

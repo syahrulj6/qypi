@@ -8,6 +8,7 @@ import { LoaderCircleIcon } from "lucide-react";
 
 type Inbox = {
   id: string;
+  subject: string;
   message: string;
   senderEmail: string;
   senderProfilePicture: string;
@@ -31,6 +32,7 @@ const InboxPage = () => {
       setMessages(
         inboxData.map((msg) => ({
           id: msg.id,
+          subject: msg.subject,
           message: msg.message,
           senderEmail: msg.sender.email,
           senderProfilePicture: msg.sender.profilePictureUrl ?? "",
@@ -48,6 +50,7 @@ const InboxPage = () => {
         ...prev,
         {
           id: newInbox.id,
+          subject: newInbox.subject,
           message: newInbox.message,
           senderEmail: newInbox.senderEmail,
           senderProfilePicture: newInbox.senderProfilePicture,
@@ -80,7 +83,9 @@ const InboxPage = () => {
           {messages.length > 0 ? (
             messages.map((msg) => (
               <InboxCard
+                key={msg.id}
                 parentId={msg.parentId}
+                subject={msg.subject}
                 refetch={refetch}
                 id={msg.id}
                 createdAt={msg.createdAt}

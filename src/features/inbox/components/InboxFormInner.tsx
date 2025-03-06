@@ -31,6 +31,21 @@ export const InboxFormInner = () => {
           </FormItem>
         )}
       />
+      <FormField
+        control={form.control}
+        name="subject"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>
+              Subject<span className="text-destructive">*</span>
+            </FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Masukkan pesan" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <FormField
         control={form.control}
@@ -38,7 +53,7 @@ export const InboxFormInner = () => {
         render={({ field }) => (
           <FormItem className="col-span-2">
             <FormLabel>
-              Message <span className="text-destructive">*</span>
+              Message<span className="text-destructive">*</span>
             </FormLabel>
             <FormControl>
               <Textarea rows={10} {...field} placeholder="Masukkan pesan" />

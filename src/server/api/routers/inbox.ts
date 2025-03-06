@@ -6,6 +6,7 @@ import { supabase } from "~/lib/supabase/client";
 type Inbox = {
   id: string;
   message: string;
+  subject: string;
   senderEmail: string;
   senderProfilePicture: string;
   receiverEmail: string;
@@ -15,9 +16,15 @@ type Inbox = {
 
 export const inboxRouter = createTRPCRouter({
   sendInbox: privateProcedure
-    .input(z.object({ message: z.string(), receiverEmail: z.string().email() }))
+    .input(
+      z.object({
+        message: z.string(),
+        receiverEmail: z.string().email(),
+        subject: z.string().min(1, "Subject is Required"),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      const { message, receiverEmail } = input;
+      const { message, receiverEmail, subject } = input;
       const { db, user } = ctx;
 
       if (!user?.email) {
@@ -26,6 +33,7 @@ export const inboxRouter = createTRPCRouter({
 
       const sendMessage = await db.inbox.create({
         data: {
+          subject,
           message,
           senderEmail: user.email,
           receiverEmail,
@@ -36,6 +44,7 @@ export const inboxRouter = createTRPCRouter({
         {
           id: sendMessage.id,
           message: sendMessage.message,
+          subject: sendMessage.subject,
           senderEmail: sendMessage.senderEmail,
           receiverEmail: sendMessage.receiverEmail,
           createdAt: sendMessage.createdAt.toISOString(),
@@ -68,19 +77,19 @@ export const inboxRouter = createTRPCRouter({
   replyInbox: privateProcedure
     .input(
       z.object({
+        subject: z.string(),
         message: z.string(),
         inboxId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { message, inboxId } = input;
+      const { message, inboxId, subject } = input;
       const { db, user } = ctx;
 
       if (!user?.email) {
         throw new Error("Sender email not found");
       }
 
-      // Get the original inbox
       const originalInbox = await db.inbox.findUnique({
         where: { id: inboxId },
       });
@@ -91,6 +100,7 @@ export const inboxRouter = createTRPCRouter({
 
       const replyInbox = await db.inbox.create({
         data: {
+          subject,
           message,
           senderEmail: user.email,
           receiverEmail: originalInbox.senderEmail,
@@ -101,6 +111,7 @@ export const inboxRouter = createTRPCRouter({
       await supabase.from("inbox").insert([
         {
           id: replyInbox.id,
+          subject: replyInbox.subject,
           message: replyInbox.message,
           senderEmail: replyInbox.senderEmail,
           receiverEmail: replyInbox.receiverEmail,
