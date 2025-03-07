@@ -2,6 +2,7 @@ import { z } from "zod";
 import { observable } from "@trpc/server/observable";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { supabase } from "~/lib/supabase/client";
+import { Prisma } from "@prisma/client";
 
 type Inbox = {
   id: string;
@@ -124,48 +125,67 @@ export const inboxRouter = createTRPCRouter({
       return replyInbox;
     }),
 
-  getInbox: privateProcedure.query(async ({ ctx }) => {
-    const { db, user } = ctx;
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-    return await db.inbox.findMany({
-      where: {
-        receiverEmail: user.email,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        sender: {
-          select: {
-            email: true,
-            username: true,
-            profilePictureUrl: true,
-          },
+  getInbox: privateProcedure
+    .input(
+      z.object({
+        subject: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { subject } = input;
+
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const searchFilter = subject
+        ? { subject: { contains: subject, mode: Prisma.QueryMode.insensitive } }
+        : {};
+
+      return await db.inbox.findMany({
+        where: {
+          ...searchFilter,
+          receiverEmail: user.email,
         },
-        receiver: true,
-        replies: {
-          include: {
-            sender: {
-              select: { email: true, username: true, profilePictureUrl: true },
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          sender: {
+            select: {
+              email: true,
+              username: true,
+              profilePictureUrl: true,
             },
           },
-          orderBy: { createdAt: "asc" },
+          receiver: true,
+          replies: {
+            include: {
+              sender: {
+                select: {
+                  email: true,
+                  username: true,
+                  profilePictureUrl: true,
+                },
+              },
+            },
+            orderBy: { createdAt: "asc" },
+          },
         },
-      },
-    });
-  }),
+      });
+    }),
 
   getInboxById: privateProcedure
     .input(
       z.object({
         id: z.string(),
+        subject: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const { id } = input;
+      const { id, subject } = input;
 
       if (!id) throw new Error("Id Not found");
 
