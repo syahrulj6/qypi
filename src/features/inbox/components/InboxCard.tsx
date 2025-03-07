@@ -84,16 +84,18 @@ export const InboxCard = ({
             <AvatarImage src={senderProfilePicture} />
           </Avatar>
           <div className="flex flex-col">
-            <p className="font-semibold">{senderEmail}</p>
+            <p className="text-sm font-semibold md:text-base">{senderEmail}</p>
             <div className="flex gap-1">
-              <p className="font-medium">{subject} - </p>
-              <p className="text-muted-foreground">{message}</p>
+              <p className="text-sm font-medium md:text-base">{subject} - </p>
+              <p className="text-sm text-muted-foreground md:text-base">
+                {message}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="z-10 flex gap-4 pt-2">
-          <p className="text-sm text-muted-foreground">
+        <div className="z-10 flex w-20 flex-col items-center gap-4 pt-2 md:w-fit md:flex-row">
+          <p className="text-center text-xs text-muted-foreground md:text-left md:text-sm">
             {new Date(createdAt).toLocaleString()}
           </p>
           <AlertDialog>
@@ -102,7 +104,7 @@ export const InboxCard = ({
                 onClick={(e) => e.stopPropagation()}
                 variant="destructive"
                 type="button"
-                className="h-7 w-7"
+                className="h-5 w-5 md:h-7 md:w-7"
               >
                 <Trash />
               </Button>
