@@ -117,7 +117,7 @@ const InboxPage = () => {
     <DashboardLayout>
       <div className="mt-3 pr-0 md:mt-6 md:pr-8">
         <div className="mb-4 flex items-center justify-between">
-          <div className="relative w-4/5 md:w-2/6">
+          <div className="relative w-3/5 md:w-2/6">
             <Input
               id="search"
               placeholder="Search inbox"
@@ -128,7 +128,12 @@ const InboxPage = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground md:h-5 md:w-5" />
             </Label>
           </div>
-          <Button onClick={() => setShowModal(true)}>Send Inbox</Button>
+          <Button
+            onClick={() => setShowModal(true)}
+            className="text-xs md:text-base"
+          >
+            Send Inbox
+          </Button>
         </div>
 
         <div className="flex flex-col gap-2">
