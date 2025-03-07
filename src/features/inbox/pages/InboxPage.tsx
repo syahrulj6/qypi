@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { SendInboxModal } from "../components/SendInboxModal";
@@ -23,7 +23,6 @@ type Inbox = {
 
 const InboxPage = () => {
   const [messages, setMessages] = useState<Inbox[]>([]);
-  const [filteredMessages, setFilteredMessages] = useState<Inbox[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -35,7 +34,13 @@ const InboxPage = () => {
     data: inboxData = [],
     isLoading,
     refetch,
-  } = api.inbox.getInbox.useQuery({}, { staleTime: 5000 });
+  } = api.inbox.getInbox.useQuery();
+
+  const { data: searchResults = [], isLoading: isSearching } =
+    api.inbox.searchInbox.useQuery(
+      { subject: search },
+      { enabled: !!search, staleTime: 5000 },
+    );
 
   const markAsRead = api.inbox.markAsRead.useMutation();
 
@@ -53,20 +58,26 @@ const InboxPage = () => {
         isRead: msg.isRead,
       }));
       setMessages(formattedMessages);
-      setFilteredMessages(formattedMessages);
     }
   }, [inboxData]);
 
-  useEffect(() => {
+  const filteredMessages = useMemo(() => {
     if (search) {
-      const filtered = messages.filter((msg) =>
-        msg.subject.toLowerCase().includes(search.toLowerCase()),
-      );
-      setFilteredMessages(filtered);
+      return searchResults.map((msg) => ({
+        id: msg.id,
+        subject: msg.subject,
+        message: msg.message,
+        senderEmail: msg.sender.email,
+        senderProfilePicture: msg.sender.profilePictureUrl ?? "",
+        receiverEmail: msg.receiver.email,
+        createdAt: new Date(msg.createdAt).toISOString(),
+        parentId: msg.parentId ?? "",
+        isRead: msg.isRead,
+      }));
     } else {
-      setFilteredMessages(messages);
+      return messages;
     }
-  }, [search, messages]);
+  }, [search, searchResults, messages]);
 
   api.inbox.onNewInbox.useSubscription(undefined, {
     onData(newInbox) {
@@ -139,8 +150,9 @@ const InboxPage = () => {
               />
             ))
           ) : (
-            <p>No inbox found.</p>
+            <div>{!isSearching && <p>No inbox found.</p>}</div>
           )}
+          {isSearching && <LoaderCircleIcon className="animate-spin" />}
         </div>
 
         {showModal && (
