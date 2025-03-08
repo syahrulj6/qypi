@@ -50,42 +50,58 @@ export default function MainDashboardPage() {
         {/* Metrics Card */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
-            <div className="h-14 w-14 rounded-full bg-violet-100 p-4">
-              <Mail className="text-violet-500" />
+            <div className="h-fit w-fit rounded-full bg-violet-100 p-3 md:h-14 md:w-14 md:p-4">
+              <Mail className="h-5 w-5 text-violet-500 md:h-6 md:w-6" />
             </div>
             <div className="flex flex-col justify-between">
-              <h5 className="font-semibold">{inboxData?.length}</h5>
-              <p className="text-muted-foreground">Total Inbox Receive</p>
+              <h5 className="text-sm font-semibold md:text-base">
+                {inboxData?.length}
+              </h5>
+              <p className="text-sm text-muted-foreground md:text-base">
+                Total Inbox Receive
+              </p>
             </div>
           </Card>
 
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
-            <div className="h-14 w-14 rounded-full bg-pink-100 p-4">
-              <Send className="text-pink-500" />
+            <div className="h-fit w-fit rounded-full bg-pink-100 p-3 md:h-14 md:w-14 md:p-4">
+              <Send className="h-5 w-5 text-pink-500 md:h-6 md:w-6" />
             </div>
             <div className="flex flex-col justify-between">
-              <h5 className="font-semibold">{senderInboxData?.length}</h5>
-              <p className="text-muted-foreground">Total Inbox Sent</p>
+              <h5 className="text-sm font-semibold md:text-base">
+                {senderInboxData?.length}
+              </h5>
+              <p className="text-sm text-muted-foreground md:text-base">
+                Total Inbox Sent
+              </p>
             </div>
           </Card>
 
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
-            <div className="h-14 w-14 rounded-full bg-blue-100 p-4">
-              <StickyNote className="text-blue-500" />
+            <div className="h-fit w-fit rounded-full bg-blue-100 p-3 md:h-14 md:w-14 md:p-4">
+              <StickyNote className="h-5 w-5 text-blue-500 md:h-6 md:w-6" />
             </div>
             <div className="flex flex-col justify-between">
-              <h5 className="font-semibold">{noteData?.length}</h5>
-              <p className="text-muted-foreground">Note Created</p>
+              <h5 className="text-sm font-semibold md:text-base">
+                {noteData?.length}
+              </h5>
+              <p className="text-sm text-muted-foreground md:text-base">
+                Note Created
+              </p>
             </div>
           </Card>
 
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
-            <div className="h-14 w-14 rounded-full bg-green-100 p-4">
-              <Calendar className="text-green-500" />
+            <div className="h-fit w-fit rounded-full bg-green-100 p-3 md:h-14 md:w-14 md:p-4">
+              <Calendar className="h-5 w-5 text-green-500 md:h-6" />
             </div>
             <div className="flex flex-col justify-between">
-              <h5 className="font-semibold">{eventData?.length}</h5>
-              <p className="text-muted-foreground">Event Created</p>
+              <h5 className="text-sm font-semibold md:text-base">
+                {eventData?.length}
+              </h5>
+              <p className="text-sm text-muted-foreground md:text-base">
+                Event Created
+              </p>
             </div>
           </Card>
         </div>
