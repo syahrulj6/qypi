@@ -37,18 +37,24 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function MainDashboardPage() {
+  const { data: inboxData } = api.inbox.getInboxCountByMonth.useQuery();
+
+  const totalInboxCount = inboxData
+    ? Object.values(inboxData).reduce((sum, count) => sum + count, 0)
+    : "";
+
   return (
     <DashboardLayout>
       <div className="mt-4 flex flex-col space-y-7">
-        {/*Metrics Card  */}
+        {/* Metrics Card */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6">
             <div className="h-14 w-14 rounded-full bg-violet-200 p-4">
               <Mail className="text-violet-500" />
             </div>
             <div className="flex flex-col justify-between">
-              <h5 className="font-semibold">152</h5>
-              <p className="text-muted-foreground">Total Inbox Sent</p>
+              <h5 className="font-semibold">{totalInboxCount}</h5>
+              <p className="text-muted-foreground">Total Inbox Created</p>
             </div>
           </div>
         </div>

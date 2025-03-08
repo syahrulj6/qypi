@@ -291,4 +291,39 @@ export const inboxRouter = createTRPCRouter({
         },
       });
     }),
+
+  getInboxCountByMonth: privateProcedure.query(async ({ ctx }) => {
+    const { db, user } = ctx;
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    const inboxCountByMonth = await db.inbox.groupBy({
+      by: ["createdAt"],
+      where: {
+        OR: [
+          { receiverEmail: user.email }, // Count inbox items where the user is the receiver
+          { senderEmail: user.email }, // Count inbox items where the user is the sender
+        ],
+      },
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    const groupedData = inboxCountByMonth.reduce(
+      (acc, inbox) => {
+        const monthYear = new Date(inbox.createdAt).toISOString().slice(0, 7);
+        acc[monthYear] = (acc[monthYear] || 0) + inbox._count.id;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    return groupedData;
+  }),
 });
