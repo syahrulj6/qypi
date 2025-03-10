@@ -79,7 +79,7 @@ export const CreateNoteModal = ({
               type="submit"
               className="col-span-2 w-full"
             >
-              {createNote.isPaused ? (
+              {createNote.isPending ? (
                 <LoaderCircleIcon className="animate-spin" />
               ) : (
                 "Simpan Note"

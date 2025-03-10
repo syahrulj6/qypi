@@ -76,7 +76,7 @@ export const CreateNotebookModal = ({
               {createNotebook.isPending ? (
                 <LoaderCircleIcon className="animate-spin" />
               ) : (
-                "Simpan Note"
+                "Simpan Notebook"
               )}
             </Button>
           </form>

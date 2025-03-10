@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { notebookFormSchema, type NotebookFormSchema } from "../forms/notebook";
 import { api } from "~/utils/api";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { LoaderCircleIcon, X } from "lucide-react";
 import { Form } from "~/components/ui/form";
 import { NotebookFormInner } from "./NotebookFormInner";
 import { Button } from "~/components/ui/button";
@@ -92,7 +92,11 @@ export const EditNotebookModal = ({
           >
             <NotebookFormInner />
             <Button type="submit" className="col-span-2 w-full">
-              Simpan Perubahan
+              {editNotebook.isPending ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                "Simpan Perubahan"
+              )}
             </Button>
           </form>
         </Form>

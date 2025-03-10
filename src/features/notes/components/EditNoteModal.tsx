@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
-import { X } from "lucide-react";
+import { LoaderCircleIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { NoteFormInner } from "./NoteFormInner";
@@ -93,7 +93,11 @@ export const EditNoteModal = ({
               className="col-span-2 w-full"
               disabled={editNote.isPending}
             >
-              Simpan Perubahan
+              {editNote.isPending ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                "Simpan Perubahan"
+              )}
             </Button>
           </form>
         </Form>
