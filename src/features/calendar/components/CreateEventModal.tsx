@@ -8,7 +8,7 @@ import { Form } from "~/components/ui/form";
 import { EventFormInner } from "./EventFormInner";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
-import { X } from "lucide-react";
+import { LoaderCircleIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -80,8 +80,16 @@ export const CreateEventModal = ({
             className="mt-2 grid grid-cols-2 gap-x-2 space-y-2"
           >
             <EventFormInner />
-            <Button type="submit" className="col-span-2 w-full">
-              Simpan Jadwal
+            <Button
+              type="submit"
+              disabled={createEvent.isPending}
+              className="col-span-2 w-full"
+            >
+              {createEvent.isPending ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                "Simpan Event"
+              )}
             </Button>
           </form>
         </Form>
