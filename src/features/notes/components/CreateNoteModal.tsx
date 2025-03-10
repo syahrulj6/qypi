@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { noteFormSchema, NoteFormSchema } from "../forms/note";
 import { api } from "~/utils/api";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { LoaderCircleIcon, X } from "lucide-react";
 import { Form } from "~/components/ui/form";
 import { NoteFormInner } from "./NoteFormInner";
 import { Button } from "~/components/ui/button";
@@ -79,7 +79,11 @@ export const CreateNoteModal = ({
               type="submit"
               className="col-span-2 w-full"
             >
-              Simpan Note
+              {createNote.isPaused ? (
+                <LoaderCircleIcon className="animate-spin" />
+              ) : (
+                "Simpan Note"
+              )}
             </Button>
           </form>
         </Form>
