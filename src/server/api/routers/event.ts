@@ -73,7 +73,7 @@ export const eventRouter = createTRPCRouter({
         select: { userId: true },
       });
 
-      return await db.event.create({
+      const createEvent = await db.event.create({
         data: {
           title: input.title,
           description: input.description,
@@ -89,6 +89,16 @@ export const eventRouter = createTRPCRouter({
           },
         },
       });
+
+      await db.userActivity.create({
+        data: {
+          userId: user.id,
+          activityType: "EVENT_CREATED",
+          details: { eventId: createEvent.id },
+        },
+      });
+
+      return createEvent;
     }),
 
   deleteEventById: privateProcedure

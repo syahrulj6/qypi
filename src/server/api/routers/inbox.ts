@@ -53,6 +53,28 @@ export const inboxRouter = createTRPCRouter({
         },
       ]);
 
+      await db.userActivity.create({
+        data: {
+          userId: user.id,
+          activityType: "INBOX_CREATED",
+          details: { inboxId: sendMessage.id },
+        },
+      });
+
+      const receiver = await db.profile.findUnique({
+        where: { email: receiverEmail },
+      });
+
+      if (receiver) {
+        await db.userActivity.create({
+          data: {
+            userId: receiver.userId,
+            activityType: "INBOX_RECEIVED",
+            details: { inboxId: sendMessage.id },
+          },
+        });
+      }
+
       return sendMessage;
     }),
 

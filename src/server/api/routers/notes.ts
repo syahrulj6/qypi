@@ -174,6 +174,14 @@ export const notesRouter = createTRPCRouter({
         },
       });
 
+      await db.userActivity.create({
+        data: {
+          userId: user.id,
+          activityType: "NOTEBOOK_CREATED",
+          details: { notebookId: createNoteBook.id },
+        },
+      });
+
       return createNoteBook;
     }),
 
@@ -198,6 +206,14 @@ export const notesRouter = createTRPCRouter({
           title,
           content,
           notebookId: notebookId || null,
+        },
+      });
+
+      await db.userActivity.create({
+        data: {
+          userId: user.id,
+          activityType: "NOTE_CREATED",
+          details: { noteId: createNote.id },
         },
       });
 

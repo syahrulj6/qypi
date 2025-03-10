@@ -58,6 +58,7 @@ model Profile {
 
     sentMessages    Inbox[] @relation("SentMessages") 
     receivedMessages Inbox[] @relation("ReceivedMessages") 
+    userActivity UserActivity[]
 }
 
 
@@ -102,5 +103,17 @@ model Inbox {
     parent         Inbox?   @relation("ReplyThread", fields: [parentId], references: [id])
     replies        Inbox[]  @relation("ReplyThread")
     @@index([receiverEmail]) 
+}
+
+model UserActivity {
+    id          String   @id @default(uuid())
+    userId      String
+    user        Profile  @relation(fields: [userId], references: [userId])
+    activityType String  
+    createdAt   DateTime @default(now())
+    details     Json?   
+
+    @@index([userId])
+    @@index([activityType])
 }
 

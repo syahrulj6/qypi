@@ -25,6 +25,7 @@ const chartData = [
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
 ];
+
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -36,17 +37,23 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+type ActivityCounts = Record<string, number>;
+
 export default function MainDashboardPage() {
-  const { data: inboxData } = api.inbox.getInbox.useQuery();
-  const { data: senderInboxData } = api.inbox.getSenderInbox.useQuery();
-  const { data: noteData } = api.notes.getAllNotesAndNotebooks.useQuery({
-    title: "",
-  });
-  const { data: eventData } = api.event.getEvents.useQuery();
+  const { data: userActivities } =
+    api.userActivity.getUserActivities.useQuery();
+
+  const activityCounts = userActivities?.reduce<ActivityCounts>(
+    (acc, activity) => {
+      acc[activity.activityType] = (acc[activity.activityType] || 0) + 1;
+      return acc;
+    },
+    {},
+  );
 
   return (
     <DashboardLayout>
-      <div className="mt-4 flex flex-col space-y-7 pr-0 md:pr-10">
+      <div className="mt-4 flex flex-col space-y-7 pr-0 md:pr-8">
         {/* Metrics Card */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
@@ -55,7 +62,7 @@ export default function MainDashboardPage() {
             </div>
             <div className="flex flex-col justify-between">
               <h5 className="text-sm font-semibold md:text-base">
-                {inboxData?.length}
+                {activityCounts?.["INBOX_RECEIVED"] || 0}
               </h5>
               <p className="text-sm text-muted-foreground md:text-base">
                 Total Inbox Receive
@@ -69,7 +76,7 @@ export default function MainDashboardPage() {
             </div>
             <div className="flex flex-col justify-between">
               <h5 className="text-sm font-semibold md:text-base">
-                {senderInboxData?.length}
+                {activityCounts?.["INBOX_CREATED"] || 0}
               </h5>
               <p className="text-sm text-muted-foreground md:text-base">
                 Total Inbox Sent
@@ -83,7 +90,7 @@ export default function MainDashboardPage() {
             </div>
             <div className="flex flex-col justify-between">
               <h5 className="text-sm font-semibold md:text-base">
-                {noteData?.length}
+                {activityCounts?.["NOTE_CREATED"] || 0}
               </h5>
               <p className="text-sm text-muted-foreground md:text-base">
                 Note Created
@@ -93,55 +100,59 @@ export default function MainDashboardPage() {
 
           <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
             <div className="h-fit w-fit rounded-full bg-green-100 p-3 md:h-14 md:w-14 md:p-4">
-              <Calendar className="h-5 w-5 text-green-500 md:h-6" />
+              <Calendar className="h-5 w-5 text-green-500 md:h-6 md:w-6" />
             </div>
             <div className="flex flex-col justify-between">
               <h5 className="text-sm font-semibold md:text-base">
-                {eventData?.length}
+                {activityCounts?.["EVENT_CREATED"] || 0}
               </h5>
               <p className="text-sm text-muted-foreground md:text-base">
                 Event Created
               </p>
             </div>
           </Card>
-        </div>
 
-        {/* Chart */}
-        <Card className="h-96 w-96">
-          <CardHeader>
-            <CardTitle>Your activities</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig}>
-              <BarChart accessibilityLayer data={chartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dashed" />}
-                />
-                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col items-start gap-2 text-sm">
-            <div className="flex gap-2 font-medium leading-none">
-              Your activites up by 5.2% this month{" "}
-              <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total activites for the last 6 months
-            </div>
-          </CardFooter>
-        </Card>
+          {/* Chart */}
+          <Card className="col-span-2 h-96 md:col-span-3">
+            <CardHeader>
+              <CardTitle>Your activities</CardTitle>
+              <CardDescription>January - June 2024</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig}>
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dashed" />}
+                  />
+                  <Bar
+                    dataKey="desktop"
+                    fill="var(--color-desktop)"
+                    radius={4}
+                  />
+                  <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+              <div className="flex gap-2 font-medium leading-none">
+                Your activites up by 5.2% this month{" "}
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div className="leading-none text-muted-foreground">
+                Showing total activites for the last 6 months
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
