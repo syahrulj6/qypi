@@ -1,4 +1,5 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
+import { subDays, format } from "date-fns";
 import { api } from "~/utils/api";
 import { Calendar, Mail, Send, StickyNote, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
@@ -17,23 +18,10 @@ import {
   ChartTooltipContent,
 } from "~/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
-
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  count: {
+    label: "Activities",
     color: "#4D55CC",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "#69247C",
   },
 } satisfies ChartConfig;
 
@@ -49,6 +37,34 @@ export default function MainDashboardPage() {
       return acc;
     },
     {},
+  );
+
+  const last7DaysActivities = userActivities?.filter((activity) => {
+    const activityDate = new Date(activity.createdAt);
+    const sevenDaysAgo = subDays(new Date(), 7);
+    return activityDate >= sevenDaysAgo;
+  });
+
+  // Group activities by day
+  const activityCountsByDay = last7DaysActivities?.reduce<
+    Record<string, number>
+  >((acc, activity) => {
+    const activityDate = format(new Date(activity.createdAt), "yyyy-MM-dd");
+    acc[activityDate] = (acc[activityDate] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Format data for the chart
+  const chartData = Object.entries(activityCountsByDay || {}).map(
+    ([date, count]) => ({
+      date,
+      count,
+    }),
+  );
+
+  // Sort data by date
+  const sortedChartData = chartData.sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
   );
 
   return (
@@ -113,42 +129,48 @@ export default function MainDashboardPage() {
           </Card>
 
           {/* Chart */}
-          <Card className="col-span-2 h-96 md:col-span-3">
+          <Card className="col-span-2 md:col-span-2">
             <CardHeader>
               <CardTitle>Your activities</CardTitle>
-              <CardDescription>January - June 2024</CardDescription>
+              <CardDescription>Last 7 days</CardDescription>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig}>
-                <BarChart accessibilityLayer data={chartData}>
+                <BarChart accessibilityLayer data={sortedChartData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="month"
+                    dataKey="date"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
+                    tickFormatter={(value) => format(new Date(value), "MMM d")}
                   />
                   <ChartTooltip
                     cursor={false}
-                    content={<ChartTooltipContent indicator="dashed" />}
+                    content={
+                      <ChartTooltipContent
+                        indicator="dashed"
+                        labelFormatter={(value) =>
+                          format(new Date(value), "MMM d, yyyy")
+                        }
+                      />
+                    }
                   />
                   <Bar
-                    dataKey="desktop"
-                    fill="var(--color-desktop)"
+                    dataKey="count"
+                    fill={chartConfig.count.color}
                     radius={4}
                   />
-                  <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
               <div className="flex gap-2 font-medium leading-none">
-                Your activites up by 5.2% this month{" "}
+                Your activities over the last 7 days{" "}
                 <TrendingUp className="h-4 w-4" />
               </div>
               <div className="leading-none text-muted-foreground">
-                Showing total activites for the last 6 months
+                Showing total activities for the last 7 days
               </div>
             </CardFooter>
           </Card>
