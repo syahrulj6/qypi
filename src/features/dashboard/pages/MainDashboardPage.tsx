@@ -69,11 +69,11 @@ export default function MainDashboardPage() {
       <div className="mt-4 flex flex-col space-y-7 pr-0 md:pr-8">
         {/* Metrics Card */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
+          <Card className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:flex-row md:gap-6">
             <div className="h-fit w-fit rounded-full bg-violet-100 p-3 md:h-14 md:w-14 md:p-4">
               <Mail className="h-5 w-5 text-violet-500 md:h-6 md:w-6" />
             </div>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between text-center md:text-left">
               <h5 className="text-sm font-semibold md:text-base">
                 {activityCounts?.["INBOX_RECEIVED"] || 0}
               </h5>
@@ -83,11 +83,11 @@ export default function MainDashboardPage() {
             </div>
           </Card>
 
-          <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
+          <Card className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:flex-row md:gap-6">
             <div className="h-fit w-fit rounded-full bg-pink-100 p-3 md:h-14 md:w-14 md:p-4">
               <Send className="h-5 w-5 text-pink-500 md:h-6 md:w-6" />
             </div>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between text-center md:text-left">
               <h5 className="text-sm font-semibold md:text-base">
                 {activityCounts?.["INBOX_CREATED"] || 0}
               </h5>
@@ -97,11 +97,11 @@ export default function MainDashboardPage() {
             </div>
           </Card>
 
-          <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
+          <Card className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:flex-row md:gap-6">
             <div className="h-fit w-fit rounded-full bg-blue-100 p-3 md:h-14 md:w-14 md:p-4">
               <StickyNote className="h-5 w-5 text-blue-500 md:h-6 md:w-6" />
             </div>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between text-center md:text-left">
               <h5 className="text-sm font-semibold md:text-base">
                 {activityCounts?.["NOTE_CREATED"] || 0}
               </h5>
@@ -111,11 +111,11 @@ export default function MainDashboardPage() {
             </div>
           </Card>
 
-          <Card className="flex items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:gap-6">
+          <Card className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 md:flex-row md:gap-6">
             <div className="h-fit w-fit rounded-full bg-green-100 p-3 md:h-14 md:w-14 md:p-4">
               <Calendar className="h-5 w-5 text-green-500 md:h-6 md:w-6" />
             </div>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between text-center md:text-left">
               <h5 className="text-sm font-semibold md:text-base">
                 {activityCounts?.["EVENT_CREATED"] || 0}
               </h5>
