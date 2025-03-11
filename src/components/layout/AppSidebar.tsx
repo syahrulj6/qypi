@@ -24,7 +24,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 
 const mainMenuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
   { title: "My Calendar", url: "/dashboard/calendar", icon: Calendar },
   { title: "My Inbox", url: "/dashboard/inbox", icon: Inbox },
   { title: "My Notes", url: "/dashboard/notes", icon: NotebookPen },

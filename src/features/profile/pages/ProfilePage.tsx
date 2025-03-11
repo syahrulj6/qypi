@@ -17,7 +17,7 @@ import {
 } from "../forms/edit-profile";
 import { ProfilePictureActions } from "../components/ProfilePictureActions";
 import { useProfilePictureHandler } from "~/hooks/useProfilePictureHandler";
-import { Skeleton } from "~/components/ui/skeleton"; // Import Skeleton
+import { Skeleton } from "~/components/ui/skeleton";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/router";
 
