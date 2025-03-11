@@ -45,7 +45,6 @@ export default function MainDashboardPage() {
     return activityDate >= sevenDaysAgo;
   });
 
-  // Group activities by day
   const activityCountsByDay = last7DaysActivities?.reduce<
     Record<string, number>
   >((acc, activity) => {
@@ -54,7 +53,6 @@ export default function MainDashboardPage() {
     return acc;
   }, {});
 
-  // Format data for the chart
   const chartData = Object.entries(activityCountsByDay || {}).map(
     ([date, count]) => ({
       date,
@@ -62,7 +60,6 @@ export default function MainDashboardPage() {
     }),
   );
 
-  // Sort data by date
   const sortedChartData = chartData.sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
   );
@@ -127,14 +124,16 @@ export default function MainDashboardPage() {
               </p>
             </div>
           </Card>
+        </div>
 
-          {/* Chart */}
-          <Card className="col-span-2 md:col-span-2">
+        {/* Chart */}
+        <div className="w-full md:w-2/3">
+          <Card className="flex w-full flex-col justify-center">
             <CardHeader>
               <CardTitle>Your activities</CardTitle>
               <CardDescription>Last 7 days</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="w-full md:w-96">
               <ChartContainer config={chartConfig}>
                 <BarChart accessibilityLayer data={sortedChartData}>
                   <CartesianGrid vertical={false} />
