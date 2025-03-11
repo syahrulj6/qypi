@@ -18,10 +18,13 @@ import {
 import { ProfilePictureActions } from "../components/ProfilePictureActions";
 import { useProfilePictureHandler } from "~/hooks/useProfilePictureHandler";
 import { Skeleton } from "~/components/ui/skeleton"; // Import Skeleton
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/router";
 
 const ProfilePage = () => {
   const apiUtils = api.useUtils();
   const { data: getProfileData, isLoading } = api.profile.getProfile.useQuery();
+  const router = useRouter();
 
   const form = useForm<EditProfileFormSchema>({
     resolver: zodResolver(editProfileFormSchema),
@@ -77,9 +80,18 @@ const ProfilePage = () => {
   return (
     <SessionRoute>
       <PageContainer>
-        <SectionContainer padded minFullscreen className="gap-y-6 py-8">
+        <Button
+          onClick={() => router.back()}
+          className="absolute left-4 top-20 z-20 md:left-40 md:top-32"
+        >
+          <ArrowLeft />
+        </Button>
+        <SectionContainer
+          padded
+          minFullscreen
+          className="mt-16 gap-y-6 py-8 md:mt-20"
+        >
           <h1 className="text-3xl font-semibold">Profile Settings</h1>
-
           <Card>
             <CardContent className="flex gap-6 pt-6">
               {isLoading ? (
@@ -126,7 +138,6 @@ const ProfilePage = () => {
               </div>
             </CardContent>
           </Card>
-
           <div className="flex w-full justify-end gap-4">
             <Button
               disabled={!form.formState.isDirty || isLoading}
