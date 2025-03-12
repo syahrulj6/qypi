@@ -2,7 +2,15 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { subDays, format } from "date-fns";
 import { api } from "~/utils/api";
 import { Calendar, Mail, Send, StickyNote, TrendingUp, X } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  TooltipProps,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -11,12 +19,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "~/components/ui/chart";
 import { useState } from "react";
 
 const chartConfig = {
@@ -24,9 +26,29 @@ const chartConfig = {
     label: "Activities",
     color: "#4D55CC",
   },
-} satisfies ChartConfig;
+};
 
 type ActivityCounts = Record<string, number>;
+
+interface CustomTooltipProps extends TooltipProps<number, string> {
+  active?: boolean;
+  payload?: { value: number }[];
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded border bg-white p-2 shadow">
+        <p className="font-medium">
+          {format(new Date(label ?? ""), "MMM d, yyyy")}
+        </p>
+        <p className="text-sm">Count: {payload[0]!.value}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function MainDashboardPage() {
   const [openModal, setOpenModal] = useState<null | string>(null);
@@ -153,41 +175,31 @@ export default function MainDashboardPage() {
         </div>
 
         {/* Chart */}
-        <div className="w-full md:w-2/4">
+        <div className="w-full md:w-2/3">
           <Card className="flex w-full flex-col justify-center">
             <CardHeader>
               <CardTitle>Your activities</CardTitle>
               <CardDescription>Last 7 days</CardDescription>
             </CardHeader>
-            <CardContent className="w-full">
-              <ChartContainer config={chartConfig}>
-                <BarChart accessibilityLayer data={sortedChartData}>
-                  <CartesianGrid vertical={false} />
+            <CardContent className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={sortedChartData}>
+                  <CartesianGrid vertical={false} stroke="#eee" />
                   <XAxis
                     dataKey="date"
                     tickLine={false}
-                    tickMargin={10}
                     axisLine={false}
                     tickFormatter={(value) => format(new Date(value), "MMM d")}
+                    tick={{ fill: "#666", fontSize: 12 }}
                   />
-                  <ChartTooltip
-                    cursor={false}
-                    content={
-                      <ChartTooltipContent
-                        indicator="dashed"
-                        labelFormatter={(value) =>
-                          format(new Date(value), "MMM d, yyyy")
-                        }
-                      />
-                    }
-                  />
+                  <Tooltip content={<CustomTooltip />} cursor={false} />
                   <Bar
                     dataKey="count"
                     fill={chartConfig.count.color}
                     radius={4}
                   />
                 </BarChart>
-              </ChartContainer>
+              </ResponsiveContainer>
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
               <div className="flex gap-2 font-medium leading-none">
