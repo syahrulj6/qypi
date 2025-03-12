@@ -153,13 +153,13 @@ export default function MainDashboardPage() {
         </div>
 
         {/* Chart */}
-        <div className="w-full md:w-2/3">
+        <div className="w-full md:w-2/4">
           <Card className="flex w-full flex-col justify-center">
             <CardHeader>
               <CardTitle>Your activities</CardTitle>
               <CardDescription>Last 7 days</CardDescription>
             </CardHeader>
-            <CardContent className="w-full md:w-96">
+            <CardContent className="w-full">
               <ChartContainer config={chartConfig}>
                 <BarChart accessibilityLayer data={sortedChartData}>
                   <CartesianGrid vertical={false} />
