@@ -22,52 +22,66 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart";
 
-const chartVisitorsData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-];
+// Define a type for the chartActivityConfig
+type ChartActivityConfig = {
+  count: {
+    label: string;
+    color: string;
+  };
+  INBOX_RECEIVED: {
+    label: string;
+    color: string;
+  };
+  INBOX_CREATED: {
+    label: string;
+    color: string;
+  };
+  NOTE_CREATED: {
+    label: string;
+    color: string;
+  };
+  NOTEBOOK_CREATED: {
+    label: string;
+    color: string;
+  };
+  EVENT_CREATED: {
+    label: string;
+    color: string;
+  };
+};
 
-const chartVisitorsConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
-const chartActivityConfig = {
+// Use the type for chartActivityConfig
+const chartActivityConfig: ChartActivityConfig = {
   count: {
     label: "Activities",
     color: "#4D55CC",
+  },
+  INBOX_RECEIVED: {
+    label: "Inbox Received",
+    color: "#8884d8",
+  },
+  INBOX_CREATED: {
+    label: "Inbox Sent",
+    color: "#82ca9d",
+  },
+  NOTE_CREATED: {
+    label: "Note Created",
+    color: "#ffc658",
+  },
+  NOTEBOOK_CREATED: {
+    label: "Notebook Created",
+    color: "#afa642",
+  },
+  EVENT_CREATED: {
+    label: "Event Created",
+    color: "#ff8042",
   },
 };
 
@@ -97,10 +111,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export default function MainDashboardPage() {
   const [openModal, setOpenModal] = useState<null | string>(null);
-
-  const totalVisitors = useMemo(() => {
-    return chartVisitorsData.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
 
   const { data: userActivities } =
     api.userActivity.getUserActivities.useQuery();
@@ -136,6 +146,16 @@ export default function MainDashboardPage() {
 
   const sortedChartData = chartData.sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  );
+
+  const pieChartData = Object.entries(activityCounts || {}).map(
+    ([activityType, count]) => ({
+      name: activityType,
+      value: count,
+      fill:
+        chartActivityConfig[activityType as keyof ChartActivityConfig]?.color ||
+        "#000",
+    }),
   );
 
   const getLast7Activities = (activityType: string) => {
@@ -222,7 +242,7 @@ export default function MainDashboardPage() {
           </Card>
         </div>
 
-        <div className="flex w-full flex-row items-center gap-4 md:gap-6">
+        <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-6">
           {/* Chart */}
           <div className="w-full md:w-2/3">
             <Card className="flex w-full flex-col justify-center">
@@ -230,7 +250,7 @@ export default function MainDashboardPage() {
                 <CardTitle>Your activities</CardTitle>
                 <CardDescription>Last 7 days</CardDescription>
               </CardHeader>
-              <CardContent className="w-full md:h-80">
+              <CardContent className="h-48 w-full md:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={sortedChartData}>
                     <CartesianGrid vertical={false} stroke="#eee" />
@@ -263,15 +283,17 @@ export default function MainDashboardPage() {
               </CardFooter>
             </Card>
           </div>
-          <div className="flex-1 md:h-full">
-            <Card className="flex flex-col">
+
+          {/* PIE CHART */}
+          <div className="h-full flex-1">
+            <Card className="flex h-fit flex-col md:h-full">
               <CardHeader className="items-center pb-0">
-                <CardTitle>Pie Chart - Donut with Text</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>Activities Breakdown</CardTitle>
+                <CardDescription>By Activity Type</CardDescription>
               </CardHeader>
               <CardContent className="flex-1 pb-0">
                 <ChartContainer
-                  config={chartVisitorsConfig}
+                  config={chartActivityConfig}
                   className="mx-auto aspect-square max-h-[250px]"
                 >
                   <PieChart>
@@ -280,11 +302,13 @@ export default function MainDashboardPage() {
                       content={<ChartTooltipContent hideLabel />}
                     />
                     <Pie
-                      data={chartData}
-                      dataKey="visitors"
-                      nameKey="browser"
+                      data={pieChartData}
+                      dataKey="value"
+                      nameKey="name"
                       innerRadius={60}
-                      strokeWidth={5}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      strokeWidth={0}
                     >
                       <Label
                         content={({ viewBox }) => {
@@ -301,14 +325,16 @@ export default function MainDashboardPage() {
                                   y={viewBox.cy}
                                   className="fill-foreground text-3xl font-bold"
                                 >
-                                  {totalVisitors.toLocaleString()}
+                                  {pieChartData
+                                    .reduce((acc, curr) => acc + curr.value, 0)
+                                    .toLocaleString()}
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
                                   y={(viewBox.cy || 0) + 24}
                                   className="fill-muted-foreground"
                                 >
-                                  Visitors
+                                  Activities
                                 </tspan>
                               </text>
                             );
@@ -321,11 +347,11 @@ export default function MainDashboardPage() {
               </CardContent>
               <CardFooter className="flex-col gap-2 text-sm">
                 <div className="flex items-center gap-2 font-medium leading-none">
-                  Trending up by 5.2% this month{" "}
+                  5.2% activities increased this month{" "}
                   <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                  Showing total visitors for the last 6 months
+                  Showing total activities by type
                 </div>
               </CardFooter>
             </Card>
