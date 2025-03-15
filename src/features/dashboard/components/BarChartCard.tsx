@@ -15,14 +15,20 @@ import {
   CardDescription,
 } from "~/components/ui/card";
 import { TrendingUp } from "lucide-react";
-import { CustomTooltip } from "./CustomTooltip";
 import { format } from "date-fns";
+import { ChartContainer, ChartTooltipContent } from "~/components/ui/chart";
 
 interface BarChartCardProps {
   data: { date: string; count: number }[];
+  config: {
+    [key: string]: {
+      label: string;
+      color: string;
+    };
+  };
 }
 
-export const BarChartCard = ({ data }: BarChartCardProps) => {
+export const BarChartCard = ({ data, config }: BarChartCardProps) => {
   return (
     <Card className="flex w-full flex-col justify-center">
       <CardHeader>
@@ -31,18 +37,23 @@ export const BarChartCard = ({ data }: BarChartCardProps) => {
       </CardHeader>
       <CardContent className="h-48 w-full md:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <CartesianGrid vertical={false} stroke="#eee" />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => format(new Date(value), "MMM d")}
-              tick={{ fill: "#666", fontSize: 12 }}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={false} />
-            <Bar dataKey="count" fill={"#4D55CC"} radius={4} />
-          </BarChart>
+          <ChartContainer config={config}>
+            <BarChart data={data}>
+              <CartesianGrid vertical={false} stroke="#eee" />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => format(new Date(value), "MMM d")}
+                tick={{ fill: "#666", fontSize: 12 }}
+              />
+              <Tooltip
+                content={<ChartTooltipContent hideLabel />}
+                cursor={false}
+              />
+              <Bar dataKey="count" fill={"#4D55CC"} radius={4} />
+            </BarChart>
+          </ChartContainer>
         </ResponsiveContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">

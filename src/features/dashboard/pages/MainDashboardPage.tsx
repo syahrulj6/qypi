@@ -58,7 +58,7 @@ export default function MainDashboardPage() {
         <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-6">
           {/* Bar Chart */}
           <div className="w-full md:w-2/3">
-            <BarChartCard data={sortedChartData} />
+            <BarChartCard config={chartActivityConfig} data={sortedChartData} />
           </div>
 
           {/* Pie Chart */}
