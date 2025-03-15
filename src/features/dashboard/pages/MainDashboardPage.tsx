@@ -1,361 +1,72 @@
 import DashboardLayout from "~/components/layout/DashboardLayout";
-import { subDays, format } from "date-fns";
-import { api } from "~/utils/api";
-import { Calendar, Mail, Send, StickyNote, TrendingUp, X } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  Tooltip,
-  ResponsiveContainer,
-  TooltipProps,
-  PieChart,
-  Pie,
-  Label,
-} from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { useState } from "react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "~/components/ui/chart";
-
-// Define a type for the chartActivityConfig
-type ChartActivityConfig = {
-  count: {
-    label: string;
-    color: string;
-  };
-  INBOX_RECEIVED: {
-    label: string;
-    color: string;
-  };
-  INBOX_CREATED: {
-    label: string;
-    color: string;
-  };
-  NOTE_CREATED: {
-    label: string;
-    color: string;
-  };
-  NOTEBOOK_CREATED: {
-    label: string;
-    color: string;
-  };
-  EVENT_CREATED: {
-    label: string;
-    color: string;
-  };
-};
-
-// Use the type for chartActivityConfig
-const chartActivityConfig: ChartActivityConfig = {
-  count: {
-    label: "Activities",
-    color: "#4D55CC",
-  },
-  INBOX_RECEIVED: {
-    label: "Inbox Received",
-    color: "#8884d8",
-  },
-  INBOX_CREATED: {
-    label: "Inbox Sent",
-    color: "#82ca9d",
-  },
-  NOTE_CREATED: {
-    label: "Note Created",
-    color: "#ffc658",
-  },
-  NOTEBOOK_CREATED: {
-    label: "Notebook Created",
-    color: "#afa642",
-  },
-  EVENT_CREATED: {
-    label: "Event Created",
-    color: "#ff8042",
-  },
-};
-
-type ActivityCounts = Record<string, number>;
-
-interface CustomTooltipProps extends TooltipProps<number, string> {
-  active?: boolean;
-  payload?: { value: number }[];
-  label?: string;
-}
-
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
-  const isValidDate = (dateString: string) => {
-    return !isNaN(new Date(dateString).getTime());
-  };
-
-  if (active && payload && payload.length && label && isValidDate(label)) {
-    return (
-      <div className="rounded border bg-white p-2 shadow">
-        <p className="font-medium">{format(new Date(label), "MMM d, yyyy")}</p>
-        <p className="text-sm">Count: {payload[0]!.value}</p>
-      </div>
-    );
-  }
-  return null;
-};
+import { useDashboardData } from "~/hooks/useDashboardData";
+import { MetricsCard } from "../components/MetricsCard";
+import { BarChartCard } from "../components/BarChartCard";
+import { PieChartCard } from "../components/PieChartCard";
+import { Mail, Send, StickyNote, Calendar, X } from "lucide-react";
+import { chartActivityConfig } from "~/utils/type";
+import { format } from "date-fns";
 
 export default function MainDashboardPage() {
   const [openModal, setOpenModal] = useState<null | string>(null);
+  const { activityCounts, sortedChartData, pieChartData, getLast7Activities } =
+    useDashboardData();
 
-  const { data: userActivities } =
-    api.userActivity.getUserActivities.useQuery();
-
-  const activityCounts = userActivities?.reduce<ActivityCounts>(
-    (acc, activity) => {
-      acc[activity.activityType] = (acc[activity.activityType] || 0) + 1;
-      return acc;
-    },
-    {},
+  const totalActivities = pieChartData.reduce(
+    (acc, curr) => acc + curr.value,
+    0,
   );
-
-  const last7DaysActivities = userActivities?.filter((activity) => {
-    const activityDate = new Date(activity.createdAt);
-    const sevenDaysAgo = subDays(new Date(), 7);
-    return activityDate >= sevenDaysAgo;
-  });
-
-  const activityCountsByDay = last7DaysActivities?.reduce<
-    Record<string, number>
-  >((acc, activity) => {
-    const activityDate = format(new Date(activity.createdAt), "yyyy-MM-dd");
-    acc[activityDate] = (acc[activityDate] || 0) + 1;
-    return acc;
-  }, {});
-
-  const chartData = Object.entries(activityCountsByDay || {}).map(
-    ([date, count]) => ({
-      date,
-      count,
-    }),
-  );
-
-  const sortedChartData = chartData.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
-
-  const pieChartData = Object.entries(activityCounts || {}).map(
-    ([activityType, count]) => ({
-      name: activityType,
-      value: count,
-      fill:
-        chartActivityConfig[activityType as keyof ChartActivityConfig]?.color ||
-        "#000",
-    }),
-  );
-
-  const getLast7Activities = (activityType: string) => {
-    return userActivities
-      ?.filter((activity) => activity.activityType === activityType)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 7);
-  };
 
   return (
     <DashboardLayout>
       <div className="mt-4 flex flex-col space-y-7 pr-0 md:pr-8">
         {/* Metrics Card */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          <Card
+          <MetricsCard
+            title="Total Inbox Receive"
+            value={activityCounts?.["INBOX_RECEIVED"] || 0}
+            iconBg="bg-violet-200"
+            icon={<Mail className="h-5 w-5 text-violet-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("INBOX_RECEIVED")}
-            className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 hover:cursor-pointer md:flex-row md:gap-6"
-          >
-            <div className="h-fit w-fit rounded-full bg-violet-100 p-3 md:h-14 md:w-14 md:p-4">
-              <Mail className="h-5 w-5 text-violet-500 md:h-6 md:w-6" />
-            </div>
-            <div className="flex flex-col justify-between text-center md:text-left">
-              <h5 className="text-sm font-semibold md:text-base">
-                {activityCounts?.["INBOX_RECEIVED"] || 0}
-              </h5>
-              <p className="text-sm text-muted-foreground md:text-base">
-                Total Inbox Receive
-              </p>
-            </div>
-          </Card>
-
-          <Card
+          />
+          <MetricsCard
+            title="Total Inbox Sent"
+            value={activityCounts?.["INBOX_CREATED"] || 0}
+            iconBg="bg-pink-100"
+            icon={<Send className="h-5 w-5 text-pink-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("INBOX_CREATED")}
-            className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 hover:cursor-pointer md:flex-row md:gap-6"
-          >
-            <div className="h-fit w-fit rounded-full bg-pink-100 p-3 md:h-14 md:w-14 md:p-4">
-              <Send className="h-5 w-5 text-pink-500 md:h-6 md:w-6" />
-            </div>
-            <div className="flex flex-col justify-between text-center md:text-left">
-              <h5 className="text-sm font-semibold md:text-base">
-                {activityCounts?.["INBOX_CREATED"] || 0}
-              </h5>
-              <p className="text-sm text-muted-foreground md:text-base">
-                Total Inbox Sent
-              </p>
-            </div>
-          </Card>
-
-          <Card
-            onClick={() => setOpenModal("NOTE_CREATED")}
-            className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 hover:cursor-pointer md:flex-row md:gap-6"
-          >
-            <div className="h-fit w-fit rounded-full bg-blue-100 p-3 md:h-14 md:w-14 md:p-4">
+          />
+          <MetricsCard
+            title="Note Created"
+            value={activityCounts?.["NOTE_CREATED"] || 0}
+            iconBg="bg-blue-200"
+            icon={
               <StickyNote className="h-5 w-5 text-blue-500 md:h-6 md:w-6" />
-            </div>
-            <div className="flex flex-col justify-between text-center md:text-left">
-              <h5 className="text-sm font-semibold md:text-base">
-                {activityCounts?.["NOTE_CREATED"] || 0}
-              </h5>
-              <p className="text-sm text-muted-foreground md:text-base">
-                Note Created
-              </p>
-            </div>
-          </Card>
-
-          <Card
+            }
+            onClick={() => setOpenModal("NOTE_CREATED")}
+          />
+          <MetricsCard
+            title="Event Created"
+            value={activityCounts?.["EVENT_CREATED"] || 0}
+            iconBg="bg-green-100"
+            icon={<Calendar className="h-5 w-5 text-green-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("EVENT_CREATED")}
-            className="flex flex-col items-center justify-center gap-4 rounded-lg border bg-card px-4 py-6 hover:cursor-pointer md:flex-row md:gap-6"
-          >
-            <div className="h-fit w-fit rounded-full bg-green-100 p-3 md:h-14 md:w-14 md:p-4">
-              <Calendar className="h-5 w-5 text-green-500 md:h-6 md:w-6" />
-            </div>
-            <div className="flex flex-col justify-between text-center md:text-left">
-              <h5 className="text-sm font-semibold md:text-base">
-                {activityCounts?.["EVENT_CREATED"] || 0}
-              </h5>
-              <p className="text-sm text-muted-foreground md:text-base">
-                Event Created
-              </p>
-            </div>
-          </Card>
+          />
         </div>
 
         <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-6">
-          {/* Chart */}
+          {/* Bar Chart */}
           <div className="w-full md:w-2/3">
-            <Card className="flex w-full flex-col justify-center">
-              <CardHeader>
-                <CardTitle>Your activities</CardTitle>
-                <CardDescription>Last 7 days</CardDescription>
-              </CardHeader>
-              <CardContent className="h-48 w-full md:h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={sortedChartData}>
-                    <CartesianGrid vertical={false} stroke="#eee" />
-                    <XAxis
-                      dataKey="date"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) =>
-                        format(new Date(value), "MMM d")
-                      }
-                      tick={{ fill: "#666", fontSize: 12 }}
-                    />
-                    <Tooltip content={<CustomTooltip />} cursor={false} />
-                    <Bar
-                      dataKey="count"
-                      fill={chartActivityConfig.count.color}
-                      radius={4}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-              <CardFooter className="flex-col items-start gap-2 text-sm">
-                <div className="flex gap-2 font-medium leading-none">
-                  Your activities over the last 7 days{" "}
-                  <TrendingUp className="h-4 w-4" />
-                </div>
-                <div className="leading-none text-muted-foreground">
-                  Showing total activities for the last 7 days
-                </div>
-              </CardFooter>
-            </Card>
+            <BarChartCard data={sortedChartData} />
           </div>
 
-          {/* PIE CHART */}
-          <div className="h-full flex-1">
-            <Card className="flex h-fit flex-col md:h-full">
-              <CardHeader className="items-center pb-0">
-                <CardTitle>Activities Breakdown</CardTitle>
-                <CardDescription>By Activity Type</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 pb-0">
-                <ChartContainer
-                  config={chartActivityConfig}
-                  className="mx-auto aspect-square max-h-[250px]"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent hideLabel />}
-                    />
-                    <Pie
-                      data={pieChartData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      strokeWidth={0}
-                    >
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text
-                                x={viewBox.cx}
-                                y={viewBox.cy}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                              >
-                                <tspan
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  className="fill-foreground text-3xl font-bold"
-                                >
-                                  {pieChartData
-                                    .reduce((acc, curr) => acc + curr.value, 0)
-                                    .toLocaleString()}
-                                </tspan>
-                                <tspan
-                                  x={viewBox.cx}
-                                  y={(viewBox.cy || 0) + 24}
-                                  className="fill-muted-foreground"
-                                >
-                                  Activities
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              </CardContent>
-              <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
-                  5.2% activities increased this month{" "}
-                  <TrendingUp className="h-4 w-4" />
-                </div>
-                <div className="leading-none text-muted-foreground">
-                  Showing total activities by type
-                </div>
-              </CardFooter>
-            </Card>
-          </div>
+          {/* Pie Chart */}
+          <PieChartCard
+            data={pieChartData}
+            totalActivities={totalActivities}
+            config={chartActivityConfig}
+          />
         </div>
       </div>
 
