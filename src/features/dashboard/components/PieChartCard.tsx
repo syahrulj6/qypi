@@ -28,7 +28,7 @@ export const PieChartCard = ({
   config,
 }: PieChartCardProps) => {
   return (
-    <div className="h-full flex-1">
+    <div className="h-full w-full md:flex-1">
       <Card className="flex h-fit flex-col md:h-full">
         <CardHeader className="items-center pb-0">
           <CardTitle>Activities Breakdown</CardTitle>
