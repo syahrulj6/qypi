@@ -1,4 +1,3 @@
-// src/features/team/components/TeamLayout.tsx
 import React, { ReactNode } from "react";
 import { Slash } from "lucide-react";
 import {

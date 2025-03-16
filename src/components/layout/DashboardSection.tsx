@@ -15,7 +15,7 @@ const menuItems = [
   { title: "My Calendar", url: "/dashboard/calendar" },
   { title: "My Notes", url: "/dashboard/notes" },
   { title: "Settings", url: "/dashboard/settings" },
-  { title: "Team", url: "/dashboard/team" },
+  { title: "Workspace", url: "/dashboard/team" },
   { title: "Inbox Detail", url: "/dashboard/inbox/[id]" },
 ];
 

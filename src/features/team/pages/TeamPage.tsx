@@ -1,4 +1,3 @@
-// src/features/team/pages/TeamPage.tsx
 import { useRouter } from "next/router";
 import TeamLayout from "../components/TeamLayout";
 import DashboardLayout from "~/components/layout/DashboardLayout";
@@ -7,7 +6,6 @@ const TeamPage = () => {
   const router = useRouter();
   const pathSegments = router.asPath.split("/").filter(Boolean);
 
-  // Remove the "dashboard" segment from the breadcrumb
   const filteredSegments = pathSegments.filter(
     (segment) => segment !== "dashboard",
   );
