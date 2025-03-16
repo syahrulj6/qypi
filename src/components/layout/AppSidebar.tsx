@@ -28,7 +28,7 @@ const mainMenuItems = [
   { title: "My Calendar", url: "/dashboard/calendar", icon: Calendar },
   { title: "My Inbox", url: "/dashboard/inbox", icon: Inbox },
   { title: "My Notes", url: "/dashboard/notes", icon: NotebookPen },
-  { title: "Teams", url: "/dashboard/teams", icon: UsersRound },
+  { title: "Team", url: "/dashboard/team", icon: UsersRound },
 ];
 
 const otherMenuItems = [
