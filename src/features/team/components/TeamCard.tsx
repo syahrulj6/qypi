@@ -25,7 +25,6 @@ export const TeamCard = ({
   return (
     <Card
       className="hover:cursor-pointer"
-      key={id}
       onClick={() => router.push(`/dashboard/team/${id}`)}
     >
       <CardHeader>

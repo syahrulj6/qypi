@@ -1,5 +1,6 @@
 import { createTeam } from "~/schemas/team";
 import { createTRPCRouter, privateProcedure } from "../trpc";
+import { z } from "zod";
 
 export const teamRouter = createTRPCRouter({
   createTeam: privateProcedure
@@ -47,13 +48,9 @@ export const teamRouter = createTRPCRouter({
 
     if (!user) throw new Error("Unauthorized");
 
-    // Fetch teams where the user is either the lead or a member
     const teams = await db.team.findMany({
       where: {
-        OR: [
-          { leadId: user.id }, // User is the lead
-          { members: { some: { userId: user.id } } }, // User is a member
-        ],
+        OR: [{ leadId: user.id }, { members: { some: { userId: user.id } } }],
       },
       include: {
         members: true,
@@ -63,4 +60,23 @@ export const teamRouter = createTRPCRouter({
 
     return teams;
   }),
+
+  getTeamById: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { id } = input;
+
+      const team = await db.team.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      return team;
+    }),
 });
