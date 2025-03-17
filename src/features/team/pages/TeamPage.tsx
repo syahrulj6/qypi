@@ -3,9 +3,18 @@ import TeamLayout from "../components/TeamLayout";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
-import { Card } from "~/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import { useState } from "react";
 import { CreateTeamModal } from "../components/CreateTeamModal";
+import { template } from "lodash";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { TeamCard } from "../components/TeamCard";
 
 const TeamPage = () => {
   const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
@@ -96,12 +105,14 @@ const TeamPage = () => {
               </div>
             ) : (
               getTeamsData.map((team) => (
-                <Card className="flex flex-col gap-3 p-4" key={team.id}>
-                  <h2 className="text-lg font-semibold md:text-2xl">
-                    {team.name}
-                  </h2>
-                  <p className="text-sm text-gray-600">{team.description}</p>
-                </Card>
+                <TeamCard
+                  key={team.id}
+                  name={team.name}
+                  description={team.description}
+                  id={team.id}
+                  profilePicture={team.lead.profilePictureUrl}
+                  router={router}
+                />
               ))
             )}
           </div>
