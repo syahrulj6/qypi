@@ -19,7 +19,7 @@ export default function TeamLayout({
   breadcrumbItems,
 }: TeamLayoutProps) {
   return (
-    <div className="mt-6 flex flex-col">
+    <div className="mt-6 flex flex-col pr-0 md:pr-8">
       {/* BREADCRUMB */}
       <Breadcrumb>
         <BreadcrumbList>

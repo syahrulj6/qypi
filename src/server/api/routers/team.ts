@@ -41,4 +41,26 @@ export const teamRouter = createTRPCRouter({
 
       return newTeam;
     }),
+
+  getTeams: privateProcedure.query(async ({ ctx }) => {
+    const { db, user } = ctx;
+
+    if (!user) throw new Error("Unauthorized");
+
+    // Fetch teams where the user is either the lead or a member
+    const teams = await db.team.findMany({
+      where: {
+        OR: [
+          { leadId: user.id }, // User is the lead
+          { members: { some: { userId: user.id } } }, // User is a member
+        ],
+      },
+      include: {
+        members: true,
+        lead: true,
+      },
+    });
+
+    return teams;
+  }),
 });
