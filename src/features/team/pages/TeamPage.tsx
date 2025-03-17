@@ -4,11 +4,18 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
 import { Card } from "~/components/ui/card";
+import { useState } from "react";
+import { CreateTeamModal } from "../components/CreateTeamModal";
 
 const TeamPage = () => {
+  const [showCreateTeamModal, setShowCreateTeamModal] = useState(false);
   const router = useRouter();
 
-  const { data: getTeamsData, isLoading } = api.team.getTeams.useQuery();
+  const {
+    data: getTeamsData,
+    isLoading,
+    refetch,
+  } = api.team.getTeams.useQuery();
 
   if (isLoading) {
     return (
@@ -65,10 +72,22 @@ const TeamPage = () => {
 
   return (
     <DashboardLayout>
+      {/* MODAL  */}
+      {showCreateTeamModal && (
+        <CreateTeamModal
+          refetch={refetch}
+          isOpen={showCreateTeamModal}
+          onClose={() => setShowCreateTeamModal(false)}
+        />
+      )}
+
+      {/* CONTENT */}
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         <div className="mt-4 flex w-full flex-col">
           <div className="flex justify-end">
-            <Button>Create Team</Button>
+            <Button onClick={() => setShowCreateTeamModal(true)}>
+              Create Team
+            </Button>
           </div>
           <div className="grid grid-cols-2 items-center gap-4 md:grid-cols-4">
             {getTeamsData.length === 0 ? (

@@ -14,7 +14,7 @@ interface CreateTeamModalProps {
   refetch: () => void;
 }
 
-export const CreateNotebookModal = ({
+export const CreateTeamModal = ({
   isOpen,
   onClose,
   refetch,
