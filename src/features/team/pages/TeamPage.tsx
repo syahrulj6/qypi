@@ -3,17 +3,10 @@ import TeamLayout from "../components/TeamLayout";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { Button } from "~/components/ui/button";
 import { api } from "~/utils/api";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+
 import { useState } from "react";
 import { CreateTeamModal } from "../components/CreateTeamModal";
-import { template } from "lodash";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+
 import { TeamCard } from "../components/TeamCard";
 
 const TeamPage = () => {

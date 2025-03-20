@@ -1,11 +1,15 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
 import { Button } from "~/components/ui/button";
+import { TeamDetailMenuButton } from "../components/TeamDetailMenuButton";
 
 const TeamDetailPage = () => {
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -34,13 +38,8 @@ const TeamDetailPage = () => {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
-          <div className="mt-4 flex w-full flex-col">
-            <div className="flex justify-end">
-              <Button>Add Member</Button>
-            </div>
-            <div className="grid grid-cols-2 items-center md:grid-cols-4">
-              <p>Loading...</p>
-            </div>
+          <div className="mt-4 flex w-full items-center justify-center">
+            <p>Loading...</p>
           </div>
         </TeamLayout>
       </DashboardLayout>
@@ -51,13 +50,8 @@ const TeamDetailPage = () => {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
-          <div className="mt-4 flex w-full flex-col">
-            <div className="flex justify-end">
-              <Button>Add Member</Button>
-            </div>
-            <div className="grid grid-cols-2 items-center md:grid-cols-4">
-              <p>No teams found or an error occurred.</p>
-            </div>
+          <div className="mt-4 flex w-full items-center justify-center">
+            <p>No teams found or an error occurred.</p>
           </div>
         </TeamLayout>
       </DashboardLayout>
@@ -67,13 +61,26 @@ const TeamDetailPage = () => {
   return (
     <DashboardLayout>
       <TeamLayout breadcrumbItems={breadcrumbItems}>
+        <TeamDetailMenuButton
+          onOpenAddMember={() => setShowAddMember(true)}
+          onOpenCreateProject={() => setShowCreateProject(true)}
+        />
         <div className="mt-4 flex w-full flex-col">
-          <div className="flex justify-end">
-            <Button>Add Member</Button>
-          </div>
-          <div className="grid grid-cols-2 items-center md:grid-cols-4">
-            <h1>{getTeamData.name}</h1>
-            <p>{getTeamData.description}</p>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col tracking-tight">
+              <p className="text-md text-muted-foreground md:text-base">
+                Team Name
+              </p>
+              <h1 className="text-lg font-semibold md:text-xl">
+                {getTeamData.name}
+              </h1>
+            </div>
+            <div className="flex flex-col">
+              <p className="text-md text-muted-foreground md:text-base">
+                Team Description
+              </p>
+              <p className="text-sm">{getTeamData.description}</p>
+            </div>
           </div>
         </div>
       </TeamLayout>
