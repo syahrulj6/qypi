@@ -21,7 +21,7 @@ export const CreateTeamFormInner = () => {
           <FormItem className="col-span-2">
             <FormLabel>Nama Team</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Masukkan nama team..." />
+              <Input {...field} placeholder="Masukkan nama team" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -33,9 +33,9 @@ export const CreateTeamFormInner = () => {
         name="description"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Content</FormLabel>
+            <FormLabel>Deskripsi</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Isi content..." />
+              <Input {...field} placeholder="Deskripsi Team" />
             </FormControl>
             <FormMessage />
           </FormItem>
