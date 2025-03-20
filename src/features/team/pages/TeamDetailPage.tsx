@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { TeamMemberCard } from "../components/TeamMemberCard";
 import { FolderOpen, Users } from "lucide-react";
 import { CreateProjectModal } from "../components/CreateProjectModal";
+import { ProjectCard } from "../components/ProjectCard";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -22,13 +23,22 @@ const TeamDetailPage = () => {
     if (!id) router.push("/dashboard");
   }, [id, router]);
 
-  const {
-    data: getTeamData,
-    isLoading,
-    refetch,
-  } = api.team.getTeamById.useQuery({ id: id as string }, { enabled: !!id });
+  const { data: getTeamData, isLoading: getTeamDataIsLoading } =
+    api.team.getTeamById.useQuery({ id: id as string }, { enabled: !!id });
 
-  const { data: getTeamMemberData } = api.team.getTeamMember.useQuery({
+  const {
+    data: getTeamMemberData,
+    isLoading: getTeamMemberIsLoading,
+    refetch: refetchTeamMemberData,
+  } = api.team.getTeamMember.useQuery({
+    teamId: getTeamData?.id || "",
+  });
+
+  const {
+    data: getProjectData,
+    refetch: refetchProjectData,
+    isLoading: getProjectDataIsLoading,
+  } = api.project.getProject.useQuery({
     teamId: getTeamData?.id || "",
   });
 
@@ -37,7 +47,7 @@ const TeamDetailPage = () => {
     { label: getTeamData?.name || "Team Details" },
   ];
 
-  if (isLoading) {
+  if (getTeamDataIsLoading) {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
@@ -69,7 +79,7 @@ const TeamDetailPage = () => {
             teamId={getTeamData.id}
             isOpen={showCreateProject}
             onClose={() => setShowCreateProject(false)}
-            refetch={refetch}
+            refetch={refetchProjectData}
           />
         )}
 
@@ -111,13 +121,16 @@ const TeamDetailPage = () => {
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
               Projects <FolderOpen className="w-3 md:w-4" />
             </p>
-            <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted px-2 py-4 md:grid-cols-4">
-              {getTeamMemberData?.map((member) => (
-                <TeamMemberCard
-                  key={member.id}
-                  leadId={getTeamData.leadId}
-                  memberId={member.user.userId}
-                  username={member.user.username}
+            <div className="grid grid-cols-1 gap-3 rounded-lg bg-muted px-2 py-4 md:grid-cols-3">
+              {getProjectData?.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  id={project.id}
+                  name={project.name}
+                  description={project.description}
+                  endDate={new Date(project.endDate!)}
+                  router={router}
+                  team={project.team}
                 />
               ))}
             </div>

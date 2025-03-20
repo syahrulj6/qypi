@@ -29,4 +29,31 @@ export const projectRouter = createTRPCRouter({
 
       return createProject;
     }),
+
+  getProject: privateProcedure
+    .input(z.object({ teamId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { teamId } = input;
+
+      const project = await db.project.findMany({
+        where: {
+          teamId,
+        },
+        include: {
+          team: {
+            include: {
+              lead: true,
+              members: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return project;
+    }),
 });
