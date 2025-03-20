@@ -32,7 +32,7 @@ const TeamPage = () => {
         <TeamLayout breadcrumbItems={[]}>
           <div className="mt-4 flex w-full flex-col">
             <div className="flex justify-end">
-              <Button>Create Team</Button>
+              <Button disabled>Create Team</Button>
             </div>
             <div className="grid grid-cols-2 items-center md:grid-cols-4">
               <p>Loading...</p>
@@ -49,7 +49,7 @@ const TeamPage = () => {
         <TeamLayout breadcrumbItems={[]}>
           <div className="mt-4 flex w-full flex-col">
             <div className="flex justify-end">
-              <Button>Create Team</Button>
+              <Button disabled>Create Team</Button>
             </div>
             <div className="grid grid-cols-2 items-center md:grid-cols-4">
               <p>No teams found or an error occurred.</p>
