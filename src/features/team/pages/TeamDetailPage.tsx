@@ -8,6 +8,7 @@ import { TeamDetailMenuButton } from "../components/TeamDetailMenuButton";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { TeamMemberCard } from "../components/TeamMemberCard";
 import { FolderOpen, Users } from "lucide-react";
+import { CreateProjectModal } from "../components/CreateProjectModal";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -21,10 +22,11 @@ const TeamDetailPage = () => {
     if (!id) router.push("/dashboard");
   }, [id, router]);
 
-  const { data: getTeamData, isLoading } = api.team.getTeamById.useQuery(
-    { id: id as string },
-    { enabled: !!id },
-  );
+  const {
+    data: getTeamData,
+    isLoading,
+    refetch,
+  } = api.team.getTeamById.useQuery({ id: id as string }, { enabled: !!id });
 
   const { data: getTeamMemberData } = api.team.getTeamMember.useQuery({
     teamId: getTeamData?.id || "",
@@ -62,6 +64,15 @@ const TeamDetailPage = () => {
   return (
     <DashboardLayout>
       <TeamLayout breadcrumbItems={breadcrumbItems}>
+        {showCreateProject && (
+          <CreateProjectModal
+            teamId={getTeamData.id}
+            isOpen={showCreateProject}
+            onClose={() => setShowCreateProject(false)}
+            refetch={refetch}
+          />
+        )}
+
         <TeamDetailMenuButton
           onOpenAddMember={() => setShowAddMember(true)}
           onOpenCreateProject={() => setShowCreateProject(true)}
@@ -100,6 +111,16 @@ const TeamDetailPage = () => {
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
               Projects <FolderOpen className="w-3 md:w-4" />
             </p>
+            <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted px-2 py-4 md:grid-cols-4">
+              {getTeamMemberData?.map((member) => (
+                <TeamMemberCard
+                  key={member.id}
+                  leadId={getTeamData.leadId}
+                  memberId={member.user.userId}
+                  username={member.user.username}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </TeamLayout>
