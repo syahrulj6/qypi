@@ -79,4 +79,26 @@ export const teamRouter = createTRPCRouter({
 
       return team;
     }),
+
+  getTeamMember: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { teamId } = input;
+
+      const member = await db.teamMember.findMany({
+        where: {
+          teamId: teamId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      return member;
+    }),
 });
