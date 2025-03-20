@@ -7,6 +7,7 @@ import { Button } from "~/components/ui/button";
 import { TeamDetailMenuButton } from "../components/TeamDetailMenuButton";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { TeamMemberCard } from "../components/TeamMemberCard";
+import { FolderOpen, Users } from "lucide-react";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -65,12 +66,12 @@ const TeamDetailPage = () => {
           onOpenAddMember={() => setShowAddMember(true)}
           onOpenCreateProject={() => setShowCreateProject(true)}
         />
-        <div className="mt-4 flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-1 md:mt-4 md:gap-2">
           <div className="flex flex-col tracking-tight">
             <p className="text-md text-muted-foreground md:text-base">
               Team Name
             </p>
-            <h1 className="text-lg font-semibold md:text-xl">
+            <h1 className="text-base font-semibold md:text-xl">
               {getTeamData.name}
             </h1>
           </div>
@@ -80,11 +81,11 @@ const TeamDetailPage = () => {
             </p>
             <p className="text-sm">{getTeamData.description}</p>
           </div>
-          <div className="flex flex-col">
-            <p className="text-md text-muted-foreground md:text-base">
-              Team Member
+          <div className="flex flex-col gap-1 md:gap-2">
+            <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
+              Team Member <Users className="w-3 md:w-4" />
             </p>
-            <div className="mt-2 grid grid-cols-2 gap-3 rounded-lg bg-muted-foreground px-2 py-4 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted px-2 py-4 md:grid-cols-4">
               {getTeamMemberData?.map((member) => (
                 <TeamMemberCard
                   key={member.id}
@@ -94,6 +95,11 @@ const TeamDetailPage = () => {
                 />
               ))}
             </div>
+          </div>
+          <div className="mt-2 flex flex-col gap-1 md:mt-4 md:gap-2">
+            <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
+              Projects <FolderOpen className="w-3 md:w-4" />
+            </p>
           </div>
         </div>
       </TeamLayout>
