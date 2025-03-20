@@ -6,6 +6,7 @@ import TeamLayout from "../components/TeamLayout";
 import { Button } from "~/components/ui/button";
 import { TeamDetailMenuButton } from "../components/TeamDetailMenuButton";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { TeamMemberCard } from "../components/TeamMemberCard";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -85,19 +86,12 @@ const TeamDetailPage = () => {
             </p>
             <div className="mt-2 grid grid-cols-2 gap-3 rounded-lg bg-muted-foreground px-2 py-4 md:grid-cols-4">
               {getTeamMemberData?.map((member) => (
-                <Card key={member.user.userId} className="px-4 py-2">
-                  <div>
-                    {member.user.userId === getTeamData.leadId ? (
-                      <p className="text-muted-foreground">Team Lead</p>
-                    ) : (
-                      <p className="text-muted-foreground">Team Member</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <p>Name:</p>
-                    <h3 className="font-semibold">{member.user.username}</h3>
-                  </div>
-                </Card>
+                <TeamMemberCard
+                  key={member.id}
+                  leadId={getTeamData.leadId}
+                  memberId={member.user.userId}
+                  username={member.user.username}
+                />
               ))}
             </div>
           </div>
