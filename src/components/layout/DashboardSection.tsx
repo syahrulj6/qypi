@@ -16,6 +16,8 @@ const menuItems = [
   { title: "My Notes", url: "/dashboard/notes" },
   { title: "Settings", url: "/dashboard/settings" },
   { title: "Workspace", url: "/dashboard/team" },
+  { title: "Team Detail", url: "/dashboard/team/[teamId]" },
+  { title: "Project Detail", url: "/dashboard/team/[teamId]/[projectId]" },
   { title: "Team Detail", url: "/dashboard/team/[id]" },
   { title: "Inbox Detail", url: "/dashboard/inbox/[id]" },
 ];

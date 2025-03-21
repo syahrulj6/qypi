@@ -6,28 +6,25 @@ import TeamLayout from "../components/TeamLayout";
 
 const ProjectDetailPage = () => {
   const router = useRouter();
-  const { teamId, projectId } = router.query; // Extract both teamId and projectId from the URL
+  const { teamId, projectId } = router.query;
 
   useEffect(() => {
     if (teamId === undefined || projectId === undefined) return;
     if (!teamId || !projectId) router.push("/dashboard");
   }, [teamId, projectId, router]);
 
-  // Fetch project details using the projectId
   const { data: getProjectData, isLoading: getProjectDataIsLoading } =
     api.project.getProjectById.useQuery(
       { projectId: projectId as string },
       { enabled: !!projectId },
     );
 
-  // Fetch team details using the teamId (optional, if you want to display team info)
   const { data: getTeamData, isLoading: getTeamDataIsLoading } =
     api.team.getTeamById.useQuery(
       { id: teamId as string },
       { enabled: !!teamId },
     );
 
-  // Breadcrumb items
   const breadcrumbItems = [
     { href: "/dashboard/team", label: "Team" },
     {
@@ -65,7 +62,6 @@ const ProjectDetailPage = () => {
     <DashboardLayout>
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         <div className="flex w-full flex-col gap-1 md:mt-4 md:gap-2">
-          {/* Project Name */}
           <div className="flex flex-col tracking-tight">
             <p className="text-md text-muted-foreground md:text-base">
               Project Name
@@ -75,7 +71,6 @@ const ProjectDetailPage = () => {
             </h1>
           </div>
 
-          {/* Project Description */}
           <div className="flex flex-col">
             <p className="text-md text-muted-foreground md:text-base">
               Project Description
@@ -83,7 +78,6 @@ const ProjectDetailPage = () => {
             <p className="text-sm">{getProjectData.description}</p>
           </div>
 
-          {/* Project End Date */}
           <div className="flex flex-col">
             <p className="text-md text-muted-foreground md:text-base">
               Project End Date
@@ -93,7 +87,6 @@ const ProjectDetailPage = () => {
             </p>
           </div>
 
-          {/* Team Info (Optional) */}
           {getTeamData && (
             <div className="mt-4 flex flex-col gap-1 md:gap-2">
               <p className="text-md text-muted-foreground md:text-base">Team</p>
