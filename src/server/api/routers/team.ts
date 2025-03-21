@@ -101,4 +101,54 @@ export const teamRouter = createTRPCRouter({
 
       return member;
     }),
+
+  addTeamMember: privateProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        teamId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { email, teamId } = input;
+
+      const user = await db.profile.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        throw new Error("User with this email does not exist.");
+      }
+
+      const existingMember = await db.teamMember.findUnique({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId: user.userId,
+          },
+        },
+      });
+
+      if (existingMember) {
+        throw new Error("User is already a member of this team.");
+      }
+
+      const newMember = await db.teamMember.create({
+        data: {
+          teamId,
+          userId: user.userId,
+        },
+      });
+
+      await db.userActivity.create({
+        data: {
+          userId: user.userId,
+          activityType: "TEAM_MEMBER_ADDED",
+          details: { teamId, addedBy: user.userId },
+        },
+      });
+
+      return newMember;
+    }),
 });
