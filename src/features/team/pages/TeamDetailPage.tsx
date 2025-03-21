@@ -130,6 +130,7 @@ const TeamDetailPage = () => {
                 <ProjectCard
                   key={project.id}
                   id={project.id}
+                  teamId={getTeamData.id}
                   name={project.name}
                   description={project.description}
                   endDate={new Date(project.endDate!)}

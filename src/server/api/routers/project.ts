@@ -56,4 +56,23 @@ export const projectRouter = createTRPCRouter({
 
       return project;
     }),
+
+  getProjectById: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { projectId } = input;
+
+      const project = await db.project.findUnique({
+        where: {
+          id: projectId,
+        },
+      });
+
+      return project;
+    }),
 });

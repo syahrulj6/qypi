@@ -13,6 +13,7 @@ interface ProjectCardProps {
   name: string;
   description: string | null;
   endDate: Date;
+  teamId: string;
   router: any;
   team: {
     lead?: {
@@ -28,6 +29,7 @@ interface ProjectCardProps {
 
 export const ProjectCard = ({
   id,
+  teamId,
   team,
   endDate,
   name,
@@ -50,7 +52,7 @@ export const ProjectCard = ({
   return (
     <Card
       className="hover:cursor-pointer"
-      onClick={() => router.push(`/dashboard/team/[id]/${id}`)}
+      onClick={() => router.push(`/dashboard/team/${teamId}/${id}`)}
     >
       <CardHeader>
         <CardTitle>Project end in</CardTitle>
