@@ -106,10 +106,11 @@ const TeamDetailPage = () => {
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
               Team Member <Users className="w-3 md:w-4" />
             </p>
-            <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted px-2 py-4 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted p-3 md:grid-cols-5 md:p-4">
               {getTeamMemberData?.map((member) => (
                 <TeamMemberCard
                   key={member.id}
+                  picture={member.user.profilePictureUrl}
                   leadId={getTeamData.leadId}
                   memberId={member.user.userId}
                   username={member.user.username}

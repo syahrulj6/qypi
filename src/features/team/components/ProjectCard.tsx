@@ -57,9 +57,11 @@ export const ProjectCard = ({
         <CardDescription>{endDate.toDateString()}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col">
           <p className="text-muted-foreground">Project name:</p>
           <p className="font-semibold">{name}</p>
+          <p className="text-muted-foreground">Project Description:</p>
+          <p className="text-muted-foreground">{description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">

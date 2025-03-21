@@ -1,21 +1,24 @@
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Card } from "~/components/ui/card";
 
 interface TeamMemberCardProps {
   memberId: string;
   leadId: string;
   username: string;
+  picture: string | null;
 }
 
 export const TeamMemberCard = ({
   leadId,
+  picture,
   memberId,
   username,
 }: TeamMemberCardProps) => {
   return (
-    <Card className="space-y-1 rounded-md px-4 py-2 md:space-y-2">
-      <div>
+    <div className="flex flex-col items-center justify-center space-y-1 rounded-md bg-card md:space-y-2">
+      <>
         {memberId === leadId ? (
-          <p className="text-sm text-muted-foreground md:text-base">
+          <p className="text-center text-sm text-muted-foreground md:text-base">
             Team Lead
           </p>
         ) : (
@@ -23,11 +26,13 @@ export const TeamMemberCard = ({
             Team Member
           </p>
         )}
-      </div>
-      <div className="flex gap-2">
-        <p className="text-sm md:text-base">Name:</p>
-        <h3 className="text-sm font-semibold md:text-base">{username}</h3>
-      </div>
-    </Card>
+      </>
+      <Avatar className="size-8">
+        <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
+        <AvatarImage src={picture ?? ""} className="rounded-full" />
+      </Avatar>
+
+      <h3 className="text-sm font-semibold md:text-base">{username}</h3>
+    </div>
   );
 };
