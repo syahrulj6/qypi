@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Card } from "~/components/ui/card";
 
 interface TeamMemberCardProps {
   memberId: string;
@@ -14,7 +15,7 @@ export const TeamMemberCard = ({
   username,
 }: TeamMemberCardProps) => {
   return (
-    <div className="flex flex-col items-center justify-center space-y-1 rounded-md bg-card md:space-y-2">
+    <Card className="flex flex-col items-center justify-center space-y-1 rounded-md bg-card md:space-y-2">
       <>
         {memberId === leadId ? (
           <p className="text-center text-sm text-muted-foreground md:text-base">
@@ -32,6 +33,6 @@ export const TeamMemberCard = ({
       </Avatar>
 
       <h3 className="text-sm font-semibold md:text-base">{username}</h3>
-    </div>
+    </Card>
   );
 };
