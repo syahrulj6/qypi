@@ -16,15 +16,18 @@ const TeamDetailPage = () => {
   const [showAddMember, setShowAddMember] = useState(false);
 
   const router = useRouter();
-  const { id } = router.query;
+  const { teamId } = router.query;
 
   useEffect(() => {
-    if (id === undefined) return;
-    if (!id) router.push("/dashboard");
-  }, [id, router]);
+    if (teamId === undefined) return;
+    if (!teamId) router.push("/dashboard");
+  }, [teamId, router]);
 
   const { data: getTeamData, isLoading: getTeamDataIsLoading } =
-    api.team.getTeamById.useQuery({ id: id as string }, { enabled: !!id });
+    api.team.getTeamById.useQuery(
+      { id: teamId as string },
+      { enabled: !!teamId },
+    );
 
   const {
     data: getTeamMemberData,

@@ -8,7 +8,7 @@ import {
 } from "~/components/ui/card";
 
 interface TeamCardProps {
-  id: string;
+  teamId: string;
   name: string;
   description: string | null;
   profilePicture: string | null;
@@ -16,7 +16,7 @@ interface TeamCardProps {
 }
 
 export const TeamCard = ({
-  id,
+  teamId,
   name,
   description,
   profilePicture,
@@ -25,7 +25,13 @@ export const TeamCard = ({
   return (
     <Card
       className="hover:cursor-pointer"
-      onClick={() => router.push(`/dashboard/team/${id}`)}
+      onClick={() => {
+        router.push(`/dashboard/team/${teamId}`);
+        console.log(
+          "Team card clicked, redirecting to:",
+          `/dashboard/team/${teamId}`,
+        );
+      }}
     >
       <CardHeader>
         <CardTitle>{name}</CardTitle>

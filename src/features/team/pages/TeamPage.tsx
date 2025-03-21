@@ -102,7 +102,7 @@ const TeamPage = () => {
                   key={team.id}
                   name={team.name}
                   description={team.description}
-                  id={team.id}
+                  teamId={team.id}
                   profilePicture={team.lead.profilePictureUrl}
                   router={router}
                 />
