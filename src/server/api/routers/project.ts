@@ -71,6 +71,18 @@ export const projectRouter = createTRPCRouter({
         where: {
           id: projectId,
         },
+        include: {
+          team: {
+            include: {
+              lead: true,
+              members: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       return project;

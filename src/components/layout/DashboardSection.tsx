@@ -22,41 +22,6 @@ const menuItems = [
   { title: "Inbox Detail", url: "/dashboard/inbox/[id]" },
 ];
 
-const CalendarDropdown = ({
-  date,
-  setDate,
-  showCalendar,
-  setShowCalendar,
-}: {
-  date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
-  showCalendar: boolean;
-  setShowCalendar: (show: boolean) => void;
-}) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(calendarRef, () => setShowCalendar(false));
-
-  return (
-    showCalendar && (
-      <div
-        ref={calendarRef}
-        className="absolute right-0 top-8 z-20 bg-card"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(selectedDate) => {
-            setDate(selectedDate);
-            setTimeout(() => setShowCalendar(true));
-          }}
-          className="rounded-md border shadow"
-        />
-      </div>
-    )
-  );
-};
-
 export const DashboardSection = ({
   children,
 }: {
@@ -91,23 +56,12 @@ export const DashboardSection = ({
           {title}
         </h3>
         <div className="relative mr-2 flex items-center gap-5 md:mr-12 md:items-center">
-          <button onClick={() => setShowCalendar((prev) => !prev)}>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-primary md:h-5 md:w-5" />
-          </button>
-
           <NotificationsDropdown
             showNotifications={showNotifications}
             setShowNotifications={setShowNotifications}
           />
 
           <ProfileDropdown handleSignOut={handleSignOut} session={session} />
-
-          <CalendarDropdown
-            date={date}
-            setDate={setDate}
-            showCalendar={showCalendar}
-            setShowCalendar={setShowCalendar}
-          />
         </div>
       </div>
       {children}
