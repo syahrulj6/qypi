@@ -49,6 +49,10 @@ export const ProjectCard = ({
     Boolean,
   );
 
+  const maxAvatars = 4;
+  const remainingMembers = Math.max(0, profilePictures.length - maxAvatars);
+  const avatarsToShow = profilePictures.slice(0, maxAvatars);
+
   return (
     <Card
       className="hover:cursor-pointer"
@@ -66,13 +70,18 @@ export const ProjectCard = ({
           <p className="text-muted-foreground">{description}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
-        {profilePictures.map((picture, index) => (
-          <Avatar key={index} className="size-8">
+      <CardFooter className="flex flex-wrap -space-x-3">
+        {avatarsToShow.map((picture, index) => (
+          <Avatar key={index} className="size-10 border-4 border-white">
             <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
             <AvatarImage src={picture ?? ""} className="rounded-full" />
           </Avatar>
         ))}
+        {remainingMembers > 0 && (
+          <Avatar className="size-10 border-4 border-white">
+            <AvatarFallback>+{remainingMembers}</AvatarFallback>
+          </Avatar>
+        )}
       </CardFooter>
     </Card>
   );
