@@ -23,6 +23,10 @@ export type ChartActivityConfig = {
     label: string;
     color: string;
   };
+  TEAM_CREATED: {
+    label: string;
+    color: string;
+  };
 };
 
 export const chartActivityConfig: ChartActivityConfig = {
@@ -49,5 +53,9 @@ export const chartActivityConfig: ChartActivityConfig = {
   EVENT_CREATED: {
     label: "Event Created",
     color: "#ff8042",
+  },
+  TEAM_CREATED: {
+    label: "Team Created",
+    color: "#D84040",
   },
 };

@@ -1,4 +1,3 @@
-// components/PieChartCard.tsx
 import {
   Card,
   CardHeader,
