@@ -132,7 +132,8 @@ const TeamDetailPage = () => {
                       key={member.id}
                       currentUserId={getProfileData?.userId || ""}
                       teamId={getTeamData.id}
-                      refetch={refetchTeamMemberData}
+                      teamMemberRefetch={refetchTeamMemberData}
+                      projectRefetch={refetchProjectData}
                       picture={member.user.profilePictureUrl}
                       leadId={getTeamData.leadId}
                       memberId={member.user.userId}

@@ -22,7 +22,8 @@ interface TeamMemberCardProps {
   teamId: string;
   leadId: string;
   username: string;
-  refetch: () => void;
+  teamMemberRefetch: () => void;
+  projectRefetch: () => void;
   picture: string | null;
 }
 
@@ -32,7 +33,8 @@ export const TeamMemberCard = ({
   leadId,
   picture,
   memberId,
-  refetch,
+  teamMemberRefetch,
+  projectRefetch,
   username,
 }: TeamMemberCardProps) => {
   const deleteMember = api.team.deleteTeamMember.useMutation();
@@ -43,7 +45,8 @@ export const TeamMemberCard = ({
       {
         onSuccess: () => {
           toast.success("Berhasil menghapus event!");
-          refetch();
+          teamMemberRefetch();
+          projectRefetch();
         },
         onError: (err) => {
           toast.error("Gagal menghapus event: " + err.message);
@@ -98,7 +101,7 @@ export const TeamMemberCard = ({
         )}
       </div>
 
-      <Avatar className="size-8">
+      <Avatar className="size-8 border">
         <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
         <AvatarImage src={picture ?? ""} className="rounded-full" />
       </Avatar>
