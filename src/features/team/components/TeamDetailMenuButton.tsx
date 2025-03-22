@@ -1,13 +1,11 @@
 import { Folder, Plus, UserRoundPlus } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button } from "~/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { useOutsideClick } from "~/hooks/useOutsideClick";
 
 interface TeamDetailMenuButtonProps {
   onOpenCreateProject: () => void;

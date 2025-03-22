@@ -151,4 +151,47 @@ export const teamRouter = createTRPCRouter({
 
       return newMember;
     }),
+
+  deleteTeamMember: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        userId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { teamId, userId } = input;
+
+      const teamMember = await db.teamMember.findUnique({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId,
+          },
+        },
+        include: {
+          team: true,
+        },
+      });
+
+      if (!teamMember) {
+        throw new Error("Team member not found.");
+      }
+
+      if (teamMember.team.leadId !== user?.id) {
+        throw new Error("Only the team lead can delete a member.");
+      }
+
+      const deletedTeamMember = await db.teamMember.delete({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId,
+          },
+        },
+      });
+
+      return deletedTeamMember;
+    }),
 });

@@ -22,6 +22,8 @@ const TeamDetailPage = () => {
     if (!teamId) router.push("/dashboard");
   }, [teamId, router]);
 
+  const { data: getProfileData } = api.profile.getProfile.useQuery();
+
   const { data: getTeamData, isLoading: getTeamDataIsLoading } =
     api.team.getTeamById.useQuery(
       { id: teamId as string },
@@ -128,6 +130,9 @@ const TeamDetailPage = () => {
                   {getTeamMemberData?.map((member) => (
                     <TeamMemberCard
                       key={member.id}
+                      currentUserId={getProfileData?.userId || ""}
+                      teamId={getTeamData.id}
+                      refetch={refetchTeamMemberData}
                       picture={member.user.profilePictureUrl}
                       leadId={getTeamData.leadId}
                       memberId={member.user.userId}
