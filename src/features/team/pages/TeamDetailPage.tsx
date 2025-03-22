@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
-import { Button } from "~/components/ui/button";
 import { TeamDetailMenuButton } from "../components/TeamDetailMenuButton";
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { TeamMemberCard } from "../components/TeamMemberCard";
 import { FolderOpen, LoaderCircle, Users } from "lucide-react";
 import { CreateProjectModal } from "../components/CreateProjectModal";
 import { ProjectCard } from "../components/ProjectCard";
+import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -83,6 +82,16 @@ const TeamDetailPage = () => {
             isOpen={showCreateProject}
             onClose={() => setShowCreateProject(false)}
             refetch={refetchProjectData}
+          />
+        )}
+
+        {showAddMember && (
+          <AddTeamMemberModal
+            teamId={getTeamData.id}
+            isOpen={showAddMember}
+            onClose={() => setShowAddMember(false)}
+            refetchTeamData={refetchTeamMemberData}
+            refetchProjectData={refetchProjectData}
           />
         )}
 
