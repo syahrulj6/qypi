@@ -4,7 +4,15 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
 import { Button } from "~/components/ui/button";
-import { CalendarDays, Ellipsis, Plus, SquarePen } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Ellipsis,
+  Plus,
+  SquarePen,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 const ProjectDetailPage = () => {
@@ -44,6 +52,13 @@ const ProjectDetailPage = () => {
   const maxAvatars = 4;
   const remainingMembers = Math.max(0, profilePictures.length - maxAvatars);
   const avatarsToShow = profilePictures.slice(0, maxAvatars);
+
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const breadcrumbItems = [
     { href: "/dashboard/team", label: "Team" },
@@ -105,27 +120,50 @@ const ProjectDetailPage = () => {
                 </Avatar>
               ))}
               {remainingMembers > 0 && (
-                <Avatar className="size-9 border-4 border-white md:size-10">
+                <Avatar className="ml-4 size-9 border-4 border-white md:size-10">
                   <AvatarFallback>+{remainingMembers}</AvatarFallback>
                 </Avatar>
               )}
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              className="hidden items-center gap-2 md:flex"
-              variant="outline"
-              size="sm"
-            >
-              <CalendarDays /> Calendar
-            </Button>
-            <Button variant="outline" size="icon" className="md:hidden">
-              <Ellipsis />
-            </Button>
-            <Button className="hidden items-center gap-1 md:flex">
-              <Plus />
-              Create Task
-            </Button>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                className="hidden items-center gap-2 md:flex"
+                variant="outline"
+                size="sm"
+              >
+                <CalendarDays /> Calendar
+              </Button>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Ellipsis />
+              </Button>
+              <Button className="hidden items-center gap-1 md:flex">
+                <Plus />
+                Create Task
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                className="flex items-center gap-2"
+                size="sm"
+                variant="outline"
+              >
+                <CalendarDays className="text-muted-foreground hover:text-current" />
+                <p>Day</p>
+                <ChevronDown className="text-muted-foreground hover:text-current" />
+              </Button>
+
+              <Button
+                className="flex items-center gap-2"
+                size="sm"
+                variant="outline"
+              >
+                <ChevronLeft className="text-muted-foreground hover:text-current" />
+                <p>{formattedDate}</p>
+                <ChevronRight className="text-muted-foreground hover:text-current" />
+              </Button>
+            </div>
           </div>
         </div>
       </TeamLayout>
