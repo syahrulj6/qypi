@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import { Button } from "~/components/ui/button";
 import {
   CalendarDays,
@@ -16,8 +19,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { CreateTaskModal } from "../components/CreateTaskModal";
 
+type CalendarEvent = {
+  id: string;
+  title: string;
+  start: Date;
+  end?: Date;
+  color?: string;
+};
+
 const ProjectDetailPage = () => {
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+
   const router = useRouter();
   const { teamId, projectId } = router.query;
 
@@ -45,6 +58,21 @@ const ProjectDetailPage = () => {
   } = api.task.getTask.useQuery();
 
   const leadProfilePicture = getProjectData?.team?.lead?.profilePictureUrl;
+
+  useEffect(() => {
+    if (getTasksData) {
+      const mappedEvents = getTasksData
+        .filter((task) => task.createdAt) // Filter out tasks without a createdAt date
+        .map((task) => ({
+          id: task.id,
+          title: task.title,
+          start: task.createdAt as Date, // We've filtered out nulls, so we can assert as Date
+          end: task.dueDate || undefined, // Use undefined instead of null
+          color: task.status === "Completed" ? "green" : "red",
+        }));
+      setEvents(mappedEvents);
+    }
+  }, [getTasksData]);
 
   const memberProfilePictures =
     getProjectData?.team?.members
@@ -112,6 +140,7 @@ const ProjectDetailPage = () => {
         />
       )}
       <TeamLayout breadcrumbItems={breadcrumbItems}>
+        {/* HEADER */}
         <div className="flex justify-between md:mr-8">
           <div className="flex flex-1 flex-col gap-1 md:gap-2">
             <div className="flex flex-col gap-1">
@@ -184,6 +213,20 @@ const ProjectDetailPage = () => {
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* CONTENT */}
+        <div className="mt-8 flex flex-col md:mt-10">
+          {getTaskDataLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <FullCalendar
+              plugins={[dayGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              events={events}
+              eventClick={(info) => alert(`Task: ${info.event.title}`)}
+            />
+          )}
         </div>
       </TeamLayout>
     </DashboardLayout>
