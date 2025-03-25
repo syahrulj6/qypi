@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
@@ -14,8 +14,10 @@ import {
   SquarePen,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { CreateTaskModal } from "../components/CreateTaskModal";
 
 const ProjectDetailPage = () => {
+  const [showCreateTask, setShowCreateTask] = useState(false);
   const router = useRouter();
   const { teamId, projectId } = router.query;
 
@@ -35,6 +37,12 @@ const ProjectDetailPage = () => {
       { id: teamId as string },
       { enabled: !!teamId },
     );
+
+  const {
+    data: getTasksData,
+    isLoading: getTaskDataLoading,
+    refetch: refetchTaskData,
+  } = api.task.getTask.useQuery();
 
   const leadProfilePicture = getProjectData?.team?.lead?.profilePictureUrl;
 
@@ -95,6 +103,14 @@ const ProjectDetailPage = () => {
 
   return (
     <DashboardLayout>
+      {showCreateTask && (
+        <CreateTaskModal
+          projectId={getProjectData.id}
+          isOpen={showCreateTask}
+          onClose={() => setShowCreateTask(false)}
+          refetch={refetchTaskData}
+        />
+      )}
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         <div className="flex justify-between md:mr-8">
           <div className="flex flex-1 flex-col gap-1 md:gap-2">
@@ -138,7 +154,10 @@ const ProjectDetailPage = () => {
               <Button variant="outline" size="icon" className="md:hidden">
                 <Ellipsis />
               </Button>
-              <Button className="hidden items-center gap-1 md:flex">
+              <Button
+                className="hidden items-center gap-1 md:flex"
+                onClick={() => setShowCreateTask(true)}
+              >
                 <Plus />
                 Create Task
               </Button>

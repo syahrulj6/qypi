@@ -1,7 +1,8 @@
+import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { createTask } from "~/schemas/task";
 
-export const TaskRouter = createTRPCRouter({
+export const taskRouter = createTRPCRouter({
   createTask: privateProcedure
     .input(createTask)
     .mutation(async ({ ctx, input }) => {
@@ -80,4 +81,35 @@ export const TaskRouter = createTRPCRouter({
 
       return task;
     }),
+
+  getTaskById: privateProcedure
+    .input(
+      z.object({
+        taskId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { taskId } = input;
+
+      if (!taskId) throw new Error("No taskId found!");
+
+      const task = await db.task.findUnique({
+        where: {
+          id: taskId,
+        },
+      });
+
+      return task;
+    }),
+
+  getTask: privateProcedure.query(async ({ ctx }) => {
+    const { db } = ctx;
+
+    const task = await db.task.findMany();
+
+    if (!task) throw new Error("No task found!");
+
+    return task;
+  }),
 });

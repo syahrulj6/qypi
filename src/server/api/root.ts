@@ -7,6 +7,7 @@ import { inboxRouter } from "./routers/inbox";
 import { userActivityRoute } from "./routers/userActivity";
 import { teamRouter } from "./routers/team";
 import { projectRouter } from "./routers/project";
+import { taskRouter } from "./routers/task";
 
 /**
  * This is the primary router for your server.
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   userActivity: userActivityRoute,
   team: teamRouter,
   project: projectRouter,
+  task: taskRouter,
 });
 
 // export type definition of API
