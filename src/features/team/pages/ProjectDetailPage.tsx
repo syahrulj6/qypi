@@ -208,12 +208,17 @@ const ProjectDetailPage = () => {
               >
                 <CalendarDays /> Calendar
               </Button>
-              <Button variant="outline" size="icon" className="md:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-6 md:hidden"
+              >
                 <Ellipsis />
               </Button>
               <Button
-                className="hidden items-center gap-1 md:flex"
+                className="center gap-1 md:flex"
                 onClick={() => setShowCreateTask(true)}
+                size={window.innerWidth < 640 ? "sm" : "default"}
               >
                 <Plus />
                 Create Task
@@ -233,20 +238,20 @@ const ProjectDetailPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={handlePrev}
-                  className="size-8"
+                  className="size-6 md:size-8"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                 </Button>
-                <h2 className="text-sm text-muted-foreground">
+                <h2 className="text-xs text-muted-foreground md:text-sm">
                   {formattedDate}
                 </h2>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={handleNext}
-                  className="size-8"
+                  className="size-6 md:size-8"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
                 </Button>
               </div>
             </div>
