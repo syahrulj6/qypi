@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { CreateTaskModal } from "../components/CreateTaskModal";
+import { UpdateProjectTitleModal } from "../components/UpdateProjectTitleModal";
 
 type CalendarEvent = {
   id: string;
@@ -31,6 +32,7 @@ type CalendarEvent = {
 
 const ProjectDetailPage = () => {
   const [showCreateTask, setShowCreateTask] = useState(false);
+  const [showUpdateProjectTitle, setShowUpdateProjectTitle] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [calendarApi, setCalendarApi] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -43,11 +45,14 @@ const ProjectDetailPage = () => {
     if (!teamId || !projectId) router.push("/dashboard");
   }, [teamId, projectId, router]);
 
-  const { data: getProjectData, isLoading: getProjectDataIsLoading } =
-    api.project.getProjectById.useQuery(
-      { projectId: projectId as string },
-      { enabled: !!projectId },
-    );
+  const {
+    data: getProjectData,
+    isLoading: getProjectDataIsLoading,
+    refetch: refetchProjectData,
+  } = api.project.getProjectById.useQuery(
+    { projectId: projectId as string },
+    { enabled: !!projectId },
+  );
 
   const { data: getTeamData, isLoading: getTeamDataIsLoading } =
     api.team.getTeamById.useQuery(
@@ -175,6 +180,15 @@ const ProjectDetailPage = () => {
           refetch={refetchTaskData}
         />
       )}
+      {showUpdateProjectTitle && (
+        <UpdateProjectTitleModal
+          projectId={getProjectData.id}
+          projectName={getProjectData.name}
+          isOpen={showUpdateProjectTitle}
+          onClose={() => setShowUpdateProjectTitle(false)}
+          refetch={refetchProjectData}
+        />
+      )}
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         {/* HEADER */}
         <div className="flex justify-between md:mr-8">
@@ -184,7 +198,9 @@ const ProjectDetailPage = () => {
                 <h1 className="text-base font-semibold md:text-2xl">
                   {getProjectData.name}
                 </h1>
-                <SquarePen className="w-4 text-muted-foreground md:w-4" />
+                <button onClick={() => setShowUpdateProjectTitle(true)}>
+                  <SquarePen className="w-4 text-muted-foreground md:w-4" />
+                </button>
               </div>
               <p className="text-xs text-muted-foreground md:text-sm">
                 {getProjectData.description}

@@ -87,4 +87,29 @@ export const projectRouter = createTRPCRouter({
 
       return project;
     }),
+
+  updateProjectTitleById: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        name: z.string().min(1, "Project name is required!"),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { db } = ctx;
+      const { projectId, name } = input;
+
+      if (!projectId) throw new Error("No project id found!");
+
+      const updateTitle = await db.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          name,
+        },
+      });
+
+      return updateTitle;
+    }),
 });

@@ -15,3 +15,15 @@ export const createProjectFormSchema = z.object({
 });
 
 export type CreateProjectFormSchmea = z.infer<typeof createProjectFormSchema>;
+
+export const updateProjectTitleFormSchema = z.object({
+  projectId: z.string(),
+  name: z
+    .string()
+    .min(1, "Project name is required")
+    .max(100, "Project name must be less than 100 characters"),
+});
+
+export type UpdateProjectTitleFormSchema = z.infer<
+  typeof updateProjectTitleFormSchema
+>;
