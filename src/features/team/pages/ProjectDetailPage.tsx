@@ -30,6 +30,8 @@ type CalendarEvent = {
 const ProjectDetailPage = () => {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [calendarApi, setCalendarApi] = useState<any>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const router = useRouter();
   const { teamId, projectId } = router.query;
@@ -62,17 +64,50 @@ const ProjectDetailPage = () => {
   useEffect(() => {
     if (getTasksData) {
       const mappedEvents = getTasksData
-        .filter((task) => task.createdAt) // Filter out tasks without a createdAt date
+        .filter((task) => task.createdAt)
         .map((task) => ({
           id: task.id,
           title: task.title,
-          start: task.createdAt as Date, // We've filtered out nulls, so we can assert as Date
-          end: task.dueDate || undefined, // Use undefined instead of null
+          start: task.createdAt as Date,
+          end: task.dueDate || undefined,
           color: task.status === "Completed" ? "green" : "red",
         }));
       setEvents(mappedEvents);
     }
   }, [getTasksData]);
+
+  const handlePrev = () => {
+    if (calendarApi) {
+      calendarApi.prev();
+      updateCurrentDate();
+    }
+  };
+
+  const handleNext = () => {
+    if (calendarApi) {
+      calendarApi.next();
+      updateCurrentDate();
+    }
+  };
+
+  const handleToday = () => {
+    if (calendarApi) {
+      calendarApi.today();
+      updateCurrentDate();
+    }
+  };
+
+  const updateCurrentDate = () => {
+    if (calendarApi) {
+      const date = calendarApi.getDate();
+      setCurrentDate(date);
+    }
+  };
+
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   const memberProfilePictures =
     getProjectData?.team?.members
@@ -88,13 +123,6 @@ const ProjectDetailPage = () => {
   const maxAvatars = 4;
   const remainingMembers = Math.max(0, profilePictures.length - maxAvatars);
   const avatarsToShow = profilePictures.slice(0, maxAvatars);
-
-  const date = new Date();
-  const formattedDate = date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
 
   const breadcrumbItems = [
     { href: "/dashboard/team", label: "Team" },
@@ -171,7 +199,7 @@ const ProjectDetailPage = () => {
               )}
             </div>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-end gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 className="hidden items-center gap-2 md:flex"
@@ -193,30 +221,40 @@ const ProjectDetailPage = () => {
             </div>
             <div className="flex items-center gap-2">
               <Button
-                className="flex items-center gap-2"
-                size="sm"
                 variant="outline"
-              >
-                <CalendarDays className="text-muted-foreground hover:text-current" />
-                <p>Day</p>
-                <ChevronDown className="text-muted-foreground hover:text-current" />
-              </Button>
-
-              <Button
-                className="flex items-center gap-2"
                 size="sm"
-                variant="outline"
+                onClick={handleToday}
+                className="hidden md:flex"
               >
-                <ChevronLeft className="text-muted-foreground hover:text-current" />
-                <p>{formattedDate}</p>
-                <ChevronRight className="text-muted-foreground hover:text-current" />
+                Today
               </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handlePrev}
+                  className="size-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <h2 className="text-sm text-muted-foreground">
+                  {formattedDate}
+                </h2>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleNext}
+                  className="size-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* CONTENT */}
-        <div className="mt-8 flex flex-col md:mt-10">
+        {/* CALENDAR */}
+        <div className="mt-4 rounded-lg border bg-white p-4 shadow-sm">
           {getTaskDataLoading ? (
             <p>Loading...</p>
           ) : (
@@ -224,7 +262,14 @@ const ProjectDetailPage = () => {
               plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               events={events}
+              headerToolbar={false}
               eventClick={(info) => alert(`Task: ${info.event.title}`)}
+              datesSet={(arg) => setCurrentDate(arg.start)}
+              ref={(ref) => {
+                if (ref) {
+                  setCalendarApi(ref.getApi());
+                }
+              }}
             />
           )}
         </div>
