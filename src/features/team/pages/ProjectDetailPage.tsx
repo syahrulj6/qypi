@@ -23,8 +23,10 @@ type CalendarEvent = {
   id: string;
   title: string;
   start: Date;
-  end?: Date;
+  end: Date;
   color?: string;
+  display?: string;
+  allDay?: boolean;
 };
 
 const ProjectDetailPage = () => {
@@ -64,13 +66,19 @@ const ProjectDetailPage = () => {
   useEffect(() => {
     if (getTasksData) {
       const mappedEvents = getTasksData
-        .filter((task) => task.createdAt)
+        .filter((task) => task.createdAt && task.dueDate)
         .map((task) => ({
           id: task.id,
           title: task.title,
           start: task.createdAt as Date,
-          end: task.dueDate || undefined,
-          color: task.status === "Completed" ? "green" : "red",
+          end: task.dueDate as Date,
+          color: task.status === "Completed" ? "#22c55e" : "#ccc",
+          display: "block",
+          allDay: true,
+          extendedProps: {
+            description: task.description,
+            status: task.status,
+          },
         }));
       setEvents(mappedEvents);
     }
@@ -268,12 +276,26 @@ const ProjectDetailPage = () => {
               initialView="dayGridMonth"
               events={events}
               headerToolbar={false}
-              eventClick={(info) => alert(`Task: ${info.event.title}`)}
+              eventClick={(info) => {
+                alert(`Task: ${info.event.title}\n
+                  Status: ${info.event.extendedProps.status}\n
+                  Description: ${info.event.extendedProps.description}`);
+              }}
               datesSet={(arg) => setCurrentDate(arg.start)}
               ref={(ref) => {
                 if (ref) {
                   setCalendarApi(ref.getApi());
                 }
+              }}
+              eventDisplay="block"
+              eventColor="#3b82f6"
+              eventTextColor="var(--primary-foreground)"
+              eventBorderColor="transparent"
+              eventTimeFormat={{
+                hour: "2-digit",
+                minute: "2-digit",
+                meridiem: false,
+                hour12: false,
               }}
             />
           )}

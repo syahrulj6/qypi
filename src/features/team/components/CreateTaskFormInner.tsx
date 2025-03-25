@@ -61,12 +61,12 @@ export const CreateTaskFormInner = () => {
         name="description"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>Judul</FormLabel>
+            <FormLabel>Deksripsi</FormLabel>
             <FormControl>
               <Textarea
                 rows={10}
                 {...field}
-                placeholder="Masukkan judul jadwal"
+                placeholder="Masukkan deskripsi task"
               />
             </FormControl>
             <FormMessage />
@@ -79,9 +79,7 @@ export const CreateTaskFormInner = () => {
         name="dueDate"
         render={({ field }) => (
           <FormItem className="col-span-2">
-            <FormLabel>
-              Tanggal <span className="text-destructive">*</span>
-            </FormLabel>
+            <FormLabel>Deadline</FormLabel>
             <FormControl>
               <Input
                 type="date"
