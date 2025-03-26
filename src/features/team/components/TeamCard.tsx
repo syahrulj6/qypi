@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Trash2, Users } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import {
@@ -27,7 +27,8 @@ interface TeamCardProps {
   teamId: string;
   name: string;
   description: string | null;
-  profilePicture: string | null;
+  leadId: string;
+  currentUserId?: string;
   refetch: () => void;
   router: any;
 }
@@ -35,26 +36,31 @@ interface TeamCardProps {
 export const TeamCard = ({
   teamId,
   name,
+  leadId,
+  currentUserId,
   description,
   refetch,
-  profilePicture,
   router,
 }: TeamCardProps) => {
   const deleteTeam = api.team.deleteTeamById.useMutation();
 
+  const { data: teamMembers } = api.team.getTeamMember.useQuery({
+    teamId: teamId,
+  });
+
+  const isTeamLead = currentUserId === leadId;
+
   const handleDeleteteam = (e: React.MouseEvent) => {
-    e.stopPropagation;
+    e.stopPropagation();
     deleteTeam.mutate(
-      {
-        teamId,
-      },
+      { teamId },
       {
         onSuccess: () => {
-          toast.success("Berhasil menghapus team!");
+          toast.success("Team deleted successfully!");
           refetch();
         },
         onError: (err) => {
-          toast.error("Gagal menghapus event: " + err.message);
+          toast.error("Failed to delete team: " + err.message);
         },
       },
     );
@@ -63,51 +69,64 @@ export const TeamCard = ({
   return (
     <Card
       className="relative hover:cursor-pointer"
-      onClick={() => {
-        router.push(`/dashboard/team/${teamId}`);
-      }}
+      onClick={() => router.push(`/dashboard/team/${teamId}`)}
     >
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-2 top-2 text-red-500 transition-colors hover:bg-red-100 hover:text-red-500"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi hapus Team</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus team? Perubahan ini bersifat
-              permanen.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-500 transition-colors hover:bg-red-600"
-              onClick={handleDeleteteam}
+      {isTeamLead && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-2 top-2 text-red-500 transition-colors hover:bg-red-100 hover:text-red-500"
+              onClick={(e) => e.stopPropagation()}
             >
-              Ya, Hapus Team
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Team Deletion</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this team? This action cannot be
+                undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-500 transition-colors hover:bg-red-600"
+                onClick={handleDeleteteam}
+              >
+                Delete Team
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
       <CardHeader>
         <CardTitle>{name}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardFooter>
-        <Avatar className="size-8">
-          <AvatarFallback>VF</AvatarFallback>
-          <AvatarImage src={profilePicture ?? ""} className="rounded-full" />
-        </Avatar>
+      <CardFooter className="flex flex-col items-start gap-2">
+        <div className="flex -space-x-2">
+          {teamMembers?.map((member) => (
+            <Avatar
+              key={member.id}
+              className="h-8 w-8 border-2 border-background"
+            >
+              <AvatarFallback>
+                {member.user.username?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+              <AvatarImage
+                src={member.user.profilePictureUrl ?? ""}
+                className="rounded-full"
+              />
+            </Avatar>
+          ))}
+        </div>
       </CardFooter>
     </Card>
   );
