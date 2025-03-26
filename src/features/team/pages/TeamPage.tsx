@@ -101,6 +101,7 @@ const TeamPage = () => {
                 <TeamCard
                   key={team.id}
                   name={team.name}
+                  refetch={refetch}
                   description={team.description}
                   teamId={team.id}
                   profilePicture={team.lead.profilePictureUrl}

@@ -9,7 +9,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { Button } from "~/components/ui/button";
 import {
   CalendarDays,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Ellipsis,

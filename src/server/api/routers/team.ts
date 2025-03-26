@@ -80,6 +80,72 @@ export const teamRouter = createTRPCRouter({
       return team;
     }),
 
+  deleteTeamById: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { teamId } = input;
+      const { db } = ctx;
+
+      if (!teamId) throw new Error("No team id found");
+
+      // First check if team exists
+      const team = await db.team.findUnique({
+        where: { id: teamId },
+      });
+
+      if (!team) throw new Error("Team not found");
+
+      // Use a transaction to ensure all deletions succeed or fail together
+      return await db.$transaction(async (tx) => {
+        // 1. Delete all task assignments for tasks in projects of this team
+        await tx.taskAssignment.deleteMany({
+          where: {
+            task: {
+              project: {
+                teamId: teamId,
+              },
+            },
+          },
+        });
+
+        // 2. Delete all tasks in projects of this team
+        await tx.task.deleteMany({
+          where: {
+            project: {
+              teamId: teamId,
+            },
+          },
+        });
+
+        // 3. Delete all projects of this team
+        await tx.project.deleteMany({
+          where: {
+            teamId: teamId,
+          },
+        });
+
+        // 4. Delete all team members
+        await tx.teamMember.deleteMany({
+          where: {
+            teamId: teamId,
+          },
+        });
+
+        // 5. Finally delete the team
+        const deletedTeam = await tx.team.delete({
+          where: {
+            id: teamId,
+          },
+        });
+
+        return deletedTeam;
+      });
+    }),
+
   getTeamMember: privateProcedure
     .input(
       z.object({
