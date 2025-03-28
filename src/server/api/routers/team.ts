@@ -84,14 +84,36 @@ export const teamRouter = createTRPCRouter({
       return team;
     }),
 
+  updateTeam: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        name: z.string().min(1, "Team name is required"),
+        description: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { teamId, name, description } = input;
+
+      return await db.team.update({
+        where: { id: teamId },
+        data: {
+          name,
+          description,
+        },
+      });
+    }),
+
   deleteTeamById: privateProcedure
     .input(
       z.object({
         teamId: z.string(),
+        name: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { teamId } = input;
+      const { teamId, name } = input;
       const { db } = ctx;
 
       if (!teamId) throw new Error("No team id found");
@@ -103,9 +125,7 @@ export const teamRouter = createTRPCRouter({
 
       if (!team) throw new Error("Team not found");
 
-      // Use a transaction to ensure all deletions succeed or fail together
       return await db.$transaction(async (tx) => {
-        // 1. Delete all task assignments for tasks in projects of this team
         await tx.taskAssignment.deleteMany({
           where: {
             task: {
@@ -116,7 +136,6 @@ export const teamRouter = createTRPCRouter({
           },
         });
 
-        // 2. Delete all tasks in projects of this team
         await tx.task.deleteMany({
           where: {
             project: {
@@ -125,24 +144,22 @@ export const teamRouter = createTRPCRouter({
           },
         });
 
-        // 3. Delete all projects of this team
         await tx.project.deleteMany({
           where: {
             teamId: teamId,
           },
         });
 
-        // 4. Delete all team members
         await tx.teamMember.deleteMany({
           where: {
             teamId: teamId,
           },
         });
 
-        // 5. Finally delete the team
         const deletedTeam = await tx.team.delete({
           where: {
             id: teamId,
+            name,
           },
         });
 

@@ -11,8 +11,8 @@ import { AddTeamMemberFormInner } from "./AddTeamMemberFormInner";
 interface AddTeamMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
-  refetchTeamData: () => void;
-  refetchProjectData: () => void;
+  refetchTeamData?: () => void;
+  refetchProjectData?: () => void;
   teamId: string;
 }
 
@@ -37,8 +37,8 @@ export const AddTeamMemberModal = ({
     addMember.mutate(data, {
       onSuccess: () => {
         toast.success("Berhasil menambahkan member");
-        refetchTeamData();
-        refetchProjectData();
+        refetchTeamData?.();
+        refetchProjectData?.();
         onClose();
         form.reset();
       },

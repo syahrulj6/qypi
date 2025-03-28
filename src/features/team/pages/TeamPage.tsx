@@ -102,7 +102,6 @@ const TeamPage = () => {
               getTeamsData.map((team) => (
                 <TeamCard
                   key={team.id}
-                  leadId={team.leadId}
                   currentUserId={currentUser?.userId}
                   name={team.name}
                   refetch={refetch}
