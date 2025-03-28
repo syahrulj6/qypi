@@ -111,10 +111,14 @@ const TeamDetailPage = () => {
             </h1>
           </div>
           <div className="flex flex-col">
-            <p className="text-md text-muted-foreground md:text-base">
-              Team Description
-            </p>
-            <p className="text-sm">{getTeamData.description}</p>
+            {getTeamData.description && (
+              <>
+                <p className="text-md text-muted-foreground md:text-base">
+                  Team Description
+                </p>
+                <p className="text-sm">{getTeamData.description}</p>
+              </>
+            )}
           </div>
           <div className="flex flex-col gap-1 md:gap-2">
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
@@ -153,21 +157,21 @@ const TeamDetailPage = () => {
                 <div className="grid-cols-2 md:grid-cols-4">
                   <LoaderCircle className="h-5 w-5 animate-spin" />
                 </div>
+              ) : getProjectData && getProjectData.length > 0 ? (
+                getProjectData.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    id={project.id}
+                    teamId={getTeamData.id}
+                    name={project.name}
+                    description={project.description}
+                    endDate={new Date(project.endDate!)}
+                    router={router}
+                    team={project.team}
+                  />
+                ))
               ) : (
-                <>
-                  {getProjectData?.map((project) => (
-                    <ProjectCard
-                      key={project.id}
-                      id={project.id}
-                      teamId={getTeamData.id}
-                      name={project.name}
-                      description={project.description}
-                      endDate={new Date(project.endDate!)}
-                      router={router}
-                      team={project.team}
-                    />
-                  ))}
-                </>
+                <p className="text-muted-foreground">No projects found</p>
               )}
             </div>
           </div>

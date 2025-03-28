@@ -75,6 +75,10 @@ export const teamRouter = createTRPCRouter({
         where: {
           id: id,
         },
+
+        include: {
+          lead: true,
+        },
       });
 
       return team;

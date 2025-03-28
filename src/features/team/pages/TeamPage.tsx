@@ -93,7 +93,7 @@ const TeamPage = () => {
               Create Team
             </Button>
           </div>
-          <div className="grid grid-cols-2 items-center gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {getTeamsData.length === 0 ? (
               <div className="col-span-2 flex items-center md:col-span-4">
                 <h2 className="font-semibold">There's no team yet!</h2>
