@@ -12,3 +12,10 @@ export const teamFormSchema = z.object({
 });
 
 export type TeamFormSchema = z.infer<typeof teamFormSchema>;
+
+export const teamSettingsFormSchema = z.object({
+  name: z.string().min(1, "Team name is required"),
+  description: z.string().optional(),
+});
+
+export type TeamSettingsFormSchema = z.infer<typeof teamSettingsFormSchema>;

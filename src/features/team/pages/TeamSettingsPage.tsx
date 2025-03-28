@@ -4,7 +4,7 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
 import { Button } from "~/components/ui/button";
-import { Trash2, Pencil, UserPlus } from "lucide-react";
+import { Trash2, UserPlus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -20,14 +20,27 @@ import { Textarea } from "~/components/ui/textarea";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { useEffect } from "react";
+import { TRPCClientError } from "@trpc/client";
+import { Skeleton } from "~/components/ui/skeleton";
+import { teamSettingsFormSchema, TeamSettingsFormSchema } from "../forms/team";
 
 const TeamSettingsPage = () => {
   const router = useRouter();
   const { teamId } = router.query;
 
   const [showAddMember, setShowAddMember] = useState(false);
-  const [teamName, setTeamName] = useState("");
-  const [teamDescription, setTeamDescription] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const {
@@ -48,20 +61,44 @@ const TeamSettingsPage = () => {
     { enabled: !!teamId },
   );
 
+  // Initialize form
+  const form = useForm<TeamSettingsFormSchema>({
+    resolver: zodResolver(teamSettingsFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  });
+
+  // Reset form when team data is loaded
+  useEffect(() => {
+    if (teamData) {
+      form.reset({
+        name: teamData.name,
+        description: teamData.description || "",
+      });
+    }
+  }, [teamData, form]);
+
   const updateTeam = api.team.updateTeam.useMutation();
   const deleteTeam = api.team.deleteTeamById.useMutation();
   const removeMember = api.team.deleteTeamMember.useMutation();
 
-  const handleUpdateTeam = async () => {
+  const handleUpdateTeam = async (values: TeamSettingsFormSchema) => {
     try {
       await updateTeam.mutateAsync({
         teamId: teamId as string,
-        name: teamName,
-        description: teamDescription,
+        name: values.name,
+        description: values.description,
       });
       toast.success("Team updated successfully");
+      refetchTeamData();
     } catch (error) {
-      toast.error("Failed to update team");
+      if (error instanceof TRPCClientError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to update team");
+      }
     }
   };
 
@@ -102,8 +139,16 @@ const TeamSettingsPage = () => {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
-          <div className="mt-4 flex w-full items-center justify-center">
-            <p>Loading...</p>
+          <div className="mt-4 flex w-full flex-col gap-8">
+            <div className="rounded-lg border p-6">
+              <Skeleton className="h-8 w-1/4" />
+              <div className="mt-6 space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="ml-auto h-10 w-1/4" />
+              </div>
+            </div>
+            <Skeleton className="h-64 w-full rounded-lg" />
           </div>
         </TeamLayout>
       </DashboardLayout>
@@ -145,41 +190,53 @@ const TeamSettingsPage = () => {
           <div className="rounded-lg border p-6">
             <h2 className="mb-6 text-lg font-semibold">General Settings</h2>
 
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="team-name">Team Name</Label>
-                <Input
-                  id="team-name"
-                  defaultValue={teamData.name}
-                  onChange={(e) => setTeamName(e.target.value)}
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="team-description">Team Description</Label>
-                <Textarea
-                  id="team-description"
-                  defaultValue={teamData.description || ""}
-                  onChange={(e) => setTeamDescription(e.target.value)}
-                />
-              </div>
-
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleUpdateTeam}
-                  disabled={updateTeam.isPending}
-                >
-                  {updateTeam.isPending ? (
-                    <Pencil className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Update Team
-                    </>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleUpdateTeam)}
+                className="grid gap-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Team Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-              </div>
-            </div>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Team Description</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={updateTeam.isPending || !form.formState.isDirty}
+                  >
+                    {updateTeam.isPending ? (
+                      <span className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      "Update Team"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
 
           {/* Team Members */}
