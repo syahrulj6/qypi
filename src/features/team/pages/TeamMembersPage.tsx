@@ -4,18 +4,30 @@ import DashboardLayout from "~/components/layout/DashboardLayout";
 import { api } from "~/utils/api";
 import TeamLayout from "../components/TeamLayout";
 import { Button } from "~/components/ui/button";
-import { UserPlus, Trash2 } from "lucide-react";
+import { UserPlus, Trash2, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
 import { toast } from "sonner";
 import { Skeleton } from "~/components/ui/skeleton";
 import { useSession } from "~/hooks/useSession";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
 
 const TeamMembersPage = () => {
   const router = useRouter();
   const { teamId } = router.query;
   const { session } = useSession();
   const [showAddMember, setShowAddMember] = useState(false);
+  const [memberToTransfer, setMemberToTransfer] = useState<string | null>(null);
 
   const {
     data: teamData,
@@ -36,6 +48,7 @@ const TeamMembersPage = () => {
   );
 
   const removeMember = api.team.deleteTeamMember.useMutation();
+  const transferLeadership = api.team.transferLeadership.useMutation();
 
   const isCurrentUserLead = teamData?.leadId === session?.user.id;
 
@@ -49,6 +62,23 @@ const TeamMembersPage = () => {
       refetchTeamMembers();
     } catch (error) {
       toast.error("Failed to remove member");
+    }
+  };
+
+  const handleTransferLeadership = async () => {
+    if (!memberToTransfer) return;
+
+    try {
+      await transferLeadership.mutateAsync({
+        teamId: teamId as string,
+        newLeadId: memberToTransfer,
+      });
+      toast.success("Leadership transferred successfully");
+      refetchTeamMembers();
+      refetchTeamData();
+      setMemberToTransfer(null);
+    } catch (error) {
+      toast.error("Failed to transfer leadership");
     }
   };
 
@@ -113,6 +143,27 @@ const TeamMembersPage = () => {
         />
       )}
 
+      <AlertDialog
+        open={!!memberToTransfer}
+        onOpenChange={(open) => !open && setMemberToTransfer(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Transfer Team Leadership</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to transfer leadership to this member? You
+              will no longer be the team lead after this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleTransferLeadership}>
+              Confirm Transfer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         <div className="flex w-full flex-col gap-8">
           <div className="flex items-center justify-end">
@@ -152,26 +203,38 @@ const TeamMembersPage = () => {
                   </div>
                 </div>
 
-                {isCurrentUserLead && teamData.leadId !== member.userId && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRemoveMember(member.userId)}
-                    disabled={removeMember.isPending}
-                  >
-                    {removeMember.isPending ? (
-                      <span className="flex items-center">
-                        <span className="mr-2 h-4 w-4 animate-spin" />
-                        Removing...
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Remove
-                      </span>
-                    )}
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {isCurrentUserLead && teamData.leadId !== member.userId && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setMemberToTransfer(member.userId)}
+                        title="Make team lead"
+                      >
+                        <UserCog className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRemoveMember(member.userId)}
+                        disabled={removeMember.isPending}
+                      >
+                        {removeMember.isPending ? (
+                          <span className="flex items-center">
+                            <span className="mr-2 h-4 w-4 animate-spin" />
+                            Removing...
+                          </span>
+                        ) : (
+                          <span className="flex items-center">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Remove
+                          </span>
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             ))}
 
