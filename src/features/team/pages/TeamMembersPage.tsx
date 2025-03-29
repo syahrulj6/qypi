@@ -9,11 +9,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
 import { toast } from "sonner";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useSession } from "~/hooks/useSession";
 
 const TeamMembersPage = () => {
   const router = useRouter();
   const { teamId } = router.query;
-
+  const { session } = useSession();
   const [showAddMember, setShowAddMember] = useState(false);
 
   const {
@@ -35,6 +36,8 @@ const TeamMembersPage = () => {
   );
 
   const removeMember = api.team.deleteTeamMember.useMutation();
+
+  const isCurrentUserLead = teamData?.leadId === session?.user.id;
 
   const handleRemoveMember = async (userId: string) => {
     try {
@@ -112,12 +115,13 @@ const TeamMembersPage = () => {
 
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         <div className="flex w-full flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Team Members</h2>
-            <Button onClick={() => setShowAddMember(true)}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add Member
-            </Button>
+          <div className="flex items-center justify-end">
+            {isCurrentUserLead && (
+              <Button onClick={() => setShowAddMember(true)}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                Add Member
+              </Button>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -148,7 +152,7 @@ const TeamMembersPage = () => {
                   </div>
                 </div>
 
-                {teamData.leadId !== member.userId && (
+                {isCurrentUserLead && teamData.leadId !== member.userId && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -177,10 +181,15 @@ const TeamMembersPage = () => {
                 <p className="text-muted-foreground">
                   Add team members to collaborate on projects
                 </p>
-                <Button className="mt-4" onClick={() => setShowAddMember(true)}>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Add Member
-                </Button>
+                {isCurrentUserLead && (
+                  <Button
+                    className="mt-4"
+                    onClick={() => setShowAddMember(true)}
+                  >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Add Member
+                  </Button>
+                )}
               </div>
             )}
           </div>

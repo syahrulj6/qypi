@@ -23,44 +23,47 @@ const TeamDetailPage = () => {
     if (!teamId) router.push("/dashboard");
   }, [teamId, router]);
 
-  const { data: getProfileData } = api.profile.getProfile.useQuery();
+  // Get current user's profile data
+  const { data: currentUser } = api.profile.getProfile.useQuery();
 
-  const { data: getTeamData, isLoading: getTeamDataIsLoading } =
+  // Get team data
+  const { data: teamData, isLoading: isTeamLoading } =
     api.team.getTeamById.useQuery(
       { id: teamId as string },
       { enabled: !!teamId },
     );
 
+  // Get team members
   const {
-    data: getTeamMemberData,
-    isLoading: getTeamMemberIsLoading,
-    refetch: refetchTeamMemberData,
+    data: teamMembers,
+    isLoading: isMembersLoading,
+    refetch: refetchTeamMembers,
   } = api.team.getTeamMember.useQuery({
-    teamId: getTeamData?.id || "",
+    teamId: teamData?.id || "",
   });
 
+  // Get projects
   const {
-    data: getProjectData,
-    refetch: refetchProjectData,
-    isLoading: getProjectDataIsLoading,
+    data: projects,
+    refetch: refetchProjects,
+    isLoading: isProjectsLoading,
   } = api.project.getProject.useQuery({
-    teamId: getTeamData?.id || "",
+    teamId: teamData?.id || "",
   });
+
+  // Check if current user is the team lead
+  const isCurrentUserLead = currentUser?.userId === teamData?.leadId;
 
   const breadcrumbItems = [
     { href: "/dashboard/team", label: "Team" },
-    { label: getTeamData?.name || "Team Details" },
+    { label: teamData?.name || "Team Details" },
   ];
 
-  if (
-    getTeamDataIsLoading ||
-    getTeamMemberIsLoading ||
-    getProjectDataIsLoading
-  ) {
+  if (isTeamLoading || isMembersLoading || isProjectsLoading) {
     return <TeamDetailSkeleton />;
   }
 
-  if (!getTeamData) {
+  if (!teamData) {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
@@ -75,96 +78,100 @@ const TeamDetailPage = () => {
   return (
     <DashboardLayout>
       <TeamLayout breadcrumbItems={breadcrumbItems}>
-        {showCreateProject && (
+        {/* Modals */}
+        {showCreateProject && isCurrentUserLead && (
           <CreateProjectModal
-            teamId={getTeamData.id}
+            teamId={teamData.id}
             isOpen={showCreateProject}
             onClose={() => setShowCreateProject(false)}
-            refetch={refetchProjectData}
+            refetch={refetchProjects}
           />
         )}
 
-        {showAddMember && (
+        {showAddMember && isCurrentUserLead && (
           <AddTeamMemberModal
-            teamId={getTeamData.id}
+            teamId={teamData.id}
             isOpen={showAddMember}
             onClose={() => setShowAddMember(false)}
-            refetchTeamData={refetchTeamMemberData}
-            refetchProjectData={refetchProjectData}
+            refetchTeamData={refetchTeamMembers}
+            refetchProjectData={refetchProjects}
           />
         )}
 
-        <TeamDetailMenuButton
-          onOpenAddMember={() => setShowAddMember(true)}
-          onOpenCreateProject={() => setShowCreateProject(true)}
-        />
+        {/* Only show action buttons if current user is lead */}
+        {isCurrentUserLead && (
+          <TeamDetailMenuButton
+            onOpenAddMember={() => setShowAddMember(true)}
+            onOpenCreateProject={() => setShowCreateProject(true)}
+          />
+        )}
+
         <div className="flex w-full flex-col gap-1 md:mt-4 md:gap-2">
+          {/* Team Info Section */}
           <div className="flex flex-col tracking-tight">
             <p className="text-md text-muted-foreground md:text-base">
               Team Name
             </p>
             <h1 className="text-base font-semibold md:text-xl">
-              {getTeamData.name}
+              {teamData.name}
             </h1>
           </div>
-          <div className="flex flex-col">
-            {getTeamData.description && (
-              <>
-                <p className="text-md text-muted-foreground md:text-base">
-                  Team Description
-                </p>
-                <p className="text-sm">{getTeamData.description}</p>
-              </>
-            )}
-          </div>
+
+          {teamData.description && (
+            <div className="flex flex-col">
+              <p className="text-md text-muted-foreground md:text-base">
+                Team Description
+              </p>
+              <p className="text-sm">{teamData.description}</p>
+            </div>
+          )}
+
+          {/* Team Members Section */}
           <div className="flex flex-col gap-1 md:gap-2">
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
-              Team Member <Users className="w-3 md:w-4" />
+              Team Members <Users className="w-3 md:w-4" />
             </p>
             <div className="grid grid-cols-2 gap-3 rounded-lg bg-muted p-3 md:grid-cols-5 md:p-4">
-              {getTeamMemberIsLoading ? (
-                <div className="grid-cols-2 md:grid-cols-5">
-                  <LoaderCircle className="h-5 w-5 animate-spin" />
-                </div>
+              {isMembersLoading ? (
+                <LoaderCircle className="h-5 w-5 animate-spin" />
               ) : (
-                <>
-                  {getTeamMemberData?.map((member) => (
-                    <TeamMemberCard
-                      key={member.id}
-                      currentUserId={getProfileData?.userId || ""}
-                      teamId={getTeamData.id}
-                      teamMemberRefetch={refetchTeamMemberData}
-                      projectRefetch={refetchProjectData}
-                      picture={member.user.profilePictureUrl}
-                      leadId={getTeamData.leadId}
-                      memberId={member.user.userId}
-                      username={member.user.username}
-                    />
-                  ))}
-                </>
+                teamMembers?.map((member) => (
+                  <TeamMemberCard
+                    key={member.id}
+                    currentUserId={currentUser?.userId || ""}
+                    teamId={teamData.id}
+                    teamMemberRefetch={refetchTeamMembers}
+                    projectRefetch={refetchProjects}
+                    picture={member.user.profilePictureUrl}
+                    leadId={teamData.leadId}
+                    memberId={member.user.userId}
+                    username={member.user.username}
+                  />
+                ))
               )}
             </div>
           </div>
+
+          {/* Projects Section */}
           <div className="mt-2 flex flex-col gap-1 md:mt-4 md:gap-2">
             <p className="text-md flex items-center gap-2 text-muted-foreground md:text-base">
               Projects <FolderOpen className="w-3 md:w-4" />
             </p>
             <div className="grid grid-cols-1 gap-3 rounded-lg bg-muted p-3 md:grid-cols-3 md:p-4">
-              {getProjectDataIsLoading ? (
-                <div className="grid-cols-2 md:grid-cols-4">
-                  <LoaderCircle className="h-5 w-5 animate-spin" />
-                </div>
-              ) : getProjectData && getProjectData.length > 0 ? (
-                getProjectData.map((project) => (
+              {isProjectsLoading ? (
+                <LoaderCircle className="h-5 w-5 animate-spin" />
+              ) : projects && projects.length > 0 ? (
+                projects.map((project) => (
                   <ProjectCard
                     key={project.id}
                     id={project.id}
-                    teamId={getTeamData.id}
+                    teamId={teamData.id}
                     name={project.name}
                     description={project.description}
                     endDate={new Date(project.endDate!)}
                     router={router}
                     team={project.team}
+                    isCurrentUserLead={isCurrentUserLead ?? ""}
                   />
                 ))
               ) : (

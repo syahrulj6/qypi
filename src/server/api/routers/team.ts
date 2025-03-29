@@ -339,4 +339,75 @@ export const teamRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  transferLeadership: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+        newLeadId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { teamId, newLeadId } = input;
+
+      if (!user) throw new Error("Unauthorized");
+
+      // Verify the current user is the team lead
+      const team = await db.team.findUnique({
+        where: { id: teamId },
+        select: { leadId: true },
+      });
+
+      if (!team) throw new Error("Team not found");
+      if (team.leadId !== user.id) {
+        throw new Error("Only the current team lead can transfer leadership");
+      }
+
+      // Verify the new lead is a member of the team
+      const newLeadMembership = await db.teamMember.findUnique({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId: newLeadId,
+          },
+        },
+      });
+
+      if (!newLeadMembership) {
+        throw new Error("The new lead must be an existing team member");
+      }
+
+      // Prevent transferring to the same user
+      if (newLeadId === user.id) {
+        throw new Error("You are already the team lead");
+      }
+
+      // Perform the transfer in a transaction
+      return await db.$transaction(async (tx) => {
+        // Update the team's lead
+        const updatedTeam = await tx.team.update({
+          where: { id: teamId },
+          data: { leadId: newLeadId },
+        });
+
+        // Log the activity for both users
+        await tx.userActivity.createMany({
+          data: [
+            {
+              userId: user.id,
+              activityType: "LEADERSHIP_TRANSFERRED",
+              details: { teamId, newLeadId },
+            },
+            {
+              userId: newLeadId,
+              activityType: "BECAME_TEAM_LEAD",
+              details: { teamId, previousLeadId: user.id },
+            },
+          ],
+        });
+
+        return updatedTeam;
+      });
+    }),
 });

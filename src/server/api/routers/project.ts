@@ -112,4 +112,24 @@ export const projectRouter = createTRPCRouter({
 
       return updateTitle;
     }),
+
+  deleteProject: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { projectId } = input;
+
+      if (!projectId) throw new Error("Project id not found");
+
+      const deleteProject = await db.project.delete({
+        where: {
+          id: projectId,
+        },
+      });
+      return deleteProject;
+    }),
 });
