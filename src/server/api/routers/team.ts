@@ -281,4 +281,62 @@ export const teamRouter = createTRPCRouter({
 
       return deletedTeamMember;
     }),
+
+  leaveTeam: privateProcedure
+    .input(
+      z.object({
+        teamId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { teamId } = input;
+
+      if (!user) throw new Error("Unauthorized");
+
+      const team = await db.team.findUnique({
+        where: { id: teamId },
+        select: { leadId: true },
+      });
+
+      if (!team) throw new Error("Team not found");
+
+      if (team.leadId === user.id) {
+        throw new Error(
+          "Team lead cannot leave the team. Transfer ownership or delete the team instead.",
+        );
+      }
+
+      const membership = await db.teamMember.findUnique({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId: user.id,
+          },
+        },
+      });
+
+      if (!membership) {
+        throw new Error("You are not a member of this team");
+      }
+
+      await db.teamMember.delete({
+        where: {
+          teamId_userId: {
+            teamId,
+            userId: user.id,
+          },
+        },
+      });
+
+      await db.userActivity.create({
+        data: {
+          userId: user.id,
+          activityType: "TEAM_LEFT",
+          details: { teamId },
+        },
+      });
+
+      return { success: true };
+    }),
 });
