@@ -9,6 +9,7 @@ import { FolderOpen, LoaderCircle, Users } from "lucide-react";
 import { CreateProjectModal } from "../components/CreateProjectModal";
 import { ProjectCard } from "../components/ProjectCard";
 import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
+import TeamDetailSkeleton from "../components/TeamDetailSkeleton";
 
 const TeamDetailPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -51,16 +52,12 @@ const TeamDetailPage = () => {
     { label: getTeamData?.name || "Team Details" },
   ];
 
-  if (getTeamDataIsLoading) {
-    return (
-      <DashboardLayout>
-        <TeamLayout breadcrumbItems={[]}>
-          <div className="mt-4 flex w-full items-center justify-center">
-            <p>Loading...</p>
-          </div>
-        </TeamLayout>
-      </DashboardLayout>
-    );
+  if (
+    getTeamDataIsLoading ||
+    getTeamMemberIsLoading ||
+    getProjectDataIsLoading
+  ) {
+    return <TeamDetailSkeleton />;
   }
 
   if (!getTeamData) {
