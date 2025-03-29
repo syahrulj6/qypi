@@ -1,40 +1,39 @@
+import { useRouter } from "next/router";
 import { PageContainer } from "~/components/layout/PageContainer";
 import { SectionContainer } from "~/components/layout/SectionContainer";
-import { TrendingContentCreator } from "~/components/TrendingContentCreator";
-import { TrendingTopics } from "~/components/TrendingTopicsSection";
+
 import { Button } from "~/components/ui/button";
+import { useSession } from "~/hooks/useSession";
 
 export default function Home() {
+  const router = useRouter();
+
+  const { session, handleSignOut } = useSession();
+
   return (
     <>
       <PageContainer>
         <SectionContainer
           padded
-          className="flex min-h-[calc(100vh-144px)] flex-col justify-center gap-y-3"
+          className="flex min-h-screen flex-col justify-center gap-y-3"
         >
-          <h1 className="text-center text-3xl font-semibold tracking-tighter md:text-5xl">
-            Kepoin Semua Tentang Content Creator Favoritmu di{" "}
-            <span className="text-primary">Qypi!</span>
-          </h1>
-          <p className="text-center text-base tracking-tight text-muted-foreground md:text-xl">
-            Dari YouTube hingga TikTok, dari gaming hingga edukasi – semua
-            tentang content creator ada di sini! Temukan profil, tren terbaru,
-            dan konten eksklusif hanya di{" "}
-            <span className="text-primary">Qypi.</span>
-          </p>
-          <Button>Jelajahi Sekarang</Button>
-        </SectionContainer>
-        <SectionContainer
-          padded
-          className="flex min-h-[calc(100vh-144px)] flex-col justify-center gap-y-3"
-        >
-          <TrendingContentCreator />
-        </SectionContainer>
-        <SectionContainer
-          padded
-          className="flex min-h-[calc(100vh-144px)] flex-col justify-center gap-y-3"
-        >
-          <TrendingTopics />
+          {session ? (
+            <div className="flex gap-2">
+              <Button onClick={() => router.push("/dashboard")}>
+                Dashboard
+              </Button>
+              <Button variant="destructive" onClick={() => handleSignOut()}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button onClick={() => router.push("/login")}>Login</Button>
+              <Button variant="outline" onClick={() => router.push("register")}>
+                Register
+              </Button>
+            </div>
+          )}
         </SectionContainer>
       </PageContainer>
     </>
