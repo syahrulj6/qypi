@@ -27,16 +27,60 @@ import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 
-const mainMenuItems = [
-  { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
-  { title: "My Calendar", url: "/dashboard/calendar", icon: Calendar },
-  { title: "My Inbox", url: "/dashboard/inbox", icon: Inbox },
-  { title: "My Notes", url: "/dashboard/notes", icon: NotebookPen },
-  { title: "Team", url: "/dashboard/team", icon: UsersRound },
+type MenuItem = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive?: (pathname: string) => boolean;
+};
+
+const mainMenuItems: MenuItem[] = [
+  {
+    title: "Overview",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    isActive: (pathname) => pathname === "/dashboard",
+  },
+  {
+    title: "My Calendar",
+    url: "/dashboard/calendar",
+    icon: Calendar,
+    isActive: (pathname) => pathname === "/dashboard/calendar",
+  },
+  {
+    title: "My Inbox",
+    url: "/dashboard/inbox",
+    icon: Inbox,
+    isActive: (pathname) => pathname === "/dashboard/inbox",
+  },
+  {
+    title: "My Notes",
+    url: "/dashboard/notes",
+    icon: NotebookPen,
+    isActive: (pathname) => pathname === "/dashboard/notes",
+  },
+  {
+    title: "Team",
+    url: "/dashboard/team",
+    icon: UsersRound,
+    isActive: (pathname) => pathname.startsWith("/dashboard/team"),
+  },
 ];
 
-const otherMenuItems = [
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
+const otherMenuItems: MenuItem[] = [
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: Settings,
+    isActive: (pathname) => pathname === "/dashboard/settings",
+  },
+];
+
+const teamSubmenuItems = [
+  { title: "Overview", path: "" },
+  { title: "Members", path: "members" },
+  { title: "Projects", path: "projects" },
+  { title: "Settings", path: "settings", leadOnly: true },
 ];
 
 export const AppSidebar = () => {
@@ -46,11 +90,12 @@ export const AppSidebar = () => {
   const [expandedTeams, setExpandedTeams] = useState<Record<string, boolean>>(
     {},
   );
-  const isTeamRoute = pathname?.startsWith("/dashboard/team");
-
-  const [isTeamMenuExpanded, setIsTeamMenuExpanded] = useState(isTeamRoute);
+  const [isTeamMenuExpanded, setIsTeamMenuExpanded] = useState(
+    pathname?.startsWith("/dashboard/team"),
+  );
 
   const { data: teams, isLoading: teamsLoading } = api.team.getTeams.useQuery();
+  const { data: currentUser } = api.profile.getProfile.useQuery();
 
   const currentTeamId = pathname?.split("/")[3];
 
@@ -65,35 +110,98 @@ export const AppSidebar = () => {
     const newExpandedState = !isTeamMenuExpanded;
     setIsTeamMenuExpanded(newExpandedState);
 
-    if (newExpandedState && !isTeamRoute) {
+    if (newExpandedState && !pathname?.startsWith("/dashboard/team")) {
       router.push("/dashboard/team");
     }
   };
-  useEffect(() => {
-    if (teams) {
-      if (currentTeamId) {
-        setExpandedTeams((prev) => ({
-          ...prev,
-          [currentTeamId]: true,
-        }));
-      }
 
-      if (isTeamRoute && !isTeamMenuExpanded) {
-        setIsTeamMenuExpanded(true);
-      }
+  useEffect(() => {
+    if (teams && currentTeamId) {
+      setExpandedTeams((prev) => ({
+        ...prev,
+        [currentTeamId]: true,
+      }));
     }
-  }, [teams, currentTeamId, isTeamRoute, isTeamMenuExpanded]);
+  }, [teams, currentTeamId]);
+
+  const renderMenuItem = ({ title, url, icon: Icon, isActive }: MenuItem) => {
+    const active = isActive ? isActive(pathname || "") : pathname === url;
+    return (
+      <SidebarMenuItem key={title}>
+        <Link href={url}>
+          <Button
+            variant="ghost"
+            className={`flex w-full items-center justify-start gap-4 ${active && "bg-primary hover:bg-primary"}`}
+          >
+            <Icon
+              className={`h-5 w-5 ${active ? "text-white" : "text-muted-foreground"}`}
+            />
+            <span className={active ? "text-white" : "text-muted-foreground"}>
+              {title}
+            </span>
+          </Button>
+        </Link>
+      </SidebarMenuItem>
+    );
+  };
+
+  const renderTeamSubmenu = (team: {
+    id: string;
+    name: string;
+    leadId: string;
+  }) => {
+    const isTeamActive = currentTeamId === team.id;
+    const isTeamExpanded = expandedTeams[team.id] || isTeamActive;
+    const isTeamLead = team.leadId === currentUser?.userId;
+
+    return (
+      <div key={team.id} className="flex flex-col">
+        <Button
+          variant="ghost"
+          className={`flex w-full items-center justify-start gap-2 px-4 py-2 ${isTeamActive ? "bg-accent" : ""}`}
+          onClick={() => toggleTeamExpansion(team.id)}
+        >
+          {isTeamExpanded ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+          <span className="truncate">{team.name}</span>
+        </Button>
+
+        {isTeamExpanded && (
+          <div className="ml-6 flex flex-col border-l pl-2">
+            {teamSubmenuItems.map((item) => {
+              if (item.leadOnly && !isTeamLead) return null;
+
+              const fullPath =
+                `/dashboard/team/${team.id}/${item.path}`.replace(/\/$/, "");
+              const isActive = pathname === fullPath;
+
+              return (
+                <Link key={item.path} href={fullPath}>
+                  <Button
+                    variant="ghost"
+                    className={`w-full justify-start ${isActive ? "bg-accent" : ""}`}
+                  >
+                    {item.title}
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="flex">
-      {/* Main Sidebar */}
       <Sidebar className="flex h-screen w-56 flex-col">
-        <SidebarHeader
-          aria-hidden
-          className="ml-1 mt-3 text-2xl font-bold text-primary hover:cursor-pointer"
-        >
-          <Link href={"/"}>Qypi</Link>
+        <SidebarHeader className="ml-1 mt-3 text-2xl font-bold text-primary hover:cursor-pointer">
+          <Link href="/">Qypi</Link>
         </SidebarHeader>
+
         <SidebarContent className="flex-1">
           <SidebarGroup>
             <SidebarGroupLabel className="text-muted-foreground">
@@ -101,182 +209,62 @@ export const AppSidebar = () => {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="flex flex-col gap-2">
-                {mainMenuItems.map(({ title, url, icon: Icon }, index) => {
-                  const isActive =
-                    pathname === url ||
-                    (url === "/dashboard/team" &&
-                      pathname?.startsWith("/dashboard/team"));
-
-                  if (title === "Team") {
+                {mainMenuItems.map((item) => {
+                  if (item.title === "Team") {
                     return (
-                      <div key={index} className="flex flex-col">
+                      <div key="team-menu" className="flex flex-col">
                         <Button
                           variant="ghost"
-                          className={`flex w-full items-center justify-start gap-4 ${isActive && "bg-primary hover:bg-primary"} transition-colors`}
+                          className={`flex w-full items-center justify-start gap-4 ${item.isActive?.(pathname || "") && "bg-primary hover:bg-primary"}`}
                           onClick={handleTeamMenuClick}
                         >
-                          <Icon
-                            className={`h-5 w-5 transition-colors ${
-                              isActive ? "text-white" : "text-muted-foreground"
-                            }`}
+                          <item.icon
+                            className={`h-5 w-5 ${item.isActive?.(pathname || "") ? "text-white" : "text-muted-foreground"}`}
                           />
                           <span
                             className={
-                              isActive ? "text-white" : "text-muted-foreground"
+                              item.isActive?.(pathname || "")
+                                ? "text-white"
+                                : "text-muted-foreground"
                             }
                           >
-                            {title}
+                            {item.title}
                           </span>
                         </Button>
 
-                        {/* Team Submenu - shown when team menu is expanded */}
                         {isTeamMenuExpanded && teams && (
                           <div className="ml-6 mt-1 flex flex-col border-l pl-2">
-                            {teams.map((team) => {
-                              const isTeamActive = currentTeamId === team.id;
-                              const isTeamExpanded =
-                                expandedTeams[team.id] || isTeamActive;
-
-                              return (
-                                <div key={team.id} className="flex flex-col">
-                                  <Button
-                                    variant="ghost"
-                                    className={`flex w-full items-center justify-start gap-2 px-4 py-2 ${isTeamActive ? "bg-accent" : ""}`}
-                                    onClick={() => toggleTeamExpansion(team.id)}
-                                  >
-                                    {isTeamExpanded ? (
-                                      <ChevronDown className="h-4 w-4" />
-                                    ) : (
-                                      <ChevronRight className="h-4 w-4" />
-                                    )}
-                                    <span className="truncate">
-                                      {team.name}
-                                    </span>
-                                  </Button>
-
-                                  {isTeamExpanded && (
-                                    <div className="ml-6 flex flex-col border-l pl-2">
-                                      <Link href={`/dashboard/team/${team.id}`}>
-                                        <Button
-                                          variant="ghost"
-                                          className={`w-full justify-start ${pathname === `/dashboard/team/${team.id}` ? "bg-accent" : ""}`}
-                                        >
-                                          Overview
-                                        </Button>
-                                      </Link>
-                                      <Link
-                                        href={`/dashboard/team/${team.id}/members`}
-                                      >
-                                        <Button
-                                          variant="ghost"
-                                          className={`w-full justify-start ${pathname === `/dashboard/team/${team.id}/members` ? "bg-accent" : ""}`}
-                                        >
-                                          Members
-                                        </Button>
-                                      </Link>
-                                      <Link
-                                        href={`/dashboard/team/${team.id}/projects`}
-                                      >
-                                        <Button
-                                          variant="ghost"
-                                          className={`w-full justify-start ${pathname === `/dashboard/team/${team.id}/projects` ? "bg-accent" : ""}`}
-                                        >
-                                          Projects
-                                        </Button>
-                                      </Link>
-                                      <Link
-                                        href={`/dashboard/team/${team.id}/settings`}
-                                      >
-                                        <Button
-                                          variant="ghost"
-                                          className={`w-full justify-start ${pathname === `/dashboard/team/${team.id}/settings` ? "bg-accent" : ""}`}
-                                        >
-                                          Settings
-                                        </Button>
-                                      </Link>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
+                            {teams.map(renderTeamSubmenu)}
                           </div>
                         )}
                       </div>
                     );
                   }
-
-                  return (
-                    <SidebarMenuItem key={index}>
-                      <Link href={url}>
-                        <Button
-                          variant="ghost"
-                          className={`flex w-full items-center justify-start gap-4 ${isActive && "bg-primary hover:bg-primary"} transition-colors`}
-                        >
-                          <Icon
-                            className={`h-5 w-5 transition-colors ${
-                              isActive ? "text-white" : "text-muted-foreground"
-                            }`}
-                          />
-                          <span
-                            className={
-                              isActive ? "text-white" : "text-muted-foreground"
-                            }
-                          >
-                            {title}
-                          </span>
-                        </Button>
-                      </Link>
-                    </SidebarMenuItem>
-                  );
+                  return renderMenuItem(item);
                 })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* Other Menu Items */}
           <SidebarGroup>
             <SidebarGroupLabel className="text-muted-foreground">
               OTHERS
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="flex flex-col gap-2">
-                {otherMenuItems.map(({ title, url, icon: Icon }, index) => {
-                  const isActive = pathname === url;
-                  return (
-                    <SidebarMenuItem key={index}>
-                      <Link href={url}>
-                        <Button
-                          variant="ghost"
-                          className={`flex w-full items-center justify-start gap-4 ${isActive && "bg-primary hover:bg-primary"} transition-colors`}
-                        >
-                          <Icon
-                            className={`h-5 w-5 transition-colors ${
-                              isActive ? "text-white" : "text-muted-foreground"
-                            }`}
-                          />
-                          <span
-                            className={
-                              isActive ? "text-white" : "text-muted-foreground"
-                            }
-                          >
-                            {title}
-                          </span>
-                        </Button>
-                      </Link>
-                    </SidebarMenuItem>
-                  );
-                })}
+                {otherMenuItems.map(renderMenuItem)}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+
         {session && (
           <SidebarFooter className="mb-4 mt-auto">
             <SidebarMenu>
               <SidebarMenuItem>
                 <Button
                   onClick={handleSignOut}
-                  variant={"destructive"}
+                  variant="destructive"
                   className="flex w-full justify-start gap-4"
                 >
                   <LogOut className="h-5 w-5" />
