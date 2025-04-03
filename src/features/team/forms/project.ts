@@ -27,3 +27,11 @@ export const updateProjectTitleFormSchema = z.object({
 export type UpdateProjectTitleFormSchema = z.infer<
   typeof updateProjectTitleFormSchema
 >;
+
+export const projectSettingsSchema = z.object({
+  name: z.string().min(1, "Project name is required"),
+  description: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
+export type ProjectSettingsSchema = z.infer<typeof projectSettingsSchema>;

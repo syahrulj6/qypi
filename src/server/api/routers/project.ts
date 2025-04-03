@@ -132,4 +132,24 @@ export const projectRouter = createTRPCRouter({
       });
       return deleteProject;
     }),
+
+  updateProject: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        name: z.string().min(1),
+        description: z.string().optional(),
+        endDate: z.date().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.project.update({
+        where: { id: input.projectId },
+        data: {
+          name: input.name,
+          description: input.description,
+          endDate: input.endDate,
+        },
+      });
+    }),
 });

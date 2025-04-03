@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Ellipsis,
   Plus,
+  Settings,
   SquarePen,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -224,6 +225,18 @@ const ProjectDetailPage = () => {
           </div>
           <div className="flex flex-col items-end gap-4">
             <div className="flex flex-wrap items-center gap-3">
+              <Button
+                className="hidden items-center gap-2 md:flex"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/team/${teamId}/projects/${projectId}/settings`,
+                  )
+                }
+              >
+                <Settings /> Settings
+              </Button>
               <Button
                 className="hidden items-center gap-2 md:flex"
                 variant="outline"
