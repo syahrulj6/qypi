@@ -353,7 +353,6 @@ export const teamRouter = createTRPCRouter({
 
       if (!user) throw new Error("Unauthorized");
 
-      // Verify the current user is the team lead
       const team = await db.team.findUnique({
         where: { id: teamId },
         select: { leadId: true },

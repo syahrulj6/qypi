@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { CreateTaskModal } from "../components/CreateTaskModal";
 import { UpdateProjectTitleModal } from "../components/UpdateProjectTitleModal";
+import { useSession } from "~/hooks/useSession";
 
 type CalendarEvent = {
   id: string;
@@ -36,6 +37,7 @@ const ProjectDetailPage = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [calendarApi, setCalendarApi] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { session } = useSession();
 
   const router = useRouter();
   const { teamId, projectId } = router.query;
@@ -65,6 +67,9 @@ const ProjectDetailPage = () => {
     isLoading: getTaskDataLoading,
     refetch: refetchTaskData,
   } = api.task.getTask.useQuery();
+
+  // Check if current user is the team lead
+  const isLead = session?.user?.id === getTeamData?.leadId;
 
   const leadProfilePicture = getProjectData?.team?.lead?.profilePictureUrl;
 
@@ -191,18 +196,20 @@ const ProjectDetailPage = () => {
       )}
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         {/* HEADER */}
-        <div className="flex justify-between md:mr-8">
+        <div className="flex flex-col justify-between gap-4 md:mr-8 md:flex-row md:gap-0">
           <div className="flex flex-1 flex-col gap-1 md:gap-2">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-semibold md:text-2xl">
+                <h1 className="text-xl font-semibold md:text-2xl">
                   {getProjectData.name}
                 </h1>
-                <button onClick={() => setShowUpdateProjectTitle(true)}>
-                  <SquarePen className="w-4 text-muted-foreground md:w-4" />
-                </button>
+                {isLead && (
+                  <button onClick={() => setShowUpdateProjectTitle(true)}>
+                    <SquarePen className="w-4 text-muted-foreground md:w-4" />
+                  </button>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground md:text-sm">
+              <p className="text-sm text-muted-foreground md:text-sm">
                 {getProjectData.description}
               </p>
             </div>
@@ -210,57 +217,63 @@ const ProjectDetailPage = () => {
               {avatarsToShow.map((picture, index) => (
                 <Avatar
                   key={index}
-                  className="size-9 border-4 border-white md:size-10"
+                  className="size-8 border-2 border-white md:size-10 md:border-4"
                 >
                   <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
                   <AvatarImage src={picture ?? ""} className="rounded-full" />
                 </Avatar>
               ))}
               {remainingMembers > 0 && (
-                <Avatar className="ml-4 size-9 border-4 border-white md:size-10">
+                <Avatar className="ml-4 size-8 border-2 border-white md:size-10 md:border-4">
                   <AvatarFallback>+{remainingMembers}</AvatarFallback>
                 </Avatar>
               )}
             </div>
           </div>
-          <div className="flex flex-col items-end gap-4">
+          <div className="flex flex-col items-start gap-4 md:items-end">
             <div className="flex flex-wrap items-center gap-3">
-              <Button
-                className="hidden items-center gap-2 md:flex"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  router.push(
-                    `/dashboard/team/${teamId}/projects/${projectId}/settings`,
-                  )
-                }
-              >
-                <Settings /> Settings
-              </Button>
-              <Button
-                className="hidden items-center gap-2 md:flex"
-                variant="outline"
-                size="sm"
-              >
-                <CalendarDays /> Calendar
-              </Button>
+              {isLead && (
+                <>
+                  <Button
+                    className="hidden items-center gap-2 md:flex"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/team/${teamId}/projects/${projectId}/settings`,
+                      )
+                    }
+                  >
+                    <Settings className="size-4" /> Settings
+                  </Button>
+                  <Button
+                    className="hidden items-center gap-2 md:flex"
+                    variant="outline"
+                    size="sm"
+                  >
+                    <CalendarDays className="size-4" /> Calendar
+                  </Button>
+                </>
+              )}
               <Button
                 variant="outline"
                 size="icon"
-                className="size-6 md:hidden"
+                className="size-8 md:hidden"
               >
-                <Ellipsis />
+                <Ellipsis className="size-4" />
               </Button>
-              <Button
-                className="center gap-1 md:flex"
-                onClick={() => setShowCreateTask(true)}
-                size={window.innerWidth < 640 ? "sm" : "default"}
-              >
-                <Plus />
-                Create Task
-              </Button>
+              {isLead && (
+                <Button
+                  className="flex items-center gap-1"
+                  onClick={() => setShowCreateTask(true)}
+                  size="sm"
+                >
+                  <Plus className="size-4" />
+                  <span className="hidden sm:inline">Create Task</span>
+                </Button>
+              )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-between gap-2 md:justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -274,20 +287,20 @@ const ProjectDetailPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={handlePrev}
-                  className="size-6 md:size-8"
+                  className="size-8"
                 >
-                  <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h2 className="text-xs text-muted-foreground md:text-sm">
+                <h2 className="text-sm text-muted-foreground">
                   {formattedDate}
                 </h2>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={handleNext}
-                  className="size-6 md:size-8"
+                  className="size-8"
                 >
-                  <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -295,9 +308,11 @@ const ProjectDetailPage = () => {
         </div>
 
         {/* CALENDAR */}
-        <div className="mt-4 rounded-lg border bg-white p-4 shadow-sm">
+        <div className="mt-4 rounded-lg border bg-white p-2 shadow-sm sm:p-4">
           {getTaskDataLoading ? (
-            <p>Loading...</p>
+            <div className="flex h-64 items-center justify-center">
+              <p>Loading calendar...</p>
+            </div>
           ) : (
             <FullCalendar
               plugins={[dayGridPlugin, interactionPlugin]}
@@ -319,12 +334,9 @@ const ProjectDetailPage = () => {
               eventColor="#3b82f6"
               eventTextColor="var(--primary-foreground)"
               eventBorderColor="transparent"
-              eventTimeFormat={{
-                hour: "2-digit",
-                minute: "2-digit",
-                meridiem: false,
-                hour12: false,
-              }}
+              height="auto"
+              contentHeight="auto"
+              aspectRatio={1.5}
             />
           )}
         </div>
