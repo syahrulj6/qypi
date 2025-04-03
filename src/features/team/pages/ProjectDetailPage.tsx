@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { TaskModal } from "../components/TaskModal";
 
 type CalendarEvent = {
   id: string;
@@ -43,6 +44,7 @@ const ProjectDetailPage = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [calendarApi, setCalendarApi] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const { session } = useSession();
 
   const router = useRouter();
@@ -74,7 +76,6 @@ const ProjectDetailPage = () => {
     refetch: refetchTaskData,
   } = api.task.getTask.useQuery();
 
-  // Check if current user is the team lead
   const isLead = session?.user?.id === getTeamData?.leadId;
 
   const leadProfilePicture = getProjectData?.team?.lead?.profilePictureUrl;
@@ -91,10 +92,6 @@ const ProjectDetailPage = () => {
           color: task.status === "Completed" ? "#22c55e" : "#ccc",
           display: "block",
           allDay: true,
-          extendedProps: {
-            description: task.description,
-            status: task.status,
-          },
         }));
       setEvents(mappedEvents);
     }
@@ -200,6 +197,12 @@ const ProjectDetailPage = () => {
           refetch={refetchProjectData}
         />
       )}
+      <TaskModal
+        taskId={selectedTaskId ?? ""}
+        isOpen={!!selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
+        refetch={refetchTaskData}
+      />
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         {/* HEADER */}
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start md:gap-8">
@@ -365,7 +368,7 @@ const ProjectDetailPage = () => {
         </div>
 
         {/* CALENDAR */}
-        <div className="mt-4 rounded-lg border bg-white p-2 shadow-sm sm:p-4">
+        <div className="mt-4 rounded-lg border bg-background p-2 shadow-sm sm:p-4">
           {getTaskDataLoading ? (
             <div className="flex h-64 items-center justify-center">
               <p>Loading calendar...</p>
@@ -377,9 +380,7 @@ const ProjectDetailPage = () => {
               events={events}
               headerToolbar={false}
               eventClick={(info) => {
-                alert(`Task: ${info.event.title}\n
-                  Status: ${info.event.extendedProps.status}\n
-                  Description: ${info.event.extendedProps.description}`);
+                setSelectedTaskId(info.event.id);
               }}
               datesSet={(arg) => setCurrentDate(arg.start)}
               ref={(ref) => {
@@ -399,6 +400,7 @@ const ProjectDetailPage = () => {
                 weekday: "short",
                 day: "numeric",
               }}
+              eventClassNames="cursor-pointer"
             />
           )}
         </div>

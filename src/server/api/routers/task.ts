@@ -98,6 +98,13 @@ export const taskRouter = createTRPCRouter({
         where: {
           id: taskId,
         },
+        include: {
+          assignees: {
+            include: {
+              user: true,
+            },
+          },
+        },
       });
 
       return task;
@@ -106,10 +113,37 @@ export const taskRouter = createTRPCRouter({
   getTask: privateProcedure.query(async ({ ctx }) => {
     const { db } = ctx;
 
-    const task = await db.task.findMany();
+    const task = await db.task.findMany({
+      include: {
+        assignees: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
 
     if (!task) throw new Error("No task found!");
 
     return task;
   }),
+
+  deleteTask: privateProcedure
+    .input(
+      z.object({
+        taskId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { taskId } = input;
+
+      if (!taskId) throw new Error("No Task Id found");
+
+      await db.task.delete({
+        where: {
+          id: taskId,
+        },
+      });
+    }),
 });
