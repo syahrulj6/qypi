@@ -123,7 +123,9 @@ export const ProjectCard = ({
           </AlertDialog>
         </div>
       )}
-      <div onClick={() => router.push(`/dashboard/team/${teamId}/${id}`)}>
+      <div
+        onClick={() => router.push(`/dashboard/team/${teamId}/projects/${id}`)}
+      >
         <CardHeader>
           <CardTitle>Project end in</CardTitle>
           <CardDescription>{endDate.toDateString()}</CardDescription>
