@@ -391,22 +391,6 @@ export const teamRouter = createTRPCRouter({
           data: { leadId: newLeadId },
         });
 
-        // Log the activity for both users
-        await tx.userActivity.createMany({
-          data: [
-            {
-              userId: user.id,
-              activityType: "LEADERSHIP_TRANSFERRED",
-              details: { teamId, newLeadId },
-            },
-            {
-              userId: newLeadId,
-              activityType: "BECAME_TEAM_LEAD",
-              details: { teamId, previousLeadId: user.id },
-            },
-          ],
-        });
-
         return updatedTeam;
       });
     }),

@@ -9,42 +9,47 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { CreateProjectModal } from "../components/CreateProjectModal";
 import { ProjectCard } from "../components/ProjectCard";
 import TeamProjectsSkeleton from "../components/TeamProjectSkeleton";
+import { useSession } from "~/hooks/useSession";
 
 const TeamProjectsPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
   const router = useRouter();
   const { teamId } = router.query;
+  const { session } = useSession();
 
-  const { data: getTeamData, isLoading: getTeamDataIsLoading } =
+  const { data: teamData, isLoading: isTeamLoading } =
     api.team.getTeamById.useQuery(
       { id: teamId as string },
       { enabled: !!teamId },
     );
 
   const {
-    data: getProjectsData,
-    isLoading: getProjectsDataIsLoading,
-    refetch: refetchProjectsData,
+    data: projects,
+    isLoading: isProjectsLoading,
+    refetch: refetchProjects,
   } = api.project.getProject.useQuery(
     { teamId: teamId as string },
     { enabled: !!teamId },
   );
 
-  const { data: getTeamMemberData, isLoading: getTeamMemberIsLoading } =
+  const { data: teamMembers, isLoading: isMembersLoading } =
     api.team.getTeamMember.useQuery(
       { teamId: teamId as string },
       { enabled: !!teamId },
     );
+
+  // Check if current user is the team lead
+  const isCurrentUserLead = teamData?.leadId === session?.user.id;
 
   useEffect(() => {
     if (teamId === undefined) return;
     if (!teamId) router.push("/dashboard");
   }, [teamId, router]);
 
-  const leadProfilePicture = getTeamData?.lead?.profilePictureUrl;
+  const leadProfilePicture = teamData?.lead?.profilePictureUrl;
 
   const memberProfilePictures =
-    getTeamMemberData
+    teamMembers
       ?.filter(
         (member) => member.user?.profilePictureUrl !== leadProfilePicture,
       )
@@ -62,16 +67,16 @@ const TeamProjectsPage = () => {
     { href: "/dashboard/team", label: "Team" },
     {
       href: `/dashboard/team/${teamId}`,
-      label: getTeamData?.name || "Team Details",
+      label: teamData?.name || "Team Details",
     },
     { label: "Projects" },
   ];
 
-  if (getTeamDataIsLoading || getProjectsDataIsLoading) {
+  if (isTeamLoading || isProjectsLoading || isMembersLoading) {
     return <TeamProjectsSkeleton />;
   }
 
-  if (!getTeamData) {
+  if (!teamData) {
     return (
       <DashboardLayout>
         <TeamLayout breadcrumbItems={[]}>
@@ -85,12 +90,13 @@ const TeamProjectsPage = () => {
 
   return (
     <DashboardLayout>
-      {showCreateProject && (
+      {/* Create Project Modal - only shown to leads */}
+      {isCurrentUserLead && showCreateProject && (
         <CreateProjectModal
           teamId={teamId as string}
           isOpen={showCreateProject}
           onClose={() => setShowCreateProject(false)}
-          refetch={refetchProjectsData}
+          refetch={refetchProjects}
         />
       )}
 
@@ -103,7 +109,7 @@ const TeamProjectsPage = () => {
                 Team Projects
               </h1>
               <p className="text-xs text-muted-foreground md:text-sm">
-                All projects for {getTeamData.name}
+                All projects for {teamData.name}
               </p>
             </div>
             <div className="mt-1 flex flex-wrap -space-x-3 md:mt-2">
@@ -123,16 +129,19 @@ const TeamProjectsPage = () => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button
-              className="center gap-1 md:flex"
-              onClick={() => setShowCreateProject(true)}
-              size={window.innerWidth < 640 ? "sm" : "default"}
-            >
-              <Plus />
-              Create Project
-            </Button>
-          </div>
+          {/* Only show create button for team lead */}
+          {isCurrentUserLead && (
+            <div className="flex items-center gap-4">
+              <Button
+                className="center gap-1 md:flex"
+                onClick={() => setShowCreateProject(true)}
+                size={window.innerWidth < 640 ? "sm" : "default"}
+              >
+                <Plus />
+                Create Project
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* PROJECTS LIST */}
@@ -142,11 +151,11 @@ const TeamProjectsPage = () => {
             <h2 className="text-sm font-medium">All Projects</h2>
           </div>
 
-          {getProjectsDataIsLoading ? (
+          {isProjectsLoading ? (
             <p>Loading projects...</p>
-          ) : getProjectsData && getProjectsData.length > 0 ? (
+          ) : projects && projects.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {getProjectsData.map((project) => (
+              {projects.map((project) => (
                 <ProjectCard
                   key={project.id}
                   id={project.id}
@@ -156,6 +165,7 @@ const TeamProjectsPage = () => {
                   endDate={new Date(project.endDate!)}
                   router={router}
                   team={project.team}
+                  isCurrentUserLead={isCurrentUserLead}
                 />
               ))}
             </div>
@@ -164,16 +174,20 @@ const TeamProjectsPage = () => {
               <FolderOpen className="h-12 w-12 text-muted-foreground" />
               <h3 className="mt-2 text-sm font-medium">No projects yet</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Get started by creating a new project
+                {isCurrentUserLead
+                  ? "Get started by creating a new project"
+                  : "Only the team lead can create new projects"}
               </p>
-              <Button
-                className="mt-4"
-                size="sm"
-                onClick={() => setShowCreateProject(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
+              {isCurrentUserLead && (
+                <Button
+                  className="mt-4"
+                  size="sm"
+                  onClick={() => setShowCreateProject(true)}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Project
+                </Button>
+              )}
             </div>
           )}
         </div>
