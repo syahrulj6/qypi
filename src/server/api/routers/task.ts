@@ -140,6 +140,12 @@ export const taskRouter = createTRPCRouter({
 
       if (!taskId) throw new Error("No Task Id found");
 
+      await db.taskAssignment.deleteMany({
+        where: {
+          taskId: taskId,
+        },
+      });
+
       await db.task.delete({
         where: {
           id: taskId,
