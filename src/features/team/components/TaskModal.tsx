@@ -1,5 +1,5 @@
 import { Button } from "~/components/ui/button";
-import { Calendar, Check, Clock, FileText, Flag, User, X } from "lucide-react";
+import { Calendar, Check, FileText, Flag, User, X } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -15,6 +15,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+
+const TASK_STATUS = ["Pending", "In Progress", "Completed"] as const;
+const TASK_PRIORITY = ["Low", "Medium", "High"] as const;
+
+type TaskStatus = (typeof TASK_STATUS)[number];
+type TaskPriority = (typeof TASK_PRIORITY)[number];
 
 interface TaskModalProps {
   taskId: string;
@@ -54,13 +60,60 @@ export const TaskModal = ({
     );
   };
 
+  const getStatusVariant = (status: string) => {
+    if (!TASK_STATUS.includes(status as TaskStatus)) return "outline";
+    return status === "Completed" ? "default" : "secondary";
+  };
+
+  const getStatusColor = (status: string) => {
+    if (!TASK_STATUS.includes(status as TaskStatus))
+      return "text-muted-foreground";
+
+    switch (status) {
+      case "Completed":
+        return "text-green-500";
+      case "In Progress":
+        return "text-blue-500";
+      default:
+        return "text-yellow-500";
+    }
+  };
+
+  const getPriorityVariant = (priority: string) => {
+    if (!TASK_PRIORITY.includes(priority as TaskPriority)) return "outline";
+
+    switch (priority) {
+      case "High":
+        return "destructive";
+      case "Medium":
+        return "secondary";
+      default:
+        return "default";
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    if (!TASK_PRIORITY.includes(priority as TaskPriority))
+      return "text-muted-foreground";
+
+    switch (priority) {
+      case "High":
+        return "text-red-500";
+      case "Medium":
+        return "text-yellow-500";
+      default:
+        return "text-green-500";
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-96 rounded-lg border border-muted-foreground bg-card p-6 md:w-[30rem]">
         {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
+          <div className="flex h-64 flex-col items-center justify-center gap-2">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <p>Loading task details...</p>
           </div>
         ) : taskData ? (
@@ -72,22 +125,24 @@ export const TaskModal = ({
                   Task details
                 </p>
               </div>
-              <button onClick={onClose}>
-                <X />
+              <button
+                onClick={onClose}
+                className="rounded-sm p-1 transition-colors hover:bg-accent"
+              >
+                <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="mt-4 space-y-4">
-              {/* Status */}
               <div className="flex items-center gap-3">
-                <Check className="h-5 w-5 text-muted-foreground" />
+                <Check
+                  className={`h-5 w-5 ${getStatusColor(taskData.status)}`}
+                />
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Status</p>
                   <Badge
-                    variant={
-                      taskData.status === "Completed" ? "default" : "secondary"
-                    }
-                    className="mt-1"
+                    variant={getStatusVariant(taskData.status)}
+                    className="mt-1 capitalize"
                   >
                     {taskData.status}
                   </Badge>
@@ -108,10 +163,15 @@ export const TaskModal = ({
 
               {taskData.priority && (
                 <div className="flex items-center gap-3">
-                  <Flag className="h-5 w-5 text-muted-foreground" />
+                  <Flag
+                    className={`h-5 w-5 ${getPriorityColor(taskData.priority)}`}
+                  />
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground">Priority</p>
-                    <Badge variant="outline" className="mt-1">
+                    <Badge
+                      variant={getPriorityVariant(taskData.priority)}
+                      className="mt-1 capitalize"
+                    >
                       {taskData.priority}
                     </Badge>
                   </div>
@@ -125,7 +185,11 @@ export const TaskModal = ({
                     <p className="text-sm text-muted-foreground">Assignees</p>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {taskData.assignees.map((assignee) => (
-                        <Badge key={assignee.user.userId} variant="outline">
+                        <Badge
+                          key={assignee.user.userId}
+                          variant="outline"
+                          className="capitalize"
+                        >
                           {assignee.user.username}
                         </Badge>
                       ))}
@@ -139,7 +203,9 @@ export const TaskModal = ({
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground">Description</p>
-                    <p className="mt-1 text-sm">{taskData.description}</p>
+                    <p className="mt-1 whitespace-pre-line text-sm">
+                      {taskData.description}
+                    </p>
                   </div>
                 </div>
               )}
@@ -181,8 +247,12 @@ export const TaskModal = ({
             </div>
           </>
         ) : (
-          <div className="flex h-64 items-center justify-center">
+          <div className="flex h-64 flex-col items-center justify-center gap-2">
+            <X className="h-8 w-8 text-destructive" />
             <p>Task not found</p>
+            <Button variant="outline" size="sm" onClick={onClose}>
+              Close
+            </Button>
           </div>
         )}
       </div>
