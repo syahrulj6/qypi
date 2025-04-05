@@ -228,14 +228,6 @@ export const teamRouter = createTRPCRouter({
         },
       });
 
-      await db.userActivity.create({
-        data: {
-          userId: user.userId,
-          activityType: "TEAM_MEMBER_ADDED",
-          details: { teamId, addedBy: user.userId },
-        },
-      });
-
       return newMember;
     }),
 
