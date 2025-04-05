@@ -44,7 +44,11 @@ export const TaskModal = ({
   const { session } = useSession();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { data: taskData, isLoading } = api.task.getTaskById.useQuery(
+  const {
+    data: taskData,
+    isLoading,
+    refetch: refetchTaskData,
+  } = api.task.getTaskById.useQuery(
     { taskId },
     { enabled: isOpen && !!taskId },
   );
@@ -246,7 +250,7 @@ export const TaskModal = ({
                   <TaskStatusUpdate
                     taskId={taskId}
                     currentStatus={taskData.status}
-                    refetch={refetch}
+                    refetch={refetchTaskData}
                     isAssigned={isAssigned ?? false}
                   />
                 )}
@@ -289,7 +293,7 @@ export const TaskModal = ({
                 task={taskData}
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                refetch={refetch}
+                refetch={refetchTaskData}
               />
             )}
           </>
