@@ -83,40 +83,16 @@ export const TaskModal = ({
     );
   };
 
-  const getStatusVariant = (status: string) => {
-    if (!TASK_STATUS.includes(status as TaskStatus)) return "outline";
-    switch (status) {
-      case "Completed":
-        return "default";
-      case "In Progress":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
   const getStatusColor = (status: string) => {
     if (!TASK_STATUS.includes(status as TaskStatus))
       return "text-muted-foreground";
     switch (status) {
       case "Completed":
-        return "text-green-500";
+        return "text-green-500 ";
       case "In Progress":
-        return "text-blue-500";
+        return "text-blue-500 ";
       default:
         return "text-yellow-500";
-    }
-  };
-
-  const getPriorityVariant = (priority: string) => {
-    if (!TASK_PRIORITY.includes(priority as TaskPriority)) return "outline";
-    switch (priority) {
-      case "High":
-        return "destructive";
-      case "Medium":
-        return "secondary";
-      default:
-        return "default";
     }
   };
 
@@ -168,7 +144,7 @@ export const TaskModal = ({
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Status</p>
                   <Badge
-                    variant={getStatusVariant(taskData.status)}
+                    variant="outline"
                     className={`mt-1 capitalize ${getStatusColor(taskData.status)}`}
                   >
                     {taskData.status}
@@ -196,8 +172,8 @@ export const TaskModal = ({
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground">Priority</p>
                     <Badge
-                      variant={getPriorityVariant(taskData.priority)}
-                      className={`mt-1 capitalize`}
+                      variant="outline"
+                      className={`mt-1 capitalize ${getPriorityColor(taskData.priority)}`}
                     >
                       {taskData.priority}
                     </Badge>
