@@ -92,9 +92,17 @@ const ProjectDetailPage = () => {
           title: task.title,
           start: task.createdAt as Date,
           end: task.dueDate as Date,
-          color: task.status === "Completed" ? "#22c55e" : "#ccc",
+          backgroundColor: "#FFF8F8",
+          textColor:
+            task.status === "Completed"
+              ? "text-green-600"
+              : task.status === "In Progress"
+                ? "text-blue-600"
+                : "text-yellow-600",
+          borderColor: "transparent",
           display: "block",
           allDay: true,
+          className: "rounded-md px-2 py-1",
         }));
       setEvents(mappedEvents);
     }
@@ -393,9 +401,6 @@ const ProjectDetailPage = () => {
                 }
               }}
               eventDisplay="block"
-              eventColor="#3b82f6"
-              eventTextColor="var(--primary-foreground)"
-              eventBorderColor="transparent"
               height="auto"
               contentHeight="auto"
               aspectRatio={1.35}
@@ -404,7 +409,18 @@ const ProjectDetailPage = () => {
                 weekday: "short",
                 day: "numeric",
               }}
-              eventClassNames="cursor-pointer"
+              eventClassNames={(arg) => {
+                return [
+                  arg.event.backgroundColor,
+                  arg.event.textColor,
+                  "rounded-md",
+                  "px-2",
+                  "py-1",
+                  "cursor-pointer",
+                  "hover:opacity-90",
+                  "transition-opacity",
+                ].join(" ");
+              }}
             />
           )}
         </div>
