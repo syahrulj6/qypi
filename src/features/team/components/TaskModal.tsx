@@ -71,11 +71,11 @@ export const TaskModal = ({
 
     switch (status) {
       case "Completed":
-        return "text-green-500";
+        return "text-primary";
       case "In Progress":
         return "text-blue-500";
       default:
-        return "text-yellow-500";
+        return "text-muted-foreground";
     }
   };
 
@@ -100,7 +100,7 @@ export const TaskModal = ({
       case "High":
         return "text-red-500";
       case "Medium":
-        return "text-yellow-500";
+        return "text-muted-foreground";
       default:
         return "text-green-500";
     }
