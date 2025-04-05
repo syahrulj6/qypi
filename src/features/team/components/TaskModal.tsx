@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import { Calendar, Check, FileText, Flag, User, X } from "lucide-react";
+import { Calendar, Check, FileText, Flag, Pencil, User, X } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -15,6 +16,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+import { TaskStatusUpdate } from "./TaskStatusUpdate";
+import { EditTaskModal } from "./EditTaskModal";
+import { useSession } from "~/hooks/useSession";
 
 const TASK_STATUS = ["Pending", "In Progress", "Completed"] as const;
 const TASK_PRIORITY = ["Low", "Medium", "High"] as const;
@@ -23,6 +27,7 @@ type TaskStatus = (typeof TASK_STATUS)[number];
 type TaskPriority = (typeof TASK_PRIORITY)[number];
 
 interface TaskModalProps {
+  teamId: string;
   taskId: string;
   isOpen: boolean;
   onClose: () => void;
@@ -33,16 +38,30 @@ export const TaskModal = ({
   isOpen,
   onClose,
   taskId,
+  teamId,
   refetch,
 }: TaskModalProps) => {
+  const { session } = useSession();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const { data: taskData, isLoading } = api.task.getTaskById.useQuery(
     { taskId },
-    {
-      enabled: isOpen && !!taskId,
-    },
+    { enabled: isOpen && !!taskId },
   );
 
+  const { data: getTeamData, isLoading: getTeamDataIsLoading } =
+    api.team.getTeamById.useQuery(
+      { id: teamId },
+      { enabled: isOpen && !!teamId },
+    );
+
   const deleteTask = api.task.deleteTask.useMutation();
+
+  const isLead = session?.user?.id === getTeamData?.leadId;
+
+  const isAssigned = taskData?.assignees.some(
+    (assignee) => assignee.user.userId === session?.user.id,
+  );
 
   const handleDeleteTask = () => {
     deleteTask.mutate(
@@ -62,26 +81,31 @@ export const TaskModal = ({
 
   const getStatusVariant = (status: string) => {
     if (!TASK_STATUS.includes(status as TaskStatus)) return "outline";
-    return status === "Completed" ? "default" : "secondary";
+    switch (status) {
+      case "Completed":
+        return "default";
+      case "In Progress":
+        return "secondary";
+      default:
+        return "outline";
+    }
   };
 
   const getStatusColor = (status: string) => {
     if (!TASK_STATUS.includes(status as TaskStatus))
       return "text-muted-foreground";
-
     switch (status) {
       case "Completed":
-        return "text-primary";
+        return "text-green-500";
       case "In Progress":
         return "text-blue-500";
       default:
-        return "text-muted-foreground";
+        return "text-yellow-500";
     }
   };
 
   const getPriorityVariant = (priority: string) => {
     if (!TASK_PRIORITY.includes(priority as TaskPriority)) return "outline";
-
     switch (priority) {
       case "High":
         return "destructive";
@@ -95,12 +119,11 @@ export const TaskModal = ({
   const getPriorityColor = (priority: string) => {
     if (!TASK_PRIORITY.includes(priority as TaskPriority))
       return "text-muted-foreground";
-
     switch (priority) {
       case "High":
         return "text-red-500";
       case "Medium":
-        return "text-muted-foreground";
+        return "text-yellow-500";
       default:
         return "text-green-500";
     }
@@ -111,7 +134,7 @@ export const TaskModal = ({
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-96 rounded-lg border border-muted-foreground bg-card p-6 md:w-[30rem]">
-        {isLoading ? (
+        {isLoading || getTeamDataIsLoading ? (
           <div className="flex h-64 flex-col items-center justify-center gap-2">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             <p>Loading task details...</p>
@@ -142,7 +165,7 @@ export const TaskModal = ({
                   <p className="text-sm text-muted-foreground">Status</p>
                   <Badge
                     variant={getStatusVariant(taskData.status)}
-                    className="mt-1 capitalize"
+                    className={`mt-1 capitalize ${getStatusColor(taskData.status)}`}
                   >
                     {taskData.status}
                   </Badge>
@@ -170,7 +193,7 @@ export const TaskModal = ({
                     <p className="text-sm text-muted-foreground">Priority</p>
                     <Badge
                       variant={getPriorityVariant(taskData.priority)}
-                      className="mt-1 capitalize"
+                      className={`mt-1 capitalize`}
                     >
                       {taskData.priority}
                     </Badge>
@@ -210,41 +233,65 @@ export const TaskModal = ({
                 </div>
               )}
 
-              {/* Actions */}
               <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={onClose}>
-                  Edit
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Task</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete this task? This action
-                        cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-500 hover:bg-red-600"
-                        onClick={handleDeleteTask}
+                {isLead ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit Task
+                  </Button>
+                ) : (
+                  <TaskStatusUpdate
+                    taskId={taskId}
+                    currentStatus={taskData.status}
+                    refetch={refetch}
+                    isAssigned={isAssigned ?? false}
+                  />
+                )}
+
+                {isLead && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Task</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this task? This action
+                          cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-500 hover:bg-red-600"
+                          onClick={handleDeleteTask}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             </div>
+
+            {taskData && (
+              <EditTaskModal
+                task={taskData}
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                refetch={refetch}
+              />
+            )}
           </>
         ) : (
           <div className="flex h-64 flex-col items-center justify-center gap-2">

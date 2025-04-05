@@ -82,6 +82,27 @@ export const taskRouter = createTRPCRouter({
       return task;
     }),
 
+  updateTask: privateProcedure
+    .input(
+      z.object({
+        taskId: z.string(),
+        title: z.string().min(1),
+        description: z.string().optional(),
+        status: z.enum(["Pending", "In Progress", "Completed"]),
+        priority: z.enum(["Low", "Medium", "High"]),
+        dueDate: z.date().nullable().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      const { taskId, ...updateData } = input;
+
+      return await db.task.update({
+        where: { id: taskId },
+        data: updateData,
+      });
+    }),
+
   getTaskById: privateProcedure
     .input(
       z.object({
@@ -110,23 +131,29 @@ export const taskRouter = createTRPCRouter({
       return task;
     }),
 
-  getTask: privateProcedure.query(async ({ ctx }) => {
-    const { db } = ctx;
+  getTask: privateProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .query(async ({ ctx }) => {
+      const { db } = ctx;
 
-    const task = await db.task.findMany({
-      include: {
-        assignees: {
-          include: {
-            user: true,
+      const task = await db.task.findMany({
+        include: {
+          assignees: {
+            include: {
+              user: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!task) throw new Error("No task found!");
+      if (!task) throw new Error("No task found!");
 
-    return task;
-  }),
+      return task;
+    }),
 
   deleteTask: privateProcedure
     .input(
@@ -150,6 +177,33 @@ export const taskRouter = createTRPCRouter({
         where: {
           id: taskId,
         },
+      });
+    }),
+
+  updateTaskStatus: privateProcedure
+    .input(
+      z.object({
+        taskId: z.string(),
+        status: z.enum(["Pending", "In Progress", "Completed"]),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { db, user } = ctx;
+
+      const isAssigned = await db.taskAssignment.findFirst({
+        where: {
+          taskId: input.taskId,
+          userId: user?.id,
+        },
+      });
+
+      if (!isAssigned) {
+        throw new Error("You are not assigned to this task");
+      }
+
+      return db.task.update({
+        where: { id: input.taskId },
+        data: { status: input.status },
       });
     }),
 });

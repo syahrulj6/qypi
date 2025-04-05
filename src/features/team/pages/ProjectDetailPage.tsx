@@ -74,7 +74,10 @@ const ProjectDetailPage = () => {
     data: getTasksData,
     isLoading: getTaskDataLoading,
     refetch: refetchTaskData,
-  } = api.task.getTask.useQuery();
+  } = api.task.getTask.useQuery(
+    { projectId: projectId as string },
+    { enabled: !!projectId },
+  );
 
   const isLead = session?.user?.id === getTeamData?.leadId;
 
@@ -198,6 +201,7 @@ const ProjectDetailPage = () => {
         />
       )}
       <TaskModal
+        teamId={teamId as string}
         taskId={selectedTaskId ?? ""}
         isOpen={!!selectedTaskId}
         onClose={() => setSelectedTaskId(null)}
