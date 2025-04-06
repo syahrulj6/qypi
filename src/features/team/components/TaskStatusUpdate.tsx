@@ -30,26 +30,14 @@ export const TaskStatusUpdate = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const updateStatus = api.task.updateTaskStatus.useMutation();
 
-  const getStatusVariant = (status: string) => {
-    if (!TASK_STATUS.includes(status as TaskStatus)) return "outline";
-    switch (status) {
-      case "Completed":
-        return "default";
-      case "In Progress":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
   const getStatusColor = (status: string) => {
     if (!TASK_STATUS.includes(status as TaskStatus))
       return "text-muted-foreground";
     switch (status) {
       case "Completed":
-        return "text-green-500";
+        return "text-green-500 ";
       case "In Progress":
-        return "text-blue-500";
+        return "text-blue-500 ";
       default:
         return "text-yellow-500";
     }
@@ -78,8 +66,8 @@ export const TaskStatusUpdate = ({
   return (
     <div className="flex items-center gap-2">
       <Badge
-        variant={getStatusVariant(currentStatus)}
-        className={`capitalize ${getStatusColor(currentStatus)}`}
+        variant="outline"
+        className={`mt-1 capitalize ${getStatusColor(currentStatus)}`}
       >
         {currentStatus}
       </Badge>
