@@ -73,7 +73,7 @@ const ProjectDetailPage = () => {
   const {
     data: getTasksData,
     isLoading: getTaskDataLoading,
-    refetch: refetchTaskData,
+    refetch: refetchTasksData,
   } = api.task.getTask.useQuery(
     { projectId: projectId as string },
     { enabled: !!projectId },
@@ -201,7 +201,7 @@ const ProjectDetailPage = () => {
           projectId={getProjectData.id}
           isOpen={showCreateTask}
           onClose={() => setShowCreateTask(false)}
-          refetch={refetchTaskData}
+          refetch={refetchTasksData}
         />
       )}
       {showUpdateProjectTitle && (
@@ -218,7 +218,8 @@ const ProjectDetailPage = () => {
         taskId={selectedTaskId ?? ""}
         isOpen={!!selectedTaskId}
         onClose={() => setSelectedTaskId(null)}
-        refetch={refetchTaskData}
+        refetch={refetchTasksData}
+        refetchTasks={refetchTasksData}
       />
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         {/* HEADER */}

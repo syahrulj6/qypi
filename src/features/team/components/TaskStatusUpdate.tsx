@@ -17,14 +17,16 @@ type TaskStatus = (typeof TASK_STATUS)[number];
 type TaskStatusUpdateProps = {
   taskId: string;
   currentStatus: string;
-  refetch: () => void;
+  refetchTask: () => void;
+  refetchTasks: () => void;
   isAssigned: boolean;
 };
 
 export const TaskStatusUpdate = ({
   taskId,
   currentStatus,
-  refetch,
+  refetchTask,
+  refetchTasks,
   isAssigned,
 }: TaskStatusUpdateProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -53,7 +55,8 @@ export const TaskStatusUpdate = ({
         status: newStatus,
       });
       toast.success(`Task marked as ${newStatus}`);
-      refetch();
+      refetchTask();
+      refetchTasks();
     } catch (error) {
       toast.error("Failed to update task status");
     } finally {

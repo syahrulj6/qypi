@@ -32,6 +32,7 @@ interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   refetch: () => void;
+  refetchTasks: () => void;
 }
 
 export const TaskModal = ({
@@ -40,6 +41,7 @@ export const TaskModal = ({
   taskId,
   teamId,
   refetch,
+  refetchTasks,
 }: TaskModalProps) => {
   const { session } = useSession();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -226,7 +228,8 @@ export const TaskModal = ({
                   <TaskStatusUpdate
                     taskId={taskId}
                     currentStatus={taskData.status}
-                    refetch={refetchTaskData}
+                    refetchTask={refetchTaskData}
+                    refetchTasks={refetchTasks}
                     isAssigned={isAssigned ?? false}
                   />
                 )}
