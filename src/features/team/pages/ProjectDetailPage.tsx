@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { TaskModal } from "../components/TaskModal";
+import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
 
 type CalendarEvent = {
   id: string;
@@ -45,6 +46,8 @@ const ProjectDetailPage = () => {
   const [calendarApi, setCalendarApi] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [showAddMember, setShowAddMember] = useState(false);
+
   const { session } = useSession();
 
   const router = useRouter();
@@ -64,11 +67,14 @@ const ProjectDetailPage = () => {
     { enabled: !!projectId },
   );
 
-  const { data: getTeamData, isLoading: getTeamDataIsLoading } =
-    api.team.getTeamById.useQuery(
-      { id: teamId as string },
-      { enabled: !!teamId },
-    );
+  const {
+    data: getTeamData,
+    isLoading: getTeamDataIsLoading,
+    refetch: refetchTeamData,
+  } = api.team.getTeamById.useQuery(
+    { id: teamId as string },
+    { enabled: !!teamId },
+  );
 
   const {
     data: getTasksData,
@@ -213,6 +219,16 @@ const ProjectDetailPage = () => {
           refetch={refetchProjectData}
         />
       )}
+
+      {showAddMember && (
+        <AddTeamMemberModal
+          teamId={teamId as string}
+          refetchTeamData={refetchTeamData}
+          isOpen={showAddMember}
+          onClose={() => setShowAddMember(false)}
+        />
+      )}
+
       <TaskModal
         teamId={teamId as string}
         taskId={selectedTaskId ?? ""}
@@ -221,6 +237,7 @@ const ProjectDetailPage = () => {
         refetch={refetchTasksData}
         refetchTasks={refetchTasksData}
       />
+
       <TeamLayout breadcrumbItems={breadcrumbItems}>
         {/* HEADER */}
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start md:gap-8">
@@ -243,23 +260,31 @@ const ProjectDetailPage = () => {
                 {getProjectData.description}
               </p>
             </div>
-            <div className="flex items-center -space-x-2">
-              {avatarsToShow.map((picture, index) => (
-                <Avatar
-                  key={index}
-                  className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10"
-                >
-                  <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
-                  <AvatarImage src={picture ?? ""} />
-                </Avatar>
-              ))}
-              {remainingMembers > 0 && (
-                <Avatar className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10">
-                  <AvatarFallback className="text-xs">
-                    +{remainingMembers}
-                  </AvatarFallback>
-                </Avatar>
-              )}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center -space-x-2">
+                {avatarsToShow.map((picture, index) => (
+                  <Avatar
+                    key={index}
+                    className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10"
+                  >
+                    <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
+                    <AvatarImage src={picture ?? ""} />
+                  </Avatar>
+                ))}
+                {remainingMembers > 0 && (
+                  <Avatar className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10">
+                    <AvatarFallback className="text-xs">
+                      +{remainingMembers}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+              <Button
+                className="h-8 w-8 rounded-full md:h-10 md:w-10"
+                onClick={() => setShowAddMember(true)}
+              >
+                <Plus />
+              </Button>
             </div>
           </div>
 
