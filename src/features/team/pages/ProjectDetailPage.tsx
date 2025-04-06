@@ -92,13 +92,18 @@ const ProjectDetailPage = () => {
           title: task.title,
           start: task.createdAt as Date,
           end: task.dueDate as Date,
-          backgroundColor: "#FFF8F8",
+          backgroundColor:
+            task.status === "Completed"
+              ? "#dcfce7"
+              : task.status === "In Progress"
+                ? "#dbeafe"
+                : "#fef9c3",
           textColor:
             task.status === "Completed"
-              ? "text-green-600"
+              ? "#22c55e"
               : task.status === "In Progress"
-                ? "text-blue-600"
-                : "text-yellow-600",
+                ? "#3b82f6"
+                : "#eab308",
           borderColor: "transparent",
           display: "block",
           allDay: true,
