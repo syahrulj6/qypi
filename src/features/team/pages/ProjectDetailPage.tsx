@@ -279,12 +279,15 @@ const ProjectDetailPage = () => {
                   </Avatar>
                 )}
               </div>
-              <Button
-                className="h-8 w-8 rounded-full md:h-10 md:w-10"
-                onClick={() => setShowAddMember(true)}
-              >
-                <Plus />
-              </Button>
+
+              {isLead && (
+                <Button
+                  className="h-8 w-8 rounded-full md:h-10 md:w-10"
+                  onClick={() => setShowAddMember(true)}
+                >
+                  <Plus />
+                </Button>
+              )}
             </div>
           </div>
 

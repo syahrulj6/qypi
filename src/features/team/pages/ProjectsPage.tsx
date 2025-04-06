@@ -10,18 +10,24 @@ import { CreateProjectModal } from "../components/CreateProjectModal";
 import { ProjectCard } from "../components/ProjectCard";
 import TeamProjectsSkeleton from "../components/TeamProjectSkeleton";
 import { useSession } from "~/hooks/useSession";
+import { AddTeamMemberModal } from "../components/AddTeamMemberModal";
 
 const TeamProjectsPage = () => {
   const [showCreateProject, setShowCreateProject] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
+
   const router = useRouter();
   const { teamId } = router.query;
   const { session } = useSession();
 
-  const { data: teamData, isLoading: isTeamLoading } =
-    api.team.getTeamById.useQuery(
-      { id: teamId as string },
-      { enabled: !!teamId },
-    );
+  const {
+    data: teamData,
+    isLoading: isTeamLoading,
+    refetch: refetchTeamData,
+  } = api.team.getTeamById.useQuery(
+    { id: teamId as string },
+    { enabled: !!teamId },
+  );
 
   const {
     data: projects,
@@ -38,7 +44,6 @@ const TeamProjectsPage = () => {
       { enabled: !!teamId },
     );
 
-  // Check if current user is the team lead
   const isCurrentUserLead = teamData?.leadId === session?.user.id;
 
   useEffect(() => {
@@ -90,13 +95,21 @@ const TeamProjectsPage = () => {
 
   return (
     <DashboardLayout>
-      {/* Create Project Modal - only shown to leads */}
       {isCurrentUserLead && showCreateProject && (
         <CreateProjectModal
           teamId={teamId as string}
           isOpen={showCreateProject}
           onClose={() => setShowCreateProject(false)}
           refetch={refetchProjects}
+        />
+      )}
+
+      {showAddMember && (
+        <AddTeamMemberModal
+          teamId={teamId as string}
+          refetchTeamData={refetchTeamData}
+          isOpen={showAddMember}
+          onClose={() => setShowAddMember(false)}
         />
       )}
 
@@ -112,23 +125,37 @@ const TeamProjectsPage = () => {
                 All projects for {teamData.name}
               </p>
             </div>
-            <div className="mt-1 flex flex-wrap -space-x-3 md:mt-2">
-              {avatarsToShow.map((picture, index) => (
-                <Avatar
-                  key={index}
-                  className="size-9 border-4 border-white md:size-10"
+            <div className="flex items-center gap-2">
+              <div className="flex items-center -space-x-2">
+                {avatarsToShow.map((picture, index) => (
+                  <Avatar
+                    key={index}
+                    className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10"
+                  >
+                    <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
+                    <AvatarImage src={picture ?? ""} />
+                  </Avatar>
+                ))}
+                {remainingMembers > 0 && (
+                  <Avatar className="h-8 w-8 border-2 border-background sm:h-10 sm:w-10">
+                    <AvatarFallback className="text-xs">
+                      +{remainingMembers}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+              </div>
+
+              {isCurrentUserLead && (
+                <Button
+                  className="h-8 w-8 rounded-full md:h-10 md:w-10"
+                  onClick={() => setShowAddMember(true)}
                 >
-                  <AvatarFallback>{picture ? "" : "U"}</AvatarFallback>
-                  <AvatarImage src={picture ?? ""} className="rounded-full" />
-                </Avatar>
-              ))}
-              {remainingMembers > 0 && (
-                <Avatar className="ml-4 size-9 border-4 border-white md:size-10">
-                  <AvatarFallback>+{remainingMembers}</AvatarFallback>
-                </Avatar>
+                  <Plus />
+                </Button>
               )}
             </div>
           </div>
+
           {/* Only show create button for team lead */}
           {isCurrentUserLead && (
             <div className="flex items-center gap-4">
