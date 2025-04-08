@@ -355,16 +355,9 @@ const ProjectDetailPage = () => {
                       <Settings className="h-4 w-4" />
                       <span>Settings</span>
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="hidden items-center gap-2 sm:flex"
-                    >
-                      <CalendarDays className="h-4 w-4" />
-                      <span>Calendar</span>
-                    </Button>
                   </>
                 )}
+
                 {isLead && (
                   <Button
                     onClick={() => setShowCreateTask(true)}
