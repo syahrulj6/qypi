@@ -19,7 +19,7 @@ export const TeamDetailMenuButton = ({
   const [openMenuButton, setOpenMenuButton] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col items-center space-y-3 md:bottom-16 md:right-16">
+    <div className="fixed bottom-6 right-6 z-10 flex flex-col items-center space-y-3 md:bottom-16 md:right-16">
       <div
         className={`flex flex-col items-center space-y-3 transition-all duration-300 ${
           openMenuButton

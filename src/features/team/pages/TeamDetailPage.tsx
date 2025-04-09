@@ -23,17 +23,14 @@ const TeamDetailPage = () => {
     if (!teamId) router.push("/dashboard");
   }, [teamId, router]);
 
-  // Get current user's profile data
   const { data: currentUser } = api.profile.getProfile.useQuery();
 
-  // Get team data
   const { data: teamData, isLoading: isTeamLoading } =
     api.team.getTeamById.useQuery(
       { id: teamId as string },
       { enabled: !!teamId },
     );
 
-  // Get team members
   const {
     data: teamMembers,
     isLoading: isMembersLoading,
@@ -42,7 +39,6 @@ const TeamDetailPage = () => {
     teamId: teamData?.id || "",
   });
 
-  // Get projects
   const {
     data: projects,
     refetch: refetchProjects,
@@ -78,7 +74,6 @@ const TeamDetailPage = () => {
   return (
     <DashboardLayout>
       <TeamLayout breadcrumbItems={breadcrumbItems}>
-        {/* Modals */}
         {showCreateProject && isCurrentUserLead && (
           <CreateProjectModal
             teamId={teamData.id}
@@ -98,7 +93,6 @@ const TeamDetailPage = () => {
           />
         )}
 
-        {/* Only show action buttons if current user is lead */}
         {isCurrentUserLead && (
           <TeamDetailMenuButton
             onOpenAddMember={() => setShowAddMember(true)}
