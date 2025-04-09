@@ -63,7 +63,7 @@ export const TeamMemberCard = ({
             <Button
               variant="ghost"
               size="sm"
-              className="absolute right-2 top-2 text-red-500 transition-colors hover:bg-red-100 hover:text-red-500"
+              className="absolute right-1 top-1 text-red-500 transition-colors hover:bg-red-100 hover:text-red-500 md:right-2 md:top-2"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -91,13 +91,9 @@ export const TeamMemberCard = ({
 
       <div className="flex flex-col items-center">
         {memberId === leadId ? (
-          <p className="text-sm text-muted-foreground md:text-base">
-            Team Lead
-          </p>
+          <p className="text-sm text-muted-foreground md:text-base">Lead</p>
         ) : (
-          <p className="text-sm text-muted-foreground md:text-base">
-            Team Member
-          </p>
+          <p className="text-sm text-muted-foreground md:text-base">Member</p>
         )}
       </div>
 
