@@ -54,8 +54,8 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
   useEffect(() => {
     void (async function () {
       const { data } = await supabase.auth.getUser();
-      if (data.user?.id !== null) {
-        setUserId(data.user!.id);
+      if (data.user?.id) {
+        setUserId(data.user.id);
       }
     })();
   }, []);
@@ -100,30 +100,55 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
   return (
     <>
       {deleteEvent.isPending || leaveEvent.isPending ? (
-        <div className="flex w-full items-center justify-center">
-          <LoaderCircleIcon className="animate-spin" />
+        <div className="flex w-full items-center justify-center py-4">
+          <LoaderCircleIcon className="size-6 animate-spin" />
         </div>
       ) : (
         <div
-          className="flex h-fit flex-col rounded-lg border p-4 shadow-md"
+          className="flex h-fit w-full flex-col rounded-lg border p-4 shadow-md sm:w-auto"
           style={{ borderColor: event.color || "#FFD43A" }}
         >
-          <div className="flex items-center justify-between">
-            <h3
-              className="text-lg font-semibold"
-              style={{ color: event.color || "#FFD43A" }}
-            >
-              {event.title}
-            </h3>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <h3
+                className="truncate text-lg font-semibold"
+                style={{ color: event.color || "#FFD43A" }}
+                title={event.title}
+              >
+                {event.title}
+              </h3>
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <p
+                  className="text-muted-foreground"
+                  style={{ color: event.color || "#FFD43A" }}
+                >
+                  {new Date(event.date).toLocaleDateString()}
+                </p>
+                <span className="text-muted-foreground">•</span>
+                <p style={{ color: event.color || "#FFD43A" }}>
+                  {event.startTime} - {event.endTime}
+                </p>
+              </div>
+            </div>
+
             {userId === event.organizer.userId ? (
-              <div className="flex items-center gap-1">
-                <Button size="icon" onClick={() => setShowUpdateModal(true)}>
+              <div className="flex items-center justify-end gap-1 sm:justify-start">
+                <Button
+                  onClick={() => setShowUpdateModal(true)}
+                  size="sm"
+                  className="size-8"
+                >
                   <Edit2 />
                 </Button>
                 <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="icon" type="button">
-                      <Trash />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      type="button"
+                      className="size-8 p-0"
+                    >
+                      <Trash className="size-4" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -152,58 +177,72 @@ export const EventCard = ({ event, refetch }: EventCardProps) => {
                 </AlertDialog>
               </div>
             ) : (
-              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="icon" type="button">
-                    <ArrowLeftFromLineIcon />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Tinggalkan Event ini?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Apakah Anda yakin ingin meninggalkan event? Perubahan ini
-                      bersifat permanen.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-500 transition-colors hover:bg-red-600"
-                      onClick={() => {
-                        setIsDialogOpen(false);
-                        handleLeaveEvent();
-                      }}
+              <div className="flex justify-end sm:justify-start">
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      className="size-8 p-0 text-destructive hover:text-destructive"
                     >
-                      Ya, Tinggalkan Event
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      <ArrowLeftFromLineIcon className="size-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Tinggalkan Event ini?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin meninggalkan event? Perubahan
+                        ini bersifat permanen.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 transition-colors hover:bg-red-600"
+                        onClick={() => {
+                          setIsDialogOpen(false);
+                          handleLeaveEvent();
+                        }}
+                      >
+                        Ya, Tinggalkan Event
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             )}
           </div>
-          <p
-            className="text-sm text-muted-foreground"
-            style={{ color: event.color || "#FFD43A" }}
-          >
-            {new Date(event.date).toLocaleDateString()}
-          </p>
-          <p className={`text-sm`} style={{ color: event.color || "#FFD43A" }}>
-            {event.startTime} - {event.endTime}
-          </p>
-          {event.participants.length > 0 && (
-            <div className="mt-3">
-              <div className="mt-1 flex items-center gap-1">
-                {event.participants.map((participant) => (
-                  <Avatar className="size-8" key={participant.userId}>
-                    <AvatarFallback>VF</AvatarFallback>
-                    <AvatarImage
-                      src={participant.profilePicture}
-                      className="rounded-full"
-                    />
-                  </Avatar>
-                ))}
-              </div>
+
+          {(event.participants.length > 0 ||
+            userId === event.organizer.userId) && (
+            <div className="mt-3 flex items-center justify-between">
+              {event.participants.length > 0 && (
+                <div className="flex -space-x-2 overflow-hidden">
+                  {event.participants.slice(0, 5).map((participant) => (
+                    <Avatar className="size-8" key={participant.userId}>
+                      <AvatarFallback className="text-xs">
+                        {participant.username?.charAt(0).toUpperCase() ||
+                          participant.email.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                      <AvatarImage
+                        src={participant.profilePicture}
+                        className="rounded-full border-2 border-background"
+                      />
+                    </Avatar>
+                  ))}
+                  {event.participants.length > 5 && (
+                    <div className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs">
+                      +{event.participants.length - 5}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {userId === event.organizer.userId && (
+                <div className="text-xs text-muted-foreground">Organizer</div>
+              )}
             </div>
           )}
         </div>
