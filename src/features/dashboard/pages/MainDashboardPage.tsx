@@ -27,14 +27,14 @@ export default function MainDashboardPage() {
             title="Total Inbox Receive"
             value={activityCounts?.["INBOX_RECEIVED"] || 0}
             iconBg="bg-violet-200"
-            icon={<Mail className="h-5 w-5 text-violet-500 md:h-6 md:w-6" />}
+            icon={<Mail className="h-4 w-4 text-violet-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("INBOX_RECEIVED")}
           />
           <MetricsCard
             title="Total Inbox Sent"
             value={activityCounts?.["INBOX_CREATED"] || 0}
             iconBg="bg-pink-100"
-            icon={<Send className="h-5 w-5 text-pink-500 md:h-6 md:w-6" />}
+            icon={<Send className="h-4 w-4 text-pink-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("INBOX_CREATED")}
           />
           <MetricsCard
@@ -42,7 +42,7 @@ export default function MainDashboardPage() {
             value={activityCounts?.["NOTE_CREATED"] || 0}
             iconBg="bg-blue-200"
             icon={
-              <StickyNote className="h-5 w-5 text-blue-500 md:h-6 md:w-6" />
+              <StickyNote className="h-4 w-4 text-blue-500 md:h-6 md:w-6" />
             }
             onClick={() => setOpenModal("NOTE_CREATED")}
           />
@@ -50,7 +50,7 @@ export default function MainDashboardPage() {
             title="Event Created"
             value={activityCounts?.["EVENT_CREATED"] || 0}
             iconBg="bg-green-100"
-            icon={<Calendar className="h-5 w-5 text-green-500 md:h-6 md:w-6" />}
+            icon={<Calendar className="h-4 w-4 text-green-500 md:h-6 md:w-6" />}
             onClick={() => setOpenModal("EVENT_CREATED")}
           />
         </div>

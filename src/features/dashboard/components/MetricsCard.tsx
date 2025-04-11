@@ -28,7 +28,7 @@ export const MetricsCard = ({
         <p className="text-sm text-muted-foreground md:text-base">{title}</p>
       </div>
       <div
-        className="relative bottom-32 left-24 md:bottom-10 md:left-1"
+        className="relative bottom-32 left-16 md:bottom-10 md:left-1"
         onClick={onClick}
       >
         <Info className="h-5 w-5 text-muted-foreground transition-colors hover:cursor-pointer hover:text-current" />
