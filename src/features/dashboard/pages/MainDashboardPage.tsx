@@ -22,7 +22,7 @@ export default function MainDashboardPage() {
     <DashboardLayout>
       <div className="mt-4 flex flex-col space-y-7 pr-0 md:pr-8">
         {/* Metrics Card */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
           <MetricsCard
             title="Total Inbox Receive"
             value={activityCounts?.["INBOX_RECEIVED"] || 0}
@@ -55,9 +55,9 @@ export default function MainDashboardPage() {
           />
         </div>
 
-        <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-6">
+        <div className="grid w-full items-center gap-4 md:gap-6 lg:grid-cols-3">
           {/* Bar Chart */}
-          <div className="w-full md:w-2/3">
+          <div className="lg:col-span-2">
             <BarChartCard config={chartActivityConfig} data={sortedChartData} />
           </div>
 
